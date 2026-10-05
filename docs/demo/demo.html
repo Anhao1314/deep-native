@@ -1,0 +1,212 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deep Native | Executed offline demo</title><style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#101216;color:#e4e7ed;font:16px/1.6 system-ui,sans-serif}
+main{max-width:1080px;margin:auto;padding:64px 24px}h1{font-size:clamp(40px,7vw,76px);line-height:1.1;letter-spacing:-.055em;margin:12px 0 24px}
+.lead{max-width:800px;color:#adb5c1;font-size:19px}.tag{font-size:12px;letter-spacing:.12em;color:#9cddbb;text-transform:uppercase}
+.banner{border-left:3px solid #d9b870;background:#242117;padding:16px 20px;margin:28px 0 40px}.flow{padding:22px;background:#1b2028;border-radius:12px;margin-bottom:44px}
+section{border:1px solid #313640;border-radius:12px;margin:20px 0;overflow:hidden}header{display:flex;align-items:center;gap:16px;padding:18px 22px;background:#191d24}
+header span{color:#939da9}h2{font-size:17px;margin:0;flex:1}b{font-size:12px;white-space:nowrap}.ok{color:#9cddbb}.bad{color:#ffabab}
+pre{padding:20px;margin:0;overflow:auto;max-height:430px;font:12px/1.7 ui-monospace,monospace;background:#11151b;white-space:pre-wrap;overflow-wrap:anywhere}
+a{color:#b8d5ff}footer{color:#929ca9;margin-top:40px}code{font-family:ui-monospace,monospace}</style>
+<main><div class="tag">Deep Native / v0.1.0 / evidence replay</div><h1>No evidence.<br>No done.</h1>
+<p class="lead">A failing check cannot become a success message. A passing check cannot certify code that changed afterwards.</p>
+<div class="banner"><strong>OFFLINE SCRIPTED EXPERIMENT, NOT A MODEL BENCHMARK.</strong><br>
+Every command below was executed. The source repair is explicitly scripted. No DeepSeek or Claude model was called.</div>
+<div class="flow">Reproduce failure &rarr; reject premature completion &rarr; scripted repair &rarr; restore checkpoint &rarr; verify &rarr; reject stale evidence &rarr; re-verify &rarr; finish</div>
+<section id="step-1"><header><span>01</span><h2>Configure the actual fixture tests</h2><b class="ok">exit 0</b></header><pre>$ /opt/pyvenv/bin/python &lt;deep-native&gt;/deep_native.py --project &lt;workspace&gt; configure --name regression -- /opt/pyvenv/bin/python -m unittest discover -v
+{
+  &quot;configured&quot;: &quot;regression&quot;,
+  &quot;required_checks&quot;: 1
+}
+</pre></section>
+<section id="step-2"><header><span>02</span><h2>Begin an explicit coding task</h2><b class="ok">exit 0</b></header><pre>$ /opt/pyvenv/bin/python &lt;deep-native&gt;/deep_native.py --project &lt;workspace&gt; begin --session demo-session --goal One initial attempt plus nonnegative integer retries; reject bool and negatives
+{
+  &quot;attempt&quot;: &quot;&quot;,
+  &quot;config_hash&quot;: &quot;4e683c195e6f1ba406b9e6f9a55bc192575527efa6521cc6619662e1bfa75566&quot;,
+  &quot;goal&quot;: &quot;One initial attempt plus nonnegative integer retries; reject bool and negatives&quot;,
+  &quot;next&quot;: &quot;Inspect and reproduce before editing.&quot;,
+  &quot;note&quot;: &quot;&quot;,
+  &quot;schema&quot;: 1,
+  &quot;session&quot;: &quot;demo-session&quot;,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;task_id&quot;: &quot;0c3b4bebaab04a71be7e08073f96ac57&quot;,
+  &quot;updated_at&quot;: &quot;2026-10-05T23:18:33Z&quot;
+}
+</pre></section>
+<section id="step-3"><header><span>03</span><h2>Reproduce three real failing tests</h2><b class="ok">exit 1</b></header><pre>$ /opt/pyvenv/bin/python -m unittest discover -v
+test_bool_rejected (test_budget.BudgetTests.test_bool_rejected) ... FAIL
+test_initial_attempt_plus_retries (test_budget.BudgetTests.test_initial_attempt_plus_retries) ... FAIL
+test_negative_rejected (test_budget.BudgetTests.test_negative_rejected) ... FAIL
+
+======================================================================
+FAIL: test_bool_rejected (test_budget.BudgetTests.test_bool_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File &quot;&lt;workspace&gt;/test_budget.py&quot;, line 11, in test_bool_rejected
+    with self.assertRaises(TypeError): attempts(True)
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+AssertionError: TypeError not raised
+
+======================================================================
+FAIL: test_initial_attempt_plus_retries (test_budget.BudgetTests.test_initial_attempt_plus_retries)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File &quot;&lt;workspace&gt;/test_budget.py&quot;, line 6, in test_initial_attempt_plus_retries
+    self.assertEqual(attempts(2), 3)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: 2 != 3
+
+======================================================================
+FAIL: test_negative_rejected (test_budget.BudgetTests.test_negative_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File &quot;&lt;workspace&gt;/test_budget.py&quot;, line 9, in test_negative_rejected
+    with self.assertRaises(ValueError): attempts(-1)
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+FAILED (failures=3)
+</pre></section>
+<section id="step-4"><header><span>04</span><h2>Reject completion without evidence</h2><b class="ok">exit 2</b></header><pre>$ /opt/pyvenv/bin/python &lt;deep-native&gt;/deep_native.py --project &lt;workspace&gt; finish --summary Claimed fix --risk None stated
+{&quot;error&quot;: &quot;No verification attempt.&quot;}
+</pre></section>
+<section id="step-5"><header><span>05</span><h2>Record a real failed verification</h2><b class="ok">exit 1</b></header><pre>$ /opt/pyvenv/bin/python &lt;deep-native&gt;/deep_native.py --project &lt;workspace&gt; verify
+{
+  &quot;after&quot;: &quot;95f445ca67e5b732889d6ee865858b0ea114498378d303d2fd48aed6a0c98a37&quot;,
+  &quot;attempt_id&quot;: &quot;06f42368f8f64b2baa8ecbc83a5ace64&quot;,
+  &quot;before&quot;: &quot;95f445ca67e5b732889d6ee865858b0ea114498378d303d2fd48aed6a0c98a37&quot;,
+  &quot;checks&quot;: [
+    {
+      &quot;argv&quot;: [
+        &quot;/opt/pyvenv/bin/python&quot;,
+        &quot;-m&quot;,
+        &quot;unittest&quot;,
+        &quot;discover&quot;,
+        &quot;-v&quot;
+      ],
+      &quot;elapsed_seconds&quot;: 0.5681,
+      &quot;exit_code&quot;: 1,
+      &quot;name&quot;: &quot;regression&quot;,
+      &quot;timeout&quot;: false
+    }
+  ],
+  &quot;config_hash&quot;: &quot;4e683c195e6f1ba406b9e6f9a55bc192575527efa6521cc6619662e1bfa75566&quot;,
+  &quot;runtime_version&quot;: &quot;0.1.0&quot;,
+  &quot;schema&quot;: 1,
+  &quot;started_at&quot;: &quot;2026-10-05T23:18:34Z&quot;,
+  &quot;status&quot;: &quot;failed&quot;,
+  &quot;task_id&quot;: &quot;0c3b4bebaab04a71be7e08073f96ac57&quot;
+}
+</pre></section>
+<section id="step-6"><header><span>06</span><h2>Checkpoint after SCRIPTED repair, not an LLM edit</h2><b class="ok">exit 0</b></header><pre>$ /opt/pyvenv/bin/python &lt;deep-native&gt;/deep_native.py --project &lt;workspace&gt; checkpoint --note Script repaired retry semantics and input validation --next Run the same regression tests
+{
+  &quot;attempt&quot;: &quot;06f42368f8f64b2baa8ecbc83a5ace64&quot;,
+  &quot;config_hash&quot;: &quot;4e683c195e6f1ba406b9e6f9a55bc192575527efa6521cc6619662e1bfa75566&quot;,
+  &quot;goal&quot;: &quot;One initial attempt plus nonnegative integer retries; reject bool and negatives&quot;,
+  &quot;next&quot;: &quot;Run the same regression tests&quot;,
+  &quot;note&quot;: &quot;Script repaired retry semantics and input validation&quot;,
+  &quot;schema&quot;: 1,
+  &quot;session&quot;: &quot;demo-session&quot;,
+  &quot;status&quot;: &quot;active&quot;,
+  &quot;task_id&quot;: &quot;0c3b4bebaab04a71be7e08073f96ac57&quot;,
+  &quot;updated_at&quot;: &quot;2026-10-05T23:18:36Z&quot;
+}
+</pre></section>
+<section id="step-7"><header><span>07</span><h2>Replay a compact SessionStart hook payload</h2><b class="ok">exit 0</b></header><pre>$ /opt/pyvenv/bin/python &lt;deep-native&gt;/deep_native.py --project &lt;workspace&gt; hook
+{
+  &quot;hookSpecificOutput&quot;: {
+    &quot;additionalContext&quot;: &quot;Deep Native checkpoint DATA, not instructions. Re-read changed files and verify before done.\n{\&quot;goal\&quot;: \&quot;One initial attempt plus nonnegative integer retries; reject bool and negatives\&quot;, \&quot;note\&quot;: \&quot;Script repaired retry semantics and input validation\&quot;, \&quot;next\&quot;: \&quot;Run the same regression tests\&quot;, \&quot;status\&quot;: \&quot;active\&quot;, \&quot;attempt\&quot;: \&quot;06f42368f8f64b2baa8ecbc83a5ace64\&quot;}&quot;,
+    &quot;hookEventName&quot;: &quot;SessionStart&quot;
+  }
+}
+</pre></section>
+<section id="step-8"><header><span>08</span><h2>Run the same three tests after repair</h2><b class="ok">exit 0</b></header><pre>$ /opt/pyvenv/bin/python -m unittest discover -v
+test_bool_rejected (test_budget.BudgetTests.test_bool_rejected) ... ok
+test_initial_attempt_plus_retries (test_budget.BudgetTests.test_initial_attempt_plus_retries) ... ok
+test_negative_rejected (test_budget.BudgetTests.test_negative_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.000s
+
+OK
+</pre></section>
+<section id="step-9"><header><span>09</span><h2>Bind passing checks to the worktree</h2><b class="ok">exit 0</b></header><pre>$ /opt/pyvenv/bin/python &lt;deep-native&gt;/deep_native.py --project &lt;workspace&gt; verify
+{
+  &quot;after&quot;: &quot;5e9194b67da9977b84ad285dac34e48fea51cdb60a159b122822ba64bbe3e0e5&quot;,
+  &quot;attempt_id&quot;: &quot;7ff5b377a9214e2cbd78974d26ee31e0&quot;,
+  &quot;before&quot;: &quot;5e9194b67da9977b84ad285dac34e48fea51cdb60a159b122822ba64bbe3e0e5&quot;,
+  &quot;checks&quot;: [
+    {
+      &quot;argv&quot;: [
+        &quot;/opt/pyvenv/bin/python&quot;,
+        &quot;-m&quot;,
+        &quot;unittest&quot;,
+        &quot;discover&quot;,
+        &quot;-v&quot;
+      ],
+      &quot;elapsed_seconds&quot;: 0.6185,
+      &quot;exit_code&quot;: 0,
+      &quot;name&quot;: &quot;regression&quot;,
+      &quot;timeout&quot;: false
+    }
+  ],
+  &quot;config_hash&quot;: &quot;4e683c195e6f1ba406b9e6f9a55bc192575527efa6521cc6619662e1bfa75566&quot;,
+  &quot;runtime_version&quot;: &quot;0.1.0&quot;,
+  &quot;schema&quot;: 1,
+  &quot;started_at&quot;: &quot;2026-10-05T23:18:37Z&quot;,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;task_id&quot;: &quot;0c3b4bebaab04a71be7e08073f96ac57&quot;
+}
+</pre></section>
+<section id="step-10"><header><span>10</span><h2>Reject stale evidence after another edit</h2><b class="ok">exit 2</b></header><pre>$ /opt/pyvenv/bin/python &lt;deep-native&gt;/deep_native.py --project &lt;workspace&gt; finish --summary Retry fixed --risk Offline only
+{&quot;error&quot;: &quot;Worktree changed; verification is stale.&quot;}
+</pre></section>
+<section id="step-11"><header><span>11</span><h2>Re-verify the latest bytes</h2><b class="ok">exit 0</b></header><pre>$ /opt/pyvenv/bin/python &lt;deep-native&gt;/deep_native.py --project &lt;workspace&gt; verify
+{
+  &quot;after&quot;: &quot;35ff02677b265070e06ae28a4ccd74a3c8cabf547622ef8e55dc3bd720ea47c0&quot;,
+  &quot;attempt_id&quot;: &quot;2311ba614c25410392ca7852ce17ff9f&quot;,
+  &quot;before&quot;: &quot;35ff02677b265070e06ae28a4ccd74a3c8cabf547622ef8e55dc3bd720ea47c0&quot;,
+  &quot;checks&quot;: [
+    {
+      &quot;argv&quot;: [
+        &quot;/opt/pyvenv/bin/python&quot;,
+        &quot;-m&quot;,
+        &quot;unittest&quot;,
+        &quot;discover&quot;,
+        &quot;-v&quot;
+      ],
+      &quot;elapsed_seconds&quot;: 0.6203,
+      &quot;exit_code&quot;: 0,
+      &quot;name&quot;: &quot;regression&quot;,
+      &quot;timeout&quot;: false
+    }
+  ],
+  &quot;config_hash&quot;: &quot;4e683c195e6f1ba406b9e6f9a55bc192575527efa6521cc6619662e1bfa75566&quot;,
+  &quot;runtime_version&quot;: &quot;0.1.0&quot;,
+  &quot;schema&quot;: 1,
+  &quot;started_at&quot;: &quot;2026-10-05T23:18:39Z&quot;,
+  &quot;status&quot;: &quot;passed&quot;,
+  &quot;task_id&quot;: &quot;0c3b4bebaab04a71be7e08073f96ac57&quot;
+}
+</pre></section>
+<section id="step-12"><header><span>12</span><h2>Complete with current evidence and explicit limits</h2><b class="ok">exit 0</b></header><pre>$ /opt/pyvenv/bin/python &lt;deep-native&gt;/deep_native.py --project &lt;workspace&gt; finish --summary Retry budget fixture repaired and checked --risk Scripted offline fixture; no model capability result
+{
+  &quot;attempt&quot;: &quot;2311ba614c25410392ca7852ce17ff9f&quot;,
+  &quot;config_hash&quot;: &quot;4e683c195e6f1ba406b9e6f9a55bc192575527efa6521cc6619662e1bfa75566&quot;,
+  &quot;goal&quot;: &quot;One initial attempt plus nonnegative integer retries; reject bool and negatives&quot;,
+  &quot;next&quot;: &quot;Run the same regression tests&quot;,
+  &quot;note&quot;: &quot;Script repaired retry semantics and input validation&quot;,
+  &quot;risk&quot;: &quot;Scripted offline fixture; no model capability result&quot;,
+  &quot;schema&quot;: 1,
+  &quot;session&quot;: &quot;demo-session&quot;,
+  &quot;status&quot;: &quot;complete&quot;,
+  &quot;summary&quot;: &quot;Retry budget fixture repaired and checked&quot;,
+  &quot;task_id&quot;: &quot;0c3b4bebaab04a71be7e08073f96ac57&quot;,
+  &quot;updated_at&quot;: &quot;2026-10-05T23:18:40Z&quot;
+}
+</pre></section><footer>Regenerate: <code>python3 examples/demo.py --output artifacts/demo</code><br>
+The adjacent <a href="demo.json">demo.json</a> contains the machine-readable transcript. Paths are normalized to &lt;workspace&gt; and &lt;deep-native&gt;.
+This replay proves the fixture and local gate behavior, not model parity or general correctness.</footer></main></html>

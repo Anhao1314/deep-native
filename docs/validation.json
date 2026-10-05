@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "kind": "LOCAL_TOOL_VALIDATION",
+  "generated_at": "2026-10-05T23:25:45Z",
+  "python": "3.13.5",
+  "test_count": 61,
+  "tests_passed": 61,
+  "test_elapsed_seconds": 18.774,
+  "runtime_statement_coverage": {
+    "statements": 419,
+    "missed": 39,
+    "display_percent": 91
+  },
+  "demo_expected_outcomes": 12,
+  "model_calls": 0,
+  "live_host_test": "NOT_RUN",
+  "model_comparison": "NOT_RUN",
+  "source_sha256": {
+    "deep_native.py": "de8a4bbc5fe9e332920d6250f1c635bbdcb53b43c900f4df0a9b2e06debad8fc",
+    "skills/deep-native/scripts/deep_native.py": "52c65a7f8a4b4c1c76c203ecd32a5b866f90cd0b454f78df628dd6ccf365670f",
+    "skills/deep-native/SKILL.md": "697e9dc0c9731a2e1021a3826591fc569704ded6b12e3daf2d99e325be367123",
+    "examples/demo.py": "6fd23471846a5218bcd005cab16e6923a24e0426bb2f2217c690864dd16c660b",
+    "evals/bench.py": "f3eeac7ec2e7df8d91a3d541a6b8ec4d73738920da8c54099d0f1e9f45caba47",
+    "tests/test_runtime.py": "823cc8dd143743ec27301a0ec943960869d4c98fe8261afa1a279b2413b64a16",
+    "tests/test_delivery.py": "3b073e98ca092e13534aeb2199604b17e8806e56a1f1d8b63d2dd62dee1d2482"
+  },
+  "browser": [
+    {
+      "viewport": [
+        1280,
+        900
+      ],
+      "step_count": 12,
+      "horizontal_overflow": false,
+      "page_errors": [],
+      "title": "Deep Native | Executed offline demo",
+      "method": "Chromium set_content; file navigation blocked by environment policy"
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "step_count": 12,
+      "horizontal_overflow": false,
+      "page_errors": [],
+      "title": "Deep Native | Executed offline demo",
+      "method": "Chromium set_content; file navigation blocked by environment policy"
+    }
+  ]
+}
