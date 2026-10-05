@@ -1,0 +1,10 @@
+.deep-native/
+.claude/settings.local.json
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+!.env.example
+artifacts/
+.DS_Store
