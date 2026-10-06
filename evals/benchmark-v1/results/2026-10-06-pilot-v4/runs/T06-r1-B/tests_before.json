@@ -1,0 +1,44 @@
+{
+  "pass": false,
+  "contract": {
+    "argv": [
+      "sandbox-exec",
+      "-D",
+      "CLI_PID=0",
+      "-f",
+      "/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-9uoqwynu/grader.sb",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/benchmark-env/bin/python",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native/evals/benchmark-v1/acceptance.py",
+      "T06",
+      "2"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-9uoqwynu/workspace/boltons/iterutils.py\", line 1364, in get_path\n    cur = root[seg]\n          ~~~~^^^^^\nKeyError: 1\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native/evals/benchmark-v1/acceptance.py\", line 205, in <module>\n    check(sys.argv[1],int(sys.argv[2]) if len(sys.argv)>2 else 2)\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native/evals/benchmark-v1/acceptance.py\", line 130, in check\n    assert get_path(root,('a','b',1,0))==7\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-9uoqwynu/workspace/boltons/iterutils.py\", line 1366, in get_path\n    raise PathAccessError(exc, seg, path)\nboltons.iterutils.PathAccessError: could not access 1 from path ('a', 'b', 1, 0), got error: KeyError(1)\n",
+    "duration_seconds": 0.0315
+  },
+  "upstream_regression": {
+    "argv": [
+      "sandbox-exec",
+      "-D",
+      "CLI_PID=0",
+      "-f",
+      "/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-9uoqwynu/grader.sb",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/benchmark-env/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_strutils.py",
+      "tests/test_iterutils.py"
+    ],
+    "exit_code": 1,
+    "stdout": "....................................................F................... [ 93%]\n.....                                                                    [100%]\n=================================== FAILURES ===================================\n__________________________ TestGetPath.test_depth_two __________________________\n\nroot = {'key': ['test']}, path = ('key', 0), default = Sentinel('_UNSET')\n\n    def get_path(root, path, default=_UNSET):\n        \"\"\"Retrieve a value from a nested object via a tuple representing the\n        lookup path.\n    \n        >>> root = {'a': {'b': {'c': [[1], [2], [3]]}}}\n        >>> get_path(root, ('a', 'b', 'c', 2, 0))\n        3\n    \n        The path tuple format is intentionally consistent with that of\n        :func:`remap`, but a single dotted string can also be passed.\n    \n        One of get_path's chief aims is improved error messaging. EAFP is\n        great, but the error messages are not.\n    \n        For instance, ``root['a']['b']['c'][2][1]`` gives back\n        ``IndexError: list index out of range``\n    \n        What went out of range where? get_path currently raises\n        ``PathAccessError: could not access 2 from path ('a', 'b', 'c', 2,\n        1), got error: IndexError('list index out of range',)``, a\n        subclass of IndexError and KeyError.\n    \n        You can also pass a default that covers the entire operation,\n        should the lookup fail at any level.\n    \n        Args:\n           root: The target nesting of dictionaries, lists, or other\n              objects supporting ``__getitem__``.\n           path (tuple): A sequence of strings and integers to be successively\n              looked up within *root*. A dot-separated (``a.b``) string may\n              also be passed.\n           default: The value to be returned should any\n              ``PathAccessError`` exceptions be raised.\n        \"\"\"\n        if isinstance(path, str):\n            path = path.split('.')\n        cur = root\n        try:\n            for seg in path:\n                try:\n>                   cur = root[seg]\nE                   KeyError: 0\n\nboltons/iterutils.py:1364: KeyError\n\nDuring handling of the above exception, another exception occurred:\n\nself = <tests.test_iterutils.TestGetPath object at 0x10b60e3f0>\n\n    def test_depth_two(self):\n        root = {'key': ['test']}\n>       assert get_path(root, ('key', 0)) == 'test'\n\ntests/test_iterutils.py:383: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nroot = {'key': ['test']}, path = ('key', 0), default = Sentinel('_UNSET')\n\n    def get_path(root, path, default=_UNSET):\n        \"\"\"Retrieve a value from a nested object via a tuple representing the\n        lookup path.\n    \n        >>> root = {'a': {'b': {'c': [[1], [2], [3]]}}}\n        >>> get_path(root, ('a', 'b', 'c', 2, 0))\n        3\n    \n        The path tuple format is intentionally consistent with that of\n        :func:`remap`, but a single dotted string can also be passed.\n    \n        One of get_path's chief aims is improved error messaging. EAFP is\n        great, but the error messages are not.\n    \n        For instance, ``root['a']['b']['c'][2][1]`` gives back\n        ``IndexError: list index out of range``\n    \n        What went out of range where? get_path currently raises\n        ``PathAccessError: could not access 2 from path ('a', 'b', 'c', 2,\n        1), got error: IndexError('list index out of range',)``, a\n        subclass of IndexError and KeyError.\n    \n        You can also pass a default that covers the entire operation,\n        should the lookup fail at any level.\n    \n        Args:\n           root: The target nesting of dictionaries, lists, or other\n              objects supporting ``__getitem__``.\n           path (tuple): A sequence of strings and integers to be successively\n              looked up within *root*. A dot-separated (``a.b``) string may\n              also be passed.\n           default: The value to be returned should any\n              ``PathAccessError`` exceptions be raised.\n        \"\"\"\n        if isinstance(path, str):\n            path = path.split('.')\n        cur = root\n        try:\n            for seg in path:\n                try:\n                    cur = root[seg]\n                except (KeyError, IndexError) as exc:\n>                   raise PathAccessError(exc, seg, path)\nE                   boltons.iterutils.PathAccessError: could not access 0 from path ('key', 0), got error: KeyError(0)\n\nboltons/iterutils.py:1366: PathAccessError\n=========================== short test summary info ============================\nFAILED tests/test_iterutils.py::TestGetPath::test_depth_two - boltons.iteruti...\n1 failed, 76 passed in 0.12s\n",
+    "stderr": "",
+    "duration_seconds": 0.2761
+  },
+  "new_regression_tests": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "No new regression tests supplied; not required by this task."
+  }
+}

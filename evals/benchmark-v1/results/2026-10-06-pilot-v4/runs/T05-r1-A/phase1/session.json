@@ -1,0 +1,99 @@
+{
+  "session_id": "0912b4de-e1c5-45cc-843e-5355f9dcc06b",
+  "exit_code": 0,
+  "duration_seconds": 77.0411,
+  "interrupted": false,
+  "stop_reason": "completed",
+  "observed_assistant_messages": 13,
+  "final_response": "The refactor is complete and verified.\n\n**Implementation** (`more_itertools/more.py:3379-3390`): replaced the two duplicated accumulation loops with a single loop that computes `keyfunc(item)` first, then appends `item if valuefunc is None else valuefunc(item)`. The existing optional reduction phase and `ret.default_factory = None` are untouched.\n\n**Behavior preserved:**\n- Callback order stays interleaved per item (`keyfunc` before `valuefunc`, and no extra callable when `valuefunc is None`)\n- The iterable is consumed exactly once, in one pass\n- `defaultdict` insertion order is identical\n- Exceptions propagate at the same points with the same partial-callback state\n- Result remains a `defaultdict` with `default_factory is None`\n\n**Regression protection** (`agent_tests/test_map_reduce_regression.py`, 20 tests): all four parameter combinations, identity of stored objects when `valuefunc is None`, interleaved callback ordering, iteration/consumption counts via a recording single-pass iterable, re-iterable inputs not processed twice, key insertion order (including through reduction), reducefunc receiving lists in insertion order, exception propagation for `keyfunc`/`valuefunc`/`reducefunc` (including exact exception identity and a one-shot generator case), result type, and missing-key `KeyError` without insertion.\n\n`more.pyi` overloads and `__init__` exports are unchanged since the signature and return types are identical; no docs update was needed for an internal refactor with unchanged semantics.\n\n`python3 benchmark_check.py` passes: benchmark tests, all 932 existing unittest tests, and the 20 new agent tests.\n\nSTATUS: DONE",
+  "cli_result": {
+    "duration_api_ms": 69689,
+    "stop_reason": "end_turn",
+    "session_id": "0912b4de-e1c5-45cc-843e-5355f9dcc06b",
+    "total_cost_usd": 0.491204,
+    "usage": {
+      "input_tokens": 12647,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 185088,
+      "output_tokens": 13417,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "deepseek-flash[1m]": {
+        "inputTokens": 12647,
+        "outputTokens": 13417,
+        "cacheReadInputTokens": 185088,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.491204,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 32000,
+        "thinkingTokens": 0,
+        "canonicalModel": "deepseek-flash[1m]",
+        "provider": "firstParty",
+        "costBasis": "unknown"
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "fast_mode_disabled_reason": "sdk_opt_in_required",
+    "subagent_stats": {
+      "spawned": 0,
+      "requested": {
+        "background": 0,
+        "foreground": 0,
+        "unset": 0
+      },
+      "started_in_background": 0,
+      "max_depth": 0,
+      "spawned_by_subagents": 0,
+      "completed": 0,
+      "failed": 0,
+      "killed": {
+        "parent": 0,
+        "user": 0,
+        "system": 0
+      },
+      "refused": {
+        "depth_limit": 0,
+        "concurrency_limit": 0,
+        "budget": 0
+      },
+      "by_type": {}
+    },
+    "is_error": false,
+    "num_turns": 20,
+    "subtype": "success",
+    "api_error_status": null,
+    "result": "The refactor is complete and verified.\n\n**Implementation** (`more_itertools/more.py:3379-3390`): replaced the two duplicated accumulation loops with a single loop that computes `keyfunc(item)` first, then appends `item if valuefunc is None else valuefunc(item)`. The existing optional reduction phase and `ret.default_factory = None` are untouched.\n\n**Behavior preserved:**\n- Callback order stays interleaved per item (`keyfunc` before `valuefunc`, and no extra callable when `valuefunc is None`)\n- The iterable is consumed exactly once, in one pass\n- `defaultdict` insertion order is identical\n- Exceptions propagate at the same points with the same partial-callback state\n- Result remains a `defaultdict` with `default_factory is None`\n\n**Regression protection** (`agent_tests/test_map_reduce_regression.py`, 20 tests): all four parameter combinations, identity of stored objects when `valuefunc is None`, interleaved callback ordering, iteration/consumption counts via a recording single-pass iterable, re-iterable inputs not processed twice, key insertion order (including through reduction), reducefunc receiving lists in insertion order, exception propagation for `keyfunc`/`valuefunc`/`reducefunc` (including exact exception identity and a one-shot generator case), result type, and missing-key `KeyError` without insertion.\n\n`more.pyi` overloads and `__init__` exports are unchanged since the signature and return types are identical; no docs update was needed for an internal refactor with unchanged semantics.\n\n`python3 benchmark_check.py` passes: benchmark tests, all 932 existing unittest tests, and the 20 new agent tests.\n\nSTATUS: DONE",
+    "ttft_ms": 1474,
+    "type": "result",
+    "duration_ms": 76802,
+    "uuid": "24639708-b693-4a46-8535-c49070defc15",
+    "ttft_stream_ms": 714,
+    "time_to_request_ms": 39,
+    "first_content_frame_ms": 714,
+    "queued_turn_count": 0,
+    "result_index": 0
+  },
+  "last_observed_verified_source_hash": "a6340635fa52b3c292858fc71bb4149d789dd1bdd5ce591541ab4d9e0aa1663c",
+  "final_source_hash": "a6340635fa52b3c292858fc71bb4149d789dd1bdd5ce591541ab4d9e0aa1663c",
+  "stale_observed_verification": false,
+  "operator_interrupted": false
+}

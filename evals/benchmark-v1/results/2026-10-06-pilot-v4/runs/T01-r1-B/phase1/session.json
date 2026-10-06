@@ -1,0 +1,99 @@
+{
+  "session_id": "ad24fd3e-a5d4-4445-9f54-d261fef4a008",
+  "exit_code": 0,
+  "duration_seconds": 98.8679,
+  "interrupted": false,
+  "stop_reason": "completed",
+  "observed_assistant_messages": 23,
+  "final_response": "## Summary\n\n**Root cause** — `boltons/strutils.py:172`: the teen-detection branch compared the tens digit against `'2'` instead of `'1'`. The branch is meant to force `th` for teens (10–19), but `'2'` instead hijacked 21/22/23. Observed before the fix:\n\n| input | before | after |\n|---|---|---|\n| 11 / 12 / 13 / 111 | `11st` / `12nd` / `13rd` / `111st` | `11th` / `12th` / `13th` / `111th` |\n| 21 / 22 / 23 / 121 | `21th` / `22th` / `23th` / `121th` | `21st` / `22nd` / `23rd` / `121st` |\n\n**Change** — one-character fix (`'2'` → `'1'`) in `boltons/strutils.py`, plus doctest examples documenting teen/twenty behavior. Preserved behavior: non-digit-terminated strings pass through unchanged (`ordinalize('hi') == 'hi'`), `ext_only` returns the bare suffix (`''` for passthrough inputs), and digit-terminated inputs still get a suffix.\n\n**Regression tests** — new `agent_tests/test_strutils_ordinalize.py` (14 tests): teens, embedded teens, 21–23, negatives, string inputs, passthrough/`ext_only`, and a 0–1200 sweep against an independently written rule.\n\n**Verification actually run**\n- `python3 benchmark_check.py` → exit 0: visible acceptance checks passed, 77 existing strutils/iterutils tests passed, 14 new tests passed. Bound by `deep-native verify` (attempt `7d1dc8725f0144d0bdfadbca9f65c275`, status `passed`).\n- `python3 -m doctest boltons/strutils.py` → exit 0.\n- Diagnostic sweep of 40,001 values (0–20000 + random up to 1e9) against an independent reference rule → 0 mismatches.\n- Diagnostic: the new tests run against the pre-fix implementation fail immediately (`11st != 11th`), confirming they detect the regression.\n- No changes to `tests/`, `benchmark_check.py`, `benchmark_tests.py`, or configuration (git status: only `boltons/strutils.py` modified, `agent_tests/` added).\n\n**Remaining risk** — tests are self-authored, not an independent review; pre-existing quirks (e.g. `ordinalize('v1.2') == 'v1.2nd'`, floats) are intentionally unchanged.\n\nSTATUS: DONE",
+  "cli_result": {
+    "duration_api_ms": 96093,
+    "stop_reason": "end_turn",
+    "session_id": "ad24fd3e-a5d4-4445-9f54-d261fef4a008",
+    "total_cost_usd": 0.720752,
+    "usage": {
+      "input_tokens": 18702,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 416384,
+      "output_tokens": 16762,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "deepseek-flash[1m]": {
+        "inputTokens": 18702,
+        "outputTokens": 16762,
+        "cacheReadInputTokens": 416384,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.720752,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 32000,
+        "thinkingTokens": 0,
+        "canonicalModel": "deepseek-flash[1m]",
+        "provider": "firstParty",
+        "costBasis": "unknown"
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "fast_mode_disabled_reason": "sdk_opt_in_required",
+    "subagent_stats": {
+      "spawned": 0,
+      "requested": {
+        "background": 0,
+        "foreground": 0,
+        "unset": 0
+      },
+      "started_in_background": 0,
+      "max_depth": 0,
+      "spawned_by_subagents": 0,
+      "completed": 0,
+      "failed": 0,
+      "killed": {
+        "parent": 0,
+        "user": 0,
+        "system": 0
+      },
+      "refused": {
+        "depth_limit": 0,
+        "concurrency_limit": 0,
+        "budget": 0
+      },
+      "by_type": {}
+    },
+    "is_error": false,
+    "num_turns": 32,
+    "subtype": "success",
+    "api_error_status": null,
+    "result": "## Summary\n\n**Root cause** — `boltons/strutils.py:172`: the teen-detection branch compared the tens digit against `'2'` instead of `'1'`. The branch is meant to force `th` for teens (10–19), but `'2'` instead hijacked 21/22/23. Observed before the fix:\n\n| input | before | after |\n|---|---|---|\n| 11 / 12 / 13 / 111 | `11st` / `12nd` / `13rd` / `111st` | `11th` / `12th` / `13th` / `111th` |\n| 21 / 22 / 23 / 121 | `21th` / `22th` / `23th` / `121th` | `21st` / `22nd` / `23rd` / `121st` |\n\n**Change** — one-character fix (`'2'` → `'1'`) in `boltons/strutils.py`, plus doctest examples documenting teen/twenty behavior. Preserved behavior: non-digit-terminated strings pass through unchanged (`ordinalize('hi') == 'hi'`), `ext_only` returns the bare suffix (`''` for passthrough inputs), and digit-terminated inputs still get a suffix.\n\n**Regression tests** — new `agent_tests/test_strutils_ordinalize.py` (14 tests): teens, embedded teens, 21–23, negatives, string inputs, passthrough/`ext_only`, and a 0–1200 sweep against an independently written rule.\n\n**Verification actually run**\n- `python3 benchmark_check.py` → exit 0: visible acceptance checks passed, 77 existing strutils/iterutils tests passed, 14 new tests passed. Bound by `deep-native verify` (attempt `7d1dc8725f0144d0bdfadbca9f65c275`, status `passed`).\n- `python3 -m doctest boltons/strutils.py` → exit 0.\n- Diagnostic sweep of 40,001 values (0–20000 + random up to 1e9) against an independent reference rule → 0 mismatches.\n- Diagnostic: the new tests run against the pre-fix implementation fail immediately (`11st != 11th`), confirming they detect the regression.\n- No changes to `tests/`, `benchmark_check.py`, `benchmark_tests.py`, or configuration (git status: only `boltons/strutils.py` modified, `agent_tests/` added).\n\n**Remaining risk** — tests are self-authored, not an independent review; pre-existing quirks (e.g. `ordinalize('v1.2') == 'v1.2nd'`, floats) are intentionally unchanged.\n\nSTATUS: DONE",
+    "ttft_ms": 1622,
+    "type": "result",
+    "duration_ms": 98628,
+    "uuid": "39d3a60e-73cd-4195-8019-f012e4e708dd",
+    "ttft_stream_ms": 1213,
+    "time_to_request_ms": 16,
+    "first_content_frame_ms": 1213,
+    "queued_turn_count": 0,
+    "result_index": 0
+  },
+  "last_observed_verified_source_hash": "e5555bac3ce69b84b4755cf3f748d44c878da577ec9f885a833bab522fd1f3d4",
+  "final_source_hash": "e5555bac3ce69b84b4755cf3f748d44c878da577ec9f885a833bab522fd1f3d4",
+  "stale_observed_verification": false,
+  "operator_interrupted": false
+}

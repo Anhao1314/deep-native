@@ -1,0 +1,99 @@
+{
+  "session_id": "57b0964c-2602-4d1a-afcd-1ce0addec7ee",
+  "exit_code": 0,
+  "duration_seconds": 112.191,
+  "interrupted": false,
+  "stop_reason": "completed",
+  "observed_assistant_messages": 22,
+  "final_response": "All checks pass. Summary of changes:\n\n**Implementation** — `more_itertools/more.py:215` (`chunked`):\n- Added eager validation: `n` must be `None` or an `int` (`bool` explicitly rejected, since it's an `int` subclass) → otherwise `TypeError('n must be an integer or None')`.\n- The type check runs before `iter(iterable)` is touched, so invalid sizes raise before any part of the input is consumed.\n- Existing checks preserved: negative integers still raise `ValueError('n must be at least 0')`; `n=0` still yields nothing without consuming the source; `n=None` still yields one chunk; `strict=True` semantics (divisibility `ValueError`, `n=None` `ValueError`) unchanged.\n- Docstring now documents the accepted types and the error behavior.\n\n**Types** — `more_itertools/more.pyi` already declares `n: int | None`, which matches the accepted types, so no stub change was needed.\n\n**Docs** — added an Unreleased changelog entry in `docs/versions.rst`.\n\n**Tests** — new `agent_tests/test_chunked_validation.py` with 29 cases covering: valid int/int-subclass/`None`/`0` outputs, negative-integer `ValueError`, `bool` and other non-integer `TypeError` (including inside `strict` mode), eager raise at call time, no consumption or even iteration of the source on `TypeError`, and preserved `strict`/`n=0`/`n=None` behavior.\n\nVerification: `python3 benchmark_check.py` → visible acceptance checks passed, 932 unittest/doc tests OK, 29 agent tests passed. Manual spot-checks confirmed `Boom()` iterables are never touched and partially-used iterators remain untouched after a rejected `n`.\n\nSTATUS: DONE",
+  "cli_result": {
+    "duration_api_ms": 104603,
+    "stop_reason": "end_turn",
+    "session_id": "57b0964c-2602-4d1a-afcd-1ce0addec7ee",
+    "total_cost_usd": 0.7714809999999999,
+    "usage": {
+      "input_tokens": 19793,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 437632,
+      "output_tokens": 18148,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "deepseek-flash[1m]": {
+        "inputTokens": 19793,
+        "outputTokens": 18148,
+        "cacheReadInputTokens": 437632,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.7714809999999999,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 32000,
+        "thinkingTokens": 0,
+        "canonicalModel": "deepseek-flash[1m]",
+        "provider": "firstParty",
+        "costBasis": "unknown"
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "fast_mode_disabled_reason": "sdk_opt_in_required",
+    "subagent_stats": {
+      "spawned": 0,
+      "requested": {
+        "background": 0,
+        "foreground": 0,
+        "unset": 0
+      },
+      "started_in_background": 0,
+      "max_depth": 0,
+      "spawned_by_subagents": 0,
+      "completed": 0,
+      "failed": 0,
+      "killed": {
+        "parent": 0,
+        "user": 0,
+        "system": 0
+      },
+      "refused": {
+        "depth_limit": 0,
+        "concurrency_limit": 0,
+        "budget": 0
+      },
+      "by_type": {}
+    },
+    "is_error": false,
+    "num_turns": 29,
+    "subtype": "success",
+    "api_error_status": null,
+    "result": "All checks pass. Summary of changes:\n\n**Implementation** — `more_itertools/more.py:215` (`chunked`):\n- Added eager validation: `n` must be `None` or an `int` (`bool` explicitly rejected, since it's an `int` subclass) → otherwise `TypeError('n must be an integer or None')`.\n- The type check runs before `iter(iterable)` is touched, so invalid sizes raise before any part of the input is consumed.\n- Existing checks preserved: negative integers still raise `ValueError('n must be at least 0')`; `n=0` still yields nothing without consuming the source; `n=None` still yields one chunk; `strict=True` semantics (divisibility `ValueError`, `n=None` `ValueError`) unchanged.\n- Docstring now documents the accepted types and the error behavior.\n\n**Types** — `more_itertools/more.pyi` already declares `n: int | None`, which matches the accepted types, so no stub change was needed.\n\n**Docs** — added an Unreleased changelog entry in `docs/versions.rst`.\n\n**Tests** — new `agent_tests/test_chunked_validation.py` with 29 cases covering: valid int/int-subclass/`None`/`0` outputs, negative-integer `ValueError`, `bool` and other non-integer `TypeError` (including inside `strict` mode), eager raise at call time, no consumption or even iteration of the source on `TypeError`, and preserved `strict`/`n=0`/`n=None` behavior.\n\nVerification: `python3 benchmark_check.py` → visible acceptance checks passed, 932 unittest/doc tests OK, 29 agent tests passed. Manual spot-checks confirmed `Boom()` iterables are never touched and partially-used iterators remain untouched after a rejected `n`.\n\nSTATUS: DONE",
+    "ttft_ms": 1648,
+    "type": "result",
+    "duration_ms": 111969,
+    "uuid": "16a133b0-2c2b-41f9-8dac-94530d61014c",
+    "ttft_stream_ms": 1052,
+    "time_to_request_ms": 24,
+    "first_content_frame_ms": 1053,
+    "queued_turn_count": 0,
+    "result_index": 0
+  },
+  "last_observed_verified_source_hash": "9de5d0ed32db258ffa1e60e644bd93c8ad1a1e59437a8dc11d8a06ab24c5f0dd",
+  "final_source_hash": "9de5d0ed32db258ffa1e60e644bd93c8ad1a1e59437a8dc11d8a06ab24c5f0dd",
+  "stale_observed_verification": false,
+  "operator_interrupted": false
+}

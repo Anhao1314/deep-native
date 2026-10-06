@@ -1,0 +1,327 @@
+diff --git a/more_itertools/more.py b/more_itertools/more.py
+index 940b800..f0d53f3 100755
+--- a/more_itertools/more.py
++++ b/more_itertools/more.py
+@@ -3378,16 +3378,9 @@ def map_reduce(iterable, keyfunc, valuefunc=None, reducefunc=None):
+ 
+     ret = defaultdict(list)
+ 
+-    if valuefunc is None:
+-        for item in iterable:
+-            key = keyfunc(item)
+-            ret[key].append(item)
+-
+-    else:
+-        for item in iterable:
+-            key = keyfunc(item)
+-            value = valuefunc(item)
+-            ret[key].append(value)
++    for item in iterable:
++        key = keyfunc(item)
++        ret[key].append(item if valuefunc is None else valuefunc(item))
+ 
+     if reducefunc is not None:
+         for key, value_list in ret.items():
+diff --git a/agent_tests/test_map_reduce_regression.py b/agent_tests/test_map_reduce_regression.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/test_map_reduce_regression.py
+@@ -0,0 +1,298 @@
++"""Regression tests for ``more_itertools.map_reduce``.
++
++These tests pin the observable behavior that must survive collapsing the
++two duplicated accumulation loops (``valuefunc is None`` vs. supplied)
++into a single accumulation loop followed by the optional reduction phase:
++
++* callback (``keyfunc``/``valuefunc``) invocation order,
++* single-pass consumption of the input iterable,
++* ``defaultdict`` insertion order,
++* exception propagation,
++* a ``defaultdict`` result whose ``default_factory`` is ``None``.
++"""
++
++import unittest
++from collections import defaultdict
++
++import more_itertools as mi
++
++
++class _RecordingIterable:
++    """A single-pass iterable that records iteration/consumption counts."""
++
++    def __init__(self, items):
++        self._items = list(items)
++        self.iter_calls = 0
++        self.next_calls = 0
++
++    def __iter__(self):
++        self.iter_calls += 1
++        for item in self._items:
++            self.next_calls += 1
++            yield item
++
++
++class MapReduceAccumulationTests(unittest.TestCase):
++    def test_all_parameter_combinations(self):
++        keyfunc = lambda x: x % 2
++        cases = [
++            (None, None, {1: [1, 3], 0: [2, 4]}),
++            (lambda x: -x, None, {1: [-1, -3], 0: [-2, -4]}),
++            (None, sum, {1: 4, 0: 6}),
++            (lambda x: -x, sum, {1: -4, 0: -6}),
++        ]
++        for valuefunc, reducefunc, expected in cases:
++            with self.subTest(valuefunc=valuefunc, reducefunc=reducefunc):
++                result = mi.map_reduce(
++                    [1, 2, 3, 4], keyfunc, valuefunc, reducefunc
++                )
++                self.assertEqual(dict(result), expected)
++
++    def test_valuefunc_none_stores_original_objects(self):
++        items = [object(), object(), object()]
++        result = mi.map_reduce(items, keyfunc=id)
++        for item in items:
++            self.assertIs(result[id(item)][0], item)
++
++    def test_valuefunc_supplied_stores_transformed_values(self):
++        result = mi.map_reduce('aab', keyfunc=lambda c: c, valuefunc=str.upper)
++        self.assertEqual(dict(result), {'a': ['A', 'A'], 'b': ['B']})
++
++    def test_callback_order_is_interleaved_per_item(self):
++        log = []
++
++        def keyfunc(item):
++            log.append(('key', item))
++            return item % 2
++
++        def valuefunc(item):
++            log.append(('value', item))
++            return item * 10
++
++        result = mi.map_reduce([3, 1, 2], keyfunc, valuefunc)
++        self.assertEqual(
++            log,
++            [
++                ('key', 3),
++                ('value', 3),
++                ('key', 1),
++                ('value', 1),
++                ('key', 2),
++                ('value', 2),
++            ],
++        )
++        self.assertEqual(dict(result), {1: [30, 10], 0: [20]})
++
++    def test_valuefunc_none_does_not_invoke_an_extra_callable(self):
++        log = []
++
++        def keyfunc(item):
++            log.append(item)
++            return item.upper()
++
++        result = mi.map_reduce(['a', 'b'], keyfunc)
++        self.assertEqual(log, ['a', 'b'])
++        self.assertEqual(dict(result), {'A': ['a'], 'B': ['b']})
++
++    def test_single_pass_consumption_without_valuefunc(self):
++        iterable = _RecordingIterable([1, 2, 3, 4])
++        result = mi.map_reduce(iterable, keyfunc=lambda x: x % 2)
++        self.assertEqual(iterable.iter_calls, 1)
++        self.assertEqual(iterable.next_calls, 4)
++        self.assertEqual(dict(result), {1: [1, 3], 0: [2, 4]})
++
++    def test_single_pass_consumption_with_valuefunc_and_reducefunc(self):
++        iterable = _RecordingIterable([1, 2, 3, 4])
++        result = mi.map_reduce(
++            iterable, lambda x: x % 2, lambda x: x * x, sum
++        )
++        self.assertEqual(iterable.iter_calls, 1)
++        self.assertEqual(iterable.next_calls, 4)
++        self.assertEqual(dict(result), {1: 10, 0: 20})
++
++    def test_reiterable_input_is_not_processed_twice(self):
++        result = mi.map_reduce([1, 2, 3], keyfunc=lambda x: 0)
++        self.assertEqual(dict(result), {0: [1, 2, 3]})
++
++    def test_insertion_order_of_keys(self):
++        result = mi.map_reduce(
++            ['b1', 'a1', 'b2', 'c1', 'a2'], keyfunc=lambda s: s[0]
++        )
++        self.assertEqual(list(result), ['b', 'a', 'c'])
++        self.assertEqual(result['b'], ['b1', 'b2'])
++        self.assertEqual(result['a'], ['a1', 'a2'])
++        self.assertEqual(result['c'], ['c1'])
++
++    def test_insertion_order_preserved_through_reduction(self):
++        result = mi.map_reduce(
++            ['b', 'a', 'b', 'c'],
++            keyfunc=lambda s: s,
++            valuefunc=lambda s: {'a': 1, 'b': 2, 'c': 3}[s],
++            reducefunc=sum,
++        )
++        self.assertEqual(list(result), ['b', 'a', 'c'])
++        self.assertEqual(dict(result), {'b': 4, 'a': 1, 'c': 3})
++
++    def test_reducefunc_receives_lists_in_insertion_order(self):
++        calls = []
++
++        def reducefunc(values):
++            calls.append((type(values), list(values)))
++            return sum(values)
++
++        result = mi.map_reduce(
++            ['b', 'a', 'b', 'c'],
++            keyfunc=lambda s: s,
++            valuefunc=lambda s: {'a': 1, 'b': 2, 'c': 3}[s],
++            reducefunc=reducefunc,
++        )
++        self.assertEqual(
++            calls, [(list, [2, 2]), (list, [1]), (list, [3])]
++        )
++        self.assertEqual(dict(result), {'b': 4, 'a': 1, 'c': 3})
++
++    def test_valuefunc_none_reducefunc_receives_original_items(self):
++        seen = []
++
++        def reducefunc(values):
++            seen.append(values)
++            return values
++
++        result = mi.map_reduce(
++            [1, 2, 3], keyfunc=lambda x: x % 2, reducefunc=reducefunc
++        )
++        self.assertEqual(seen, [[1, 3], [2]])
++        self.assertEqual(dict(result), {1: [1, 3], 0: [2]})
++
++    def test_reducefunc_result_is_stored_per_key(self):
++        first, second = object(), object()
++        outputs = iter([first, second])
++        result = mi.map_reduce(
++            ['a', 'a', 'b'],
++            keyfunc=lambda s: s,
++            reducefunc=lambda values: next(outputs),
++        )
++        self.assertIs(result['a'], first)
++        self.assertIs(result['b'], second)
++
++    def test_empty_iterable(self):
++        calls = []
++
++        def reducefunc(values):
++            calls.append(values)
++            return values
++
++        result = mi.map_reduce([], keyfunc=lambda x: x, reducefunc=reducefunc)
++        self.assertEqual(list(result), [])
++        self.assertEqual(calls, [])
++        self.assertIsNone(result.default_factory)
++
++
++class MapReduceExceptionTests(unittest.TestCase):
++    def test_keyfunc_exception_propagates_before_valuefunc(self):
++        error = ValueError('key boom')
++        calls = []
++
++        def keyfunc(item):
++            calls.append(('key', item))
++            if item == 2:
++                raise error
++            return item
++
++        def valuefunc(item):
++            calls.append(('value', item))
++            return item
++
++        with self.assertRaises(ValueError) as ctx:
++            mi.map_reduce([1, 2, 3], keyfunc, valuefunc)
++        self.assertIs(ctx.exception, error)
++        self.assertEqual(calls, [('key', 1), ('value', 1), ('key', 2)])
++
++    def test_valuefunc_exception_propagates_after_keyfunc(self):
++        error = RuntimeError('value boom')
++        calls = []
++
++        def keyfunc(item):
++            calls.append(('key', item))
++            return item
++
++        def valuefunc(item):
++            calls.append(('value', item))
++            if item == 2:
++                raise error
++            return item
++
++        with self.assertRaises(RuntimeError) as ctx:
++            mi.map_reduce([1, 2, 3], keyfunc, valuefunc)
++        self.assertIs(ctx.exception, error)
++        self.assertEqual(
++            calls,
++            [('key', 1), ('value', 1), ('key', 2), ('value', 2)],
++        )
++
++    def test_valuefunc_exception_with_one_shot_iterator(self):
++        error = RuntimeError('value boom')
++        consumed = []
++
++        def gen():
++            for item in [1, 2, 3]:
++                consumed.append(item)
++                yield item
++
++        def valuefunc(item):
++            if item == 2:
++                raise error
++            return item
++
++        with self.assertRaises(RuntimeError) as ctx:
++            mi.map_reduce(gen(), keyfunc=lambda x: x, valuefunc=valuefunc)
++        self.assertIs(ctx.exception, error)
++        self.assertEqual(consumed, [1, 2])
++
++    def test_reducefunc_exception_propagates_after_prior_reductions(self):
++        error = KeyError('reduce boom')
++        reduced = []
++
++        def reducefunc(values):
++            reduced.append(tuple(values))
++            if len(reduced) == 2:
++                raise error
++            return sum(values)
++
++        with self.assertRaises(KeyError) as ctx:
++            mi.map_reduce(
++                ['a', 'b', 'c'],
++                keyfunc=lambda s: s,
++                valuefunc=len,
++                reducefunc=reducefunc,
++            )
++        self.assertIs(ctx.exception, error)
++        self.assertEqual(reduced, [(1,), (1,)])
++
++
++class MapReduceResultTypeTests(unittest.TestCase):
++    def test_result_is_defaultdict_with_default_factory_none(self):
++        cases = [
++            (None, None),
++            (lambda x: -x, None),
++            (None, sum),
++            (lambda x: -x, sum),
++        ]
++        for valuefunc, reducefunc in cases:
++            with self.subTest(valuefunc=valuefunc, reducefunc=reducefunc):
++                result = mi.map_reduce(
++                    [1, 2, 3, 4], lambda x: x % 2, valuefunc, reducefunc
++                )
++                self.assertIsInstance(result, defaultdict)
++                self.assertIsNone(result.default_factory)
++
++    def test_missing_key_raises_and_is_not_inserted(self):
++        result = mi.map_reduce([1, 2], keyfunc=lambda x: x)
++        with self.assertRaises(KeyError):
++            result['missing']
++        self.assertNotIn('missing', result)
++        self.assertEqual(list(result), [1, 2])
++
++
++if __name__ == '__main__':
++    unittest.main()

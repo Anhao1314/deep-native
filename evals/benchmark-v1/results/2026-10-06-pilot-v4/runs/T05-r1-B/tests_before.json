@@ -1,0 +1,44 @@
+{
+  "pass": false,
+  "contract": {
+    "argv": [
+      "sandbox-exec",
+      "-D",
+      "CLI_PID=0",
+      "-f",
+      "/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-z57we7u9/grader.sb",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/benchmark-env/bin/python",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native/evals/benchmark-v1/acceptance.py",
+      "T05",
+      "2"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native/evals/benchmark-v1/acceptance.py\", line 205, in <module>\n    check(sys.argv[1],int(sys.argv[2]) if len(sys.argv)>2 else 2)\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native/evals/benchmark-v1/acceptance.py\", line 125, in check\n    assert input_accumulation_loops(fn) == 1, 'Expected one input accumulation loop'\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Expected one input accumulation loop\n",
+    "duration_seconds": 0.0456
+  },
+  "upstream_regression": {
+    "argv": [
+      "sandbox-exec",
+      "-D",
+      "CLI_PID=0",
+      "-f",
+      "/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-z57we7u9/grader.sb",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/benchmark-env/bin/python",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................\n----------------------------------------------------------------------\nRan 932 tests in 6.408s\n\nOK\n",
+    "duration_seconds": 6.5064
+  },
+  "new_regression_tests": {
+    "exit_code": 5,
+    "stdout": "",
+    "stderr": "Required new regression tests are missing."
+  }
+}

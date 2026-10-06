@@ -1,0 +1,44 @@
+{
+  "pass": false,
+  "contract": {
+    "argv": [
+      "sandbox-exec",
+      "-D",
+      "CLI_PID=0",
+      "-f",
+      "/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-augf_hl9/grader.sb",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/benchmark-env/bin/python",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native/evals/benchmark-v1/acceptance.py",
+      "T08",
+      "2"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native/evals/benchmark-v1/acceptance.py\", line 205, in <module>\n    check(sys.argv[1],int(sys.argv[2]) if len(sys.argv)>2 else 2)\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native/evals/benchmark-v1/acceptance.py\", line 84, in check\n    assert parse_int_list('1,1,3-1') == [1,1,1,2,3]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError\n",
+    "duration_seconds": 0.0389
+  },
+  "upstream_regression": {
+    "argv": [
+      "sandbox-exec",
+      "-D",
+      "CLI_PID=0",
+      "-f",
+      "/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-augf_hl9/grader.sb",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/benchmark-env/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_strutils.py",
+      "tests/test_iterutils.py"
+    ],
+    "exit_code": 0,
+    "stdout": "........................................................................ [ 93%]\n.....                                                                    [100%]\n77 passed in 0.10s\n",
+    "stderr": "",
+    "duration_seconds": 0.2648
+  },
+  "new_regression_tests": {
+    "exit_code": 5,
+    "stdout": "",
+    "stderr": "Required new regression tests are missing."
+  }
+}

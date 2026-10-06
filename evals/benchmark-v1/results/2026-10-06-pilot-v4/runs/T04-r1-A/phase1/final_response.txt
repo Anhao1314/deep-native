@@ -1,0 +1,25 @@
+All checks are green. Here's a summary of the work:
+
+## Implementation — `boltons/strutils.py`
+
+Rewrote `parse_int_list` (boltons/strutils.py:886) to parse each token with full-match validation:
+
+- **Signed integers**: `[+-]?[0-9]+` tokens, so `-3` → `[-3]` and `+2` → `[2]`.
+- **Signed inclusive ranges**: the range delimiter is matched literally (`re.escape`) between two optionally signed endpoints, so `-3--1` → `[-3, -2, -1]` and `+2-+4` → `[2, 3, 4]` parse unambiguously (signs are never mistaken for delimiters).
+- **Reversed endpoints**: `min`/`max` semantics preserved (`8-5` → `[5,6,7,8]`, `-1--3` → `[-3,-2,-1]`).
+- **Whitespace**: stripped around tokens and allowed around range delimiters/endpoints (`' 8 - 5 , -3 - -1 '` → `[-3,-2,-1,5,6,7,8]`).
+- **Preserved behavior**: output sorted, duplicates kept, empty segments/whitespace-only input → `[]`, and custom `delim`/`range_delim` still work as *literals* (regex-special delimiters like `.`, `*`, `+` are escaped; multi-char delimiters work).
+- **Malformed input raises `ValueError`**: tokens like `1-2-3`, `1--2--3`, `1-`, `--1`, `a`, `+ 1` now raise instead of being silently accepted/rejected differently.
+
+Docstring updated with signed/range semantics, whitespace and reversed-range notes, a `Returns`/`Raises` section, and new doctest examples.
+
+## Tests — `agent_tests/test_parse_int_list_extended.py` (new)
+
+42 regression tests covering signed integers/ranges, reversed endpoints, whitespace around tokens and endpoints, sorting/duplicates/empty input, custom literal delimiters (including regex-special and multi-char), malformed-input errors, and an assertion that the updated docstring's doctests pass.
+
+## Verification
+
+- `python3 benchmark_check.py`: visible acceptance check passed, existing `tests/test_strutils.py` + `tests/test_iterutils.py` → 77 passed, new `agent_tests/` → 42 passed.
+- No existing tests, benchmark files, or configuration were modified; only `boltons/strutils.py` was changed.
+
+STATUS: DONE

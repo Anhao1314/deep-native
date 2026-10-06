@@ -1,0 +1,367 @@
+diff --git a/boltons/strutils.py b/boltons/strutils.py
+index 74441c7..3191b1c 100644
+--- a/boltons/strutils.py
++++ b/boltons/strutils.py
+@@ -883,51 +883,113 @@ def args2cmd(args, sep=' '):
+     return ''.join(result)
+ 
+ 
+-def parse_int_list(range_string, delim=',', range_delim='-'):
+-    """Returns a sorted list of positive integers based on
++_SIGNED_INT_TOKEN_RE = re.compile(r'[+-]?[0-9]+$')
++
++
++def _signed_range_token_re(range_delim):
++    """Return a regex matching a two-ended signed range token, such as
++    ``-3--1`` or ``8-5``, as used by :func:`parse_int_list`. The
++    captured groups are the (possibly reversed) range endpoints.
++    """
++    return re.compile(r'([+-]?[0-9]+)\s*{0}\s*([+-]?[0-9]+)$'.format(
++        re.escape(range_delim)))
++
++
++def _parse_int_token(token, range_token_re):
++    """Expand one comma-delimited *token* into a list of integers.
++
++    *token* is either a signed integer (e.g. ``-3``) or a pair of
++    signed integers joined by the range delimiter (e.g. ``-3--1`` or
++    ``8-5``). Reversed endpoints describe the same inclusive range as
++    their sorted counterparts. Raises :exc:`ValueError` for anything
++    else, including empty-handed malformed ranges like ``1-2-3``.
++    """
++    token = token.strip()
++    if not token:
++        return []
++
++    if _SIGNED_INT_TOKEN_RE.match(token):
++        return [int(token)]
++
++    match = range_token_re.match(token)
++    if match:
++        min_limit, max_limit = sorted(int(group) for group in match.groups())
++        return list(range(min_limit, max_limit + 1))
++
++    raise ValueError('invalid integer or range: %r' % (token,))
++
++
++def parse_int_list(range_string, delim=',', range_delim='-',
++                   allow_signed=True):
++    """Returns a sorted, duplicate-free list of integers based on
+     *range_string*. Reverse of :func:`format_int_list`.
+ 
+     Args:
+-        range_string (str): String of comma separated positive
+-            integers or ranges (e.g. '1,2,4-6,8'). Typical of a custom
+-            page range string used in printer dialogs.
++        range_string (str): String of comma separated integers or
++            ranges (e.g. '1,2,4-6,8'). Typical of a custom
++            page range string used in printer dialogs. Reversed
++            endpoints are accepted, so '8-5' is the same as '5-8'.
++            When *allow_signed* is enabled, signed integers and
++            ranges are accepted as well (e.g. '-3', '-3--1', '5--2').
+         delim (char): Defaults to ','. Separates integers and
+             contiguous ranges of integers.
+         range_delim (char): Defaults to '-'. Indicates a contiguous
+             range of integers.
++        allow_signed (bool): Defaults to ``True``. When enabled,
++            integers may carry a leading ``+`` or ``-``, which also
++            causes malformed ranges such as '1-2-3' to be rejected
++            with a :exc:`ValueError` instead of being expanded
++            leniently. Set to ``False`` for the historical
++            positive-integer-only behavior, which does not accept
++            signed values.
+ 
+     >>> parse_int_list('1,3,5-8,10-11,15')
+     [1, 3, 5, 6, 7, 8, 10, 11, 15]
+ 
++    >>> parse_int_list('-3--1,2,2')
++    [-3, -2, -1, 2]
++
++    >>> parse_int_list('8-5')
++    [5, 6, 7, 8]
++
+     """
+     output = []
+ 
+-    for x in range_string.strip().split(delim):
++    if allow_signed:
++        range_token_re = _signed_range_token_re(range_delim)
++        for x in range_string.strip().split(delim):
++            output += _parse_int_token(x, range_token_re)
++    else:
++        for x in range_string.strip().split(delim):
+ 
+-        # Range
+-        if range_delim in x:
+-            range_limits = list(map(int, x.split(range_delim)))
+-            output += list(range(min(range_limits), max(range_limits)+1))
++            # Range
++            if range_delim in x:
++                range_limits = list(map(int, x.split(range_delim)))
++                output += list(range(min(range_limits), max(range_limits)+1))
+ 
+-        # Empty String
+-        elif not x:
+-            continue
++            # Empty String
++            elif not x:
++                continue
+ 
+-        # Integer
+-        else:
+-            output.append(int(x))
++            # Integer
++            else:
++                output.append(int(x))
+ 
+-    return sorted(output)
++    return sorted(set(output))
+ 
+ 
+ def format_int_list(int_list, delim=',', range_delim='-', delim_space=False):
+-    """Returns a sorted range string from a list of positive integers
++    """Returns a sorted range string from a list of integers
+     (*int_list*). Contiguous ranges of integers are collapsed to min
+-    and max values. Reverse of :func:`parse_int_list`.
++    and max values. Reverse of :func:`parse_int_list`. Signed
++    integers are supported; a contiguous run of negative values is
++    formatted with the conventional doubled delimiter (e.g.
++    ``-3--1``), which :func:`parse_int_list` reads back.
+ 
+     Args:
+-        int_list (list): List of positive integers to be converted
+-           into a range string (e.g. [1,2,4,5,6,8]).
++        int_list (list): List of integers to be converted
++           into a range string (e.g. [1,2,4,5,6,8] or [-3,-2,-1,2]).
++           Duplicate and out-of-order values are normalized away.
+         delim (char): Defaults to ','. Separates integers and
+            contiguous ranges of integers.
+         range_delim (char): Defaults to '-'. Indicates a contiguous
+@@ -938,6 +1000,9 @@ def format_int_list(int_list, delim=',', range_delim='-', delim_space=False):
+     >>> format_int_list([1,3,5,6,7,8,10,11,15])
+     '1,3,5-8,10-11,15'
+ 
++    >>> format_int_list([-3,-2,-1,2,2])
++    '-3--1,2'
++
+     """
+     output = []
+     contig_range = collections.deque()
+diff --git a/boltons/rangeutils.py b/boltons/rangeutils.py
+new file mode 100644
+--- /dev/null
++++ b/boltons/rangeutils.py
+@@ -0,0 +1,213 @@
++# Copyright (c) 2013, Mahmoud Hashemi
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions are
++# met:
++#
++#    * Redistributions of source code must retain the above copyright
++#      notice, this list of conditions and the following disclaimer.
++#
++#    * Redistributions in binary form must reproduce the above
++#      copyright notice, this list of conditions and the following
++#      disclaimer in the documentation and/or other materials provided
++#      with the distribution.
++#
++#    * The names of the contributors may not be used to endorse or
++#      promote products derived from this software without specific
++#      prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++
++"""``rangeutils`` - Compact parsing and formatting of integer ranges
++
++Range strings like ``'-3--1,2,5-8'`` are a compact, human-friendly way
++to describe sets of integers, familiar from printer page-range dialogs
++and port lists. :func:`parse_ranges` expands such a string into a
++sorted, duplicate-free list of integers, and :func:`format_ranges`
++turns a list of integers back into a canonical range string.
++
++Both functions build on :func:`boltons.strutils.parse_int_list` and
++:func:`boltons.strutils.format_int_list`, extending them to support
++signed integers and reversed endpoints.
++
++>>> parse_ranges('1,3,5-8,10-11,15')
++[1, 3, 5, 6, 7, 8, 10, 11, 15]
++>>> parse_ranges('-3--1,2,2')
++[-3, -2, -1, 2]
++>>> parse_ranges('8-5')
++[5, 6, 7, 8]
++>>> format_ranges([-3, -2, -1, 2, 2])
++'-3--1,2'
++
++The module doubles as a command-line tool, exposing the same
++functionality as ``expand`` and ``compact`` subcommands::
++
++    $ python3 -m boltons.rangeutils expand '1,3,5-8'
++    [1, 3, 5, 6, 7, 8]
++    $ python3 -m boltons.rangeutils compact '1,3,5,6,7,8'
++    1,3,5-8
++
++Malformed input makes the command exit non-zero with a short error
++message, rather than a traceback.
++"""
++
++import argparse
++import json
++import sys
++
++try:
++    from .strutils import parse_int_list, format_int_list
++except ImportError:  # pragma: no cover
++    # Support copying this module out of the package, the way boltons
++    # modules are often vendored.
++    from boltons.strutils import parse_int_list, format_int_list
++
++
++__all__ = ['parse_ranges', 'format_ranges', 'main']
++
++
++def parse_ranges(text):
++    """Parse a comma-separated range string *text* into a sorted,
++    duplicate-free list of integers.
++
++    Each comma-separated token is either a signed integer (``'-3'``)
++    or an inclusive range of two signed integers separated by ``'-'``
++    (``'5-8'``, ``'-3--1'``, ``'5--2'``). Reversed endpoints are
++    accepted, so ``'8-5'`` is the same range as ``'5-8'``. Empty
++    tokens (e.g. a trailing comma) are ignored.
++
++    Args:
++        text (str): String of comma-separated integers and ranges,
++            e.g. ``'-3--1,2,5-8'``.
++
++    Returns:
++        list: Sorted, duplicate-free integers, e.g. ``[-3, -2, -1, 2,
++        5, 6, 7, 8]``.
++
++    Raises:
++        ValueError: If a token is not an integer or a well-formed
++            range, such as ``'abc'``, ``'1-'`` or ``'1-2-3'``.
++        TypeError: If *text* is not a string.
++
++    >>> parse_ranges('-3--1,2,5-8')
++    [-3, -2, -1, 2, 5, 6, 7, 8]
++
++    >>> parse_ranges(' 3, 1-2 ,2 ')
++    [1, 2, 3]
++
++    >>> parse_ranges('')
++    []
++
++    """
++    if not isinstance(text, str):
++        raise TypeError('expected range text as a str, not %s' %
++                        type(text).__name__)
++    # strutils' parser carries the real work; allow_signed enables the
++    # signed tokens ('-3--1') and strict range validation this API
++    # promises.
++    return parse_int_list(text, allow_signed=True)
++
++
++def format_ranges(values):
++    """Format an iterable of integers *values* as a canonical range
++    string, the reverse of :func:`parse_ranges`.
++
++    Values are sorted and de-duplicated, and contiguous runs are
++    collapsed to their endpoints, so ``[2, 1, 3, 3]`` formats as
++    ``'1-3'``. Negative runs use the conventional doubled delimiter,
++    so ``[-3, -2, -1]`` formats as ``'-3--1'``, which
++    :func:`parse_ranges` reads back.
++
++    Args:
++        values (iterable): Iterable of integers, e.g. ``[-3, -2, -1,
++            2]``.
++
++    Returns:
++        str: Canonical, compact range string, e.g. ``'-3--1,2'``. An
++        empty iterable formats as ``''``.
++
++    >>> format_ranges([-3, -2, -1, 2, 2])
++    '-3--1,2'
++
++    >>> format_ranges([2, 1, 3, 5, 4])
++    '1-5'
++
++    >>> format_ranges([])
++    ''
++
++    """
++    return format_int_list(values)
++
++
++def _normalize_argv(argv):
++    """Insert argparse's ``--`` separator before a *TEXT* argument that
++    starts with a dash, such as ``'-3--1,2'``, which argparse would
++    otherwise mistake for an option and reject.
++    """
++    if (len(argv) > 1 and argv[0] in ('expand', 'compact')
++            and argv[1].startswith('-')
++            and argv[1] not in ('-h', '--help', '--')):
++        return [argv[0], '--'] + list(argv[1:])
++    return list(argv)
++
++
++def _build_parser():
++    parser = argparse.ArgumentParser(
++        prog='python3 -m boltons.rangeutils',
++        description='Expand and compact comma-separated integer ranges.')
++    subparsers = parser.add_subparsers(dest='command', required=True)
++
++    expand_parser = subparsers.add_parser(
++        'expand', help='expand TEXT into a JSON list of integers')
++    expand_parser.add_argument(
++        'text', metavar='TEXT',
++        help="integers and inclusive ranges, e.g. '1,3,5-8' or '-3--1,2'")
++
++    compact_parser = subparsers.add_parser(
++        'compact', help='compact TEXT into canonical range text')
++    compact_parser.add_argument(
++        'text', metavar='TEXT',
++        help="integers and ranges, e.g. '1,3,5,6,7,8' or '-3,-2,-1,2'")
++
++    return parser
++
++
++def main(argv=None):
++    """Command-line entry point for ``python3 -m boltons.rangeutils``.
++
++    With ``expand``, prints the parsed integers as a JSON list. With
++    ``compact``, prints the canonical range string. Returns ``0`` on
++    success; malformed *TEXT* or missing arguments exit non-zero with
++    a message on stderr and no traceback. *argv* defaults to
++    ``sys.argv[1:]``.
++    """
++    if argv is None:
++        argv = sys.argv[1:]
++
++    parser = _build_parser()
++    args = parser.parse_args(_normalize_argv(list(argv)))
++
++    try:
++        values = parse_ranges(args.text)
++        if args.command == 'expand':
++            print(json.dumps(values))
++        else:
++            print(format_ranges(values))
++    except (TypeError, ValueError) as exc:
++        parser.exit(1, '{0}: error: {1}\n'.format(parser.prog, exc))
++
++    return 0
++
++
++if __name__ == '__main__':
++    sys.exit(main())

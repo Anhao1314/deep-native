@@ -1,0 +1,183 @@
+diff --git a/more_itertools/__init__.py b/more_itertools/__init__.py
+index 45df8ad..c8678d0 100644
+--- a/more_itertools/__init__.py
++++ b/more_itertools/__init__.py
+@@ -4,5 +4,3 @@ from .more import *  # noqa
+ from .recipes import *  # noqa
+ 
+ __version__ = '11.1.0'
+-
+-from .more import windowed as windowed_complete
+diff --git a/more_itertools/more.py b/more_itertools/more.py
+index c9871dc..191d609 100755
+--- a/more_itertools/more.py
++++ b/more_itertools/more.py
+@@ -4221,6 +4221,8 @@ def windowed_complete(iterable, n):
+     * Each ``beginning`` has the items before the ones in ``middle``
+     * Each ``end`` has the items after the ones in ``middle``
+ 
++    Concatenating the three tuples of a result yields the original sequence.
++
+     >>> iterable = range(7)
+     >>> n = 3
+     >>> for beginning, middle, end in windowed_complete(iterable, n):
+@@ -4249,7 +4251,7 @@ def windowed_complete(iterable, n):
+     for i in range(size - n + 1):
+         beginning = seq[:i]
+         middle = seq[i : i + n]
+-        end = seq[i + n + 1 :]
++        end = seq[i + n :]
+         yield beginning, middle, end
+diff --git a/agent_tests/test_windowed_complete_regression.py b/agent_tests/test_windowed_complete_regression.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/test_windowed_complete_regression.py
+@@ -0,0 +1,148 @@
++"""Regression tests for ``more_itertools.windowed_complete``.
++
++Covers two historical defects:
++
++1. ``more_itertools/__init__.py`` rebound the public ``windowed_complete``
++   name to the plain ``windowed`` function, so the package-level import
++   yielded n-tuples instead of ``(prefix, window, suffix)`` triples.
++2. The windowed tail was sliced with an off-by-one
++   (``seq[i + n + 1:]``), dropping one item from every suffix and breaking
++   the invariant that ``prefix + window + suffix == original sequence``,
++   including for zero-width windows.
++"""
++
++import pytest
++
++import more_itertools
++import more_itertools.more as more
++from more_itertools import windowed_complete
++
++
++def assert_valid_triples(result, seq, n):
++    """Every triple is (prefix, window, suffix) and reconstructs *seq*."""
++    assert isinstance(result, list)
++    assert len(result) == max(len(seq) - n + 1, 0)
++    for prefix, window, suffix in result:
++        assert isinstance(prefix, tuple)
++        assert isinstance(window, tuple)
++        assert isinstance(suffix, tuple)
++        assert len(window) == n
++        assert prefix + window + suffix == tuple(seq)
++    # The windows enumerate exactly the contiguous n-item windows of seq.
++    assert [window for _, window, _ in result] == [
++        tuple(seq[i : i + n]) for i in range(max(len(seq) - n + 1, 0))
++    ]
++
++
++def test_public_import_yields_triples():
++    actual = list(windowed_complete(range(3), 1))
++    assert actual == [
++        ((), (0,), (1, 2)),
++        ((0,), (1,), (2,)),
++        ((0, 1), (2,), ()),
++    ]
++    assert_valid_triples(actual, range(3), 1)
++
++
++def test_module_import_yields_triples():
++    actual = list(more.windowed_complete(range(3), 1))
++    assert actual == [
++        ((), (0,), (1, 2)),
++        ((0,), (1,), (2,)),
++        ((0, 1), (2,), ()),
++    ]
++    assert_valid_triples(actual, range(3), 1)
++
++
++def test_public_import_is_the_real_function():
++    # Guards against the package-level name being shadowed by ``windowed``.
++    assert windowed_complete is more.windowed_complete
++    assert windowed_complete is not more.windowed
++
++
++def test_docstring_example():
++    actual = list(windowed_complete(range(7), 3))
++    assert actual == [
++        ((), (0, 1, 2), (3, 4, 5, 6)),
++        ((0,), (1, 2, 3), (4, 5, 6)),
++        ((0, 1), (2, 3, 4), (5, 6)),
++        ((0, 1, 2), (3, 4, 5), (6,)),
++        ((0, 1, 2, 3), (4, 5, 6), ()),
++    ]
++
++
++@pytest.mark.parametrize('seq', ['ABCDE', range(5), [1, 2, 3, 4, 5]])
++@pytest.mark.parametrize('n', range(6))
++def test_public_module_agree_and_concatenation_holds(seq, n):
++    expected = list(more.windowed_complete(seq, n))
++    actual = list(windowed_complete(seq, n))
++    assert actual == expected
++    assert_valid_triples(actual, tuple(seq), n)
++
++
++def test_accepts_one_shot_iterable():
++    result = list(windowed_complete(iter(range(4)), 2))
++    assert result == [
++        ((), (0, 1), (2, 3)),
++        ((0,), (1, 2), (3,)),
++        ((0, 1), (2, 3), ()),
++    ]
++    assert_valid_triples(result, tuple(range(4)), 2)
++
++
++def test_zero_width_windows():
++    actual = list(windowed_complete([1, 2, 3], 0))
++    assert actual == [
++        ((), (), (1, 2, 3)),
++        ((1,), (), (2, 3)),
++        ((1, 2), (), (3,)),
++        ((1, 2, 3), (), ()),
++    ]
++    assert_valid_triples(actual, [1, 2, 3], 0)
++
++
++def test_full_width_window():
++    # n == len(seq) is allowed and yields a single all-in-window triple.
++    assert list(windowed_complete([1, 2, 3], 3)) == [((), (1, 2, 3), ())]
++    assert_valid_triples(list(windowed_complete([1, 2, 3], 3)), [1, 2, 3], 3)
++
++
++def test_empty_iterable_zero_width():
++    assert list(windowed_complete([], 0)) == [((), (), ())]
++
++
++@pytest.mark.parametrize('seq', ['ABC', [1, 2, 3]])
++def test_every_split_is_covered(seq):
++    # With a zero-width window the triples enumerate every split of seq.
++    splits = {
++        (prefix, suffix)
++        for prefix, _window, suffix in windowed_complete(seq, 0)
++    }
++    expected = {
++        (tuple(seq[:i]), tuple(seq[i:])) for i in range(len(seq) + 1)
++    }
++    assert splits == expected
++
++    # For every window width, the window is contiguous and reconstructs seq.
++    for n in range(len(seq) + 1):
++        assert_valid_triples(list(windowed_complete(seq, n)), tuple(seq), n)
++
++
++@pytest.mark.parametrize('bad_n', [-10, -1])
++def test_rejects_negative_n(bad_n):
++    with pytest.raises(ValueError):
++        list(windowed_complete([1, 2, 3, 4, 5], bad_n))
++
++
++@pytest.mark.parametrize('bad_n', [4, 10])
++def test_rejects_n_greater_than_length(bad_n):
++    seq = [1, 2, 3]
++    with pytest.raises(ValueError):
++        list(windowed_complete(seq, bad_n))
++
++
++def test_validation_preserved_in_module_import():
++    with pytest.raises(ValueError):
++        list(more.windowed_complete([1, 2, 3], -1))
++    with pytest.raises(ValueError):
++        list(more.windowed_complete([1, 2, 3], 4))

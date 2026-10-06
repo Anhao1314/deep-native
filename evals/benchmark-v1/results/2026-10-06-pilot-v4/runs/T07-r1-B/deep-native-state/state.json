@@ -1,0 +1,12 @@
+{
+  "attempt": "",
+  "config_hash": "2e428a9e92f3c656414809ec7099ee07c53ede0769d373e0cff6c449bf8a9f09",
+  "goal": "take_until_inclusive(iterable, pred) yields through and including the first item satisfying pred, stops without consuming later items, exports from more_itertools, documented, with agent_tests; python3 benchmark_check.py passes",
+  "next": "Inspect and reproduce before editing.",
+  "note": "",
+  "schema": 1,
+  "session": "54e397fb-be84-4389-8b96-6f30f231f66f",
+  "status": "active",
+  "task_id": "e303e7dc44d242cfa9073db89642a77a",
+  "updated_at": "2026-10-06T04:54:18Z"
+}

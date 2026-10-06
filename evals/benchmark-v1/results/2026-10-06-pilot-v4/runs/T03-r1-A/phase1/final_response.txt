@@ -1,0 +1,11 @@
+Both bugs are fixed and verified:
+
+**Root causes**
+1. `more_itertools/__init__.py:8` shadowed the real function: `from .more import windowed as windowed_complete` made the public `more_itertools.windowed_complete` actually be `windowed`, yielding bare window tuples. Removed the alias so the star-imported `more.windowed_complete` is used.
+2. `more_itertools/more.py:4252` computed `end = seq[i + n + 1 :]`, dropping the first item of every suffix. Changed to `seq[i + n :]`.
+
+The `.pyi` stubs and docs were already correct (`windowed_complete` is in `more.pyi.__all__` with the `(prefix, window, suffix)` signature, and `docs/api.rst` already autodocs it), so no doc/type changes were needed.
+
+**Regression tests** added at `agent_tests/test_windowed_complete.py` covering, for both the public and module import: exact tuple structure, `prefix + window + suffix == original sequence` across sizes including `n == 0` and `n == len(seq)`, preserved zero-width windows, tuple element types, `ValueError` validation for `n < 0` and `n > len(seq)`, and agreement between the two imports.
+
+**Verification** — `python3 benchmark_check.py`: visible acceptance checks passed, 932 existing unittest tests OK, 29 new agent tests passed.

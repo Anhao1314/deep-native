@@ -1,0 +1,292 @@
+diff --git a/boltons/strutils.py b/boltons/strutils.py
+index 74441c7..4f54674 100644
+--- a/boltons/strutils.py
++++ b/boltons/strutils.py
+@@ -884,38 +884,68 @@ def args2cmd(args, sep=' '):
+ 
+ 
+ def parse_int_list(range_string, delim=',', range_delim='-'):
+-    """Returns a sorted list of positive integers based on
+-    *range_string*. Reverse of :func:`format_int_list`.
++    """Returns a sorted list of integers based on *range_string*. Signed
++    integers and inclusive ranges are supported. Reverse of
++    :func:`format_int_list`.
+ 
+     Args:
+-        range_string (str): String of comma separated positive
+-            integers or ranges (e.g. '1,2,4-6,8'). Typical of a custom
+-            page range string used in printer dialogs.
++        range_string (str): String of *delim*-separated, optionally
++            signed integers or inclusive ranges (e.g. '1,2,4-6,8',
++            '-3--1,+2-+4'). Typical of a custom page range string used
++            in printer dialogs. Whitespace around tokens and range
++            endpoints is ignored. Ranges may be specified in either
++            direction, e.g. '8-5' is equivalent to '5-8'.
+         delim (char): Defaults to ','. Separates integers and
+             contiguous ranges of integers.
+         range_delim (char): Defaults to '-'. Indicates a contiguous
+-            range of integers.
++            range of integers. Treated as a literal, not as a regular
++            expression.
++
++    Returns:
++        list: A sorted list of ``int``, with duplicate entries
++            preserved.
++
++    Raises:
++        ValueError: If *range_string* contains a malformed integer or
++            range, such as '1-2-3', '1-', or 'a'.
+ 
+     >>> parse_int_list('1,3,5-8,10-11,15')
+     [1, 3, 5, 6, 7, 8, 10, 11, 15]
+ 
++    >>> parse_int_list('-3--1,+2-+4')
++    [-3, -2, -1, 2, 3, 4]
++
++    >>> parse_int_list(' 8 - 5 , -3 - -1 ')
++    [-3, -2, -1, 5, 6, 7, 8]
++
+     """
+     output = []
+ 
+-    for x in range_string.strip().split(delim):
++    int_re = re.compile(r'[+-]?[0-9]+')
++    range_re = re.compile(
++        r'([+-]?[0-9]+)\s*' + re.escape(range_delim) + r'\s*([+-]?[0-9]+)')
+ 
+-        # Range
+-        if range_delim in x:
+-            range_limits = list(map(int, x.split(range_delim)))
+-            output += list(range(min(range_limits), max(range_limits)+1))
++    for x in range_string.strip().split(delim):
++        x = x.strip()
+ 
+         # Empty String
+-        elif not x:
++        if not x:
+             continue
+ 
+         # Integer
+-        else:
++        if int_re.fullmatch(x):
+             output.append(int(x))
++            continue
++
++        # Inclusive Range
++        range_match = range_re.fullmatch(x)
++        if range_match:
++            range_limits = [int(range_match.group(1)),
++                            int(range_match.group(2))]
++            output += list(range(min(range_limits), max(range_limits) + 1))
++            continue
++
++        raise ValueError('malformed integer or range: %r' % (x,))
+ 
+     return sorted(output)
+diff --git a/agent_tests/test_parse_int_list_extended.py b/agent_tests/test_parse_int_list_extended.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/test_parse_int_list_extended.py
+@@ -0,0 +1,202 @@
++"""Regression tests for signed integer/range support in
++``boltons.strutils.parse_int_list``.
++
++Covers signed integers, signed inclusive ranges, reversed range
++endpoints, whitespace around tokens and endpoints, preserved sorting,
++duplicate entries, empty input, custom literal delimiters, and
++``ValueError`` for malformed integers/ranges.
++"""
++
++import doctest
++
++import pytest
++
++from boltons.strutils import parse_int_list
++
++
++# --- Signed integers ---------------------------------------------------
++
++def test_positive_sign_integer():
++    assert parse_int_list('+2') == [2]
++    assert parse_int_list('+2,+4,+6') == [2, 4, 6]
++
++
++def test_negative_integer():
++    assert parse_int_list('-3') == [-3]
++    assert parse_int_list('-1,-5,-3') == [-5, -3, -1]
++
++
++def test_mixed_signed_integers():
++    assert parse_int_list('-3,+2,0') == [-3, 0, 2]
++    assert parse_int_list('-1,+1,-1,+1') == [-1, -1, 1, 1]
++
++
++def test_zero_signs():
++    assert parse_int_list('0') == [0]
++    assert parse_int_list('-0') == [0]
++    assert parse_int_list('+0') == [0]
++
++
++# --- Signed inclusive ranges -------------------------------------------
++
++def test_negative_range():
++    assert parse_int_list('-3--1') == [-3, -2, -1]
++
++
++def test_positive_sign_range():
++    assert parse_int_list('+2-+4') == [2, 3, 4]
++
++
++def test_mixed_sign_range():
++    assert parse_int_list('-1-+1') == [-1, 0, 1]
++    assert parse_int_list('+1--1') == [-1, 0, 1]
++    assert parse_int_list('-2--4') == [-4, -3, -2]
++    assert parse_int_list('2-+4') == [2, 3, 4]
++    assert parse_int_list('-4-2') == [-4, -3, -2, -1, 0, 1, 2]
++
++
++def test_signed_ranges_and_integers_combined():
++    assert parse_int_list('-3--1,+2-+4') == [-3, -2, -1, 2, 3, 4]
++    assert parse_int_list('-5,-3--1,+2-+4,1') == [-5, -3, -2, -1, 1, 2, 3, 4]
++
++
++def test_range_endpoints_are_inclusive():
++    assert parse_int_list('1-1') == [1]
++    assert parse_int_list('-2--2') == [-2]
++    assert parse_int_list('5-8') == [5, 6, 7, 8]
++
++
++# --- Reversed endpoints ------------------------------------------------
++
++def test_reversed_endpoints_positive():
++    assert parse_int_list('8-5') == [5, 6, 7, 8]
++    assert parse_int_list('4-2') == [2, 3, 4]
++
++
++def test_reversed_endpoints_signed():
++    assert parse_int_list('-1--3') == [-3, -2, -1]
++    assert parse_int_list('+4-+2') == [2, 3, 4]
++    assert parse_int_list('2--3') == [-3, -2, -1, 0, 1, 2]
++
++
++# --- Whitespace --------------------------------------------------------
++
++def test_whitespace_around_tokens():
++    assert parse_int_list(' 1, 3 ,5-8,10-11,15 ') == [1, 3, 5, 6, 7, 8, 10, 11, 15]
++    assert parse_int_list('\t-3\n,\t+2\n') == [-3, 2]
++
++
++def test_whitespace_around_endpoints():
++    assert parse_int_list('1 - 3') == [1, 2, 3]
++    assert parse_int_list('-3 - -1') == [-3, -2, -1]
++    assert parse_int_list('+2 - +4') == [2, 3, 4]
++    assert parse_int_list(' 8 - 5 , -3 - -1 ') == [-3, -2, -1, 5, 6, 7, 8]
++    assert parse_int_list('1- 3') == [1, 2, 3]
++    assert parse_int_list('1 -3') == [1, 2, 3]
++    assert parse_int_list('-3 --1') == [-3, -2, -1]
++
++
++# --- Preserved behavior ------------------------------------------------
++
++def test_sorting_preserved():
++    assert parse_int_list('5,1,3') == [1, 3, 5]
++    assert parse_int_list('3,1,5-8,10-11,15') == [1, 3, 5, 6, 7, 8, 10, 11, 15]
++    assert parse_int_list('+3,-2,+1') == [-2, 1, 3]
++
++
++def test_duplicates_preserved():
++    assert parse_int_list('1,1,1-2,2') == [1, 1, 1, 2, 2]
++    assert parse_int_list('-1,-1,0-1') == [-1, -1, 0, 1]
++    assert parse_int_list('3-1,2') == [1, 2, 2, 3]
++    assert parse_int_list('1-2,1-2') == [1, 1, 2, 2]
++
++
++def test_empty_input():
++    assert parse_int_list('') == []
++    assert parse_int_list('   ') == []
++    assert parse_int_list(',') == []
++    assert parse_int_list(', ,,') == []
++    assert parse_int_list('1,3,') == [1, 3]
++    assert parse_int_list(',1,3') == [1, 3]
++
++
++def test_custom_delimiter_literal():
++    assert parse_int_list('1;3-5', delim=';') == [1, 3, 4, 5]
++    assert parse_int_list('1::2::3', delim='::') == [1, 2, 3]
++    assert parse_int_list('1|3', delim='|') == [1, 3]
++    assert parse_int_list(' 1 ; -3--1 ', delim=';') == [-3, -2, -1, 1]
++
++
++def test_custom_range_delimiter_literal():
++    assert parse_int_list('1..3', range_delim='..') == [1, 2, 3]
++    assert parse_int_list('-3..-1,+2..+4', range_delim='..') == [-3, -2, -1, 2, 3, 4]
++    assert parse_int_list('1 to 3', range_delim='to') == [1, 2, 3]
++    # Regex-special characters must be treated literally as delimiters.
++    assert parse_int_list('1.3', range_delim='.') == [1, 2, 3]
++    assert parse_int_list('1+3', range_delim='+') == [1, 2, 3]
++    assert parse_int_list('1*3', range_delim='*') == [1, 2, 3]
++
++
++def test_custom_delimiters_combined():
++    assert parse_int_list('1 to 3 | -1 to 1', delim='|', range_delim='to') == [-1, 0, 1, 1, 2, 3]
++    assert parse_int_list('1..3;+5..+6', delim=';', range_delim='..') == [1, 2, 3, 5, 6]
++
++
++# --- Malformed input ---------------------------------------------------
++
++@pytest.mark.parametrize('bad', [
++    '1-2-3',
++    '1--2--3',
++    '1 - 2 - 3',
++    '5-3-1',
++    '1-',
++    '-',
++    '--',
++    '1--',
++    '--1',
++    '3---1',
++    '-3--1-',
++    '+',
++    '++1',
++    '+-1',
++    'a',
++    '1-a',
++    'a-1',
++    '1 2',
++    '+ 1',
++    '- 3',
++])
++def test_malformed_raises_value_error(bad):
++    with pytest.raises(ValueError):
++        parse_int_list(bad)
++
++
++def test_malformed_raises_with_custom_delimiters():
++    with pytest.raises(ValueError):
++        parse_int_list('1..2..3', range_delim='..')
++    with pytest.raises(ValueError):
++        parse_int_list('1;2;x', delim=';')
++    with pytest.raises(ValueError):
++        parse_int_list('1..', range_delim='..')
++
++
++def test_malformed_between_valid_tokens_raises():
++    with pytest.raises(ValueError):
++        parse_int_list('1,,x')
++    with pytest.raises(ValueError):
++        parse_int_list('-3--1,bogus,+2-+4')
++
++
++# --- Docstring examples -------------------------------------------------
++
++def test_docstring_examples():
++    doc_test = doctest.DocTestParser().get_doctest(
++        parse_int_list.__doc__,
++        {'parse_int_list': parse_int_list},
++        'parse_int_list',
++        None,
++        0,
++    )
++    runner = doctest.DocTestRunner()
++    runner.run(doc_test)
++    assert runner.failures == 0

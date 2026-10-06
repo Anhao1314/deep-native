@@ -1,0 +1,23 @@
+## Summary
+
+**Root cause** — `boltons/iterutils.py:1364`: `get_path` keeps a `cur` cursor for the traversal but indexed the outer `root` on every iteration:
+
+```python
+cur = root
+for seg in path:
+    cur = root[seg]   # bug: always the outer root
+```
+
+So only the first segment was resolved correctly. Later segments were looked up against the original root, causing either spurious `PathAccessError`s (`get_path({'a': {'b': 7}}, ('a', 'b'))` → `KeyError: 'b'`) or silently wrong results when the root happened to share the key (`get_path({'a': {'b': 1}, 'b': 99}, ('a', 'b'))` returned `99`).
+
+**Fix** — one-token change to use the cursor: `cur = cur[seg]`. This also restores the intended behavior of the `TypeError` fallback branch (which already used `cur`), so dotted list-index paths like `'a.b.c.2.0'` and string-digit segments on lists keep working. Defaults and `PathAccessError` construction are untouched, so `.exc`, `.seg`, `.path`, the `KeyError`/`IndexError`/`TypeError` inheritance, and message formatting are preserved. The docstring already documented the correct behavior, so no documentation change was needed.
+
+**Regression tests** — new `agent_tests/test_get_path.py` (24 tests) covers:
+- nested mappings at multiple depths, including same-key-at-outer/inner and list roots (catches the silent wrong-answer variant)
+- tuple paths, dotted paths with list indices, string-digit segments, negative indices, non-string dict keys, empty path
+- defaults at every failure mode, including falsy defaults that must not be confused with "unset"
+- `PathAccessError` details (`.seg`, `.path`, `.exc`, `str`/`repr`, exception-class inheritance) and propagation of unrelated exceptions despite a default
+
+**Verification** — `python3 benchmark_check.py` exits 0: acceptance script passes, 77 existing tests pass, 24 new agent tests pass.
+
+STATUS: DONE

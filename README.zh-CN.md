@@ -59,10 +59,43 @@ python3 deep_native.py --project "$PROJECT" install --hooks
 
 只安装到指定项目。安装器不会覆盖内容不同的已有 Skill；不会替你购买模型、改 API Key 或开启绕过权限。完整参数、如何设置项目测试命令、卸载与故障处理，见[详细教程](docs/tutorial.zh-CN.md)。
 
+## 真实本机 Preliminary Pilot：已暂停
+
+**阶段判断：STOP，停止扩样。** 原计划 60 次，按用户要求在当前运行完成后暂停，
+实际保留 21 次：Raw 10 次、Deep Native 11 次。
+其中 20 次构成 10 个完整配对；额外的 T08 第二次 B 运行通过，单独保留。
+
+![配对阶段成功率](evals/benchmark-v1/reviews/preliminary-v4-matched.png)
+
+| 指标 | Raw DeepSeek | DeepSeek + Deep Native |
+| --- | ---: | ---: |
+| 配对 20 次独立成功率 | 8/10（80.0%） | 7/10（70.0%） |
+| 全部保留运行的成功率 | 8/10（80.0%） | 8/11（72.7%） |
+| Verified Completion / 明确 DONE | 5/5 | 1/1 |
+| 完成声明未知 | 5/10 | 10/11 |
+| 全部运行耗时中位数（秒） | 108.0 | 103.7 |
+| 可用总 token 中位数（含缓存） | 465,399（9/10 可用） | 482,782（9/11 可用） |
+| 工具调用中位数 | 29.0 | 36.0 |
+| 真实 API 费用 | unavailable | unavailable |
+
+配对耗时 B/A 比值中位数约 1.20（10 对），token 比值约 1.21（8 对）。
+质量结果为 B 胜 0、负 1（T08）、平 9；没有观察到完成率改善信号。
+固定最终声明规则下，两组 false completion 均为 0，但明确 DONE 样本很少，
+尤其 B 的未知声明较多，不能据此声称降低了 false completion。
+
+这是阶段性描述，不是正式统计结论。原冻结规则下的完整实验判断仍为 INCONCLUSIVE。
+独立评分与证据哈希核对通过；轨迹中有 17 次沙箱导致的 shell 临时文件拒写，
+自动验证标记也存在误识别，因而不能将当前差异完全归因于 Skill。
+Deep Native 保持 `fda3dd0`，未做任务调优，暂停后没有继续模型调用。
+
+[阶段报告](evals/benchmark-v1/reviews/preliminary-v4.zh-CN.md) · [机器可读结果](evals/benchmark-v1/reviews/preliminary-v4.json) ·
+[方法与复现](evals/benchmark-v1/README.md) ·
+[原始证据](evals/benchmark-v1/results/2026-10-06-pilot-v4/runs/)
+
 ## 已验证与未验证
 
 本地工具测试、失败路径、12 步演示、三组同起点评测夹具已执行，结果见[验证报告](docs/validation.md)。
 
-**开发环境中没有 Claude Code 可执行程序或模型凭据，外部 DNS 也不可用。因此，真实宿主加载、真实 DeepSeek 调用以及与原生 Claude 的对照尚未执行。** 没有成功率提升百分比，没有 token 节省数据，没有模型等价承诺。
+v0.1 最初开发环境没有 Claude Code 或模型凭据。后续本机 Preliminary Pilot 已记录真实宿主加载与 DeepSeek 调用，见上方阶段结果；与原生 Claude 的对照仍未执行，没有模型等价承诺。
 
 这版交付的是可安装、可复现、可继续评测的基础版本。它不是安全沙盒；本地记录也不是不可伪造的证明。请在可信项目运行，并由独立测试与人工评审判断最终正确性。

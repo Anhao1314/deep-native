@@ -1,0 +1,16 @@
+Fixed `ordinalize` in `boltons/strutils.py:150`. The regression checked only `numstr[-2] == '2'` — which sent all teens (11–13) through the wrong last-digit rule and forced every number ending in 20–29 to `'th'`. The logic now matches standard English:
+
+```python
+if numstr[-2:] in ('11', '12', '13'):
+    ext = 'th'
+else:
+    ext = _ORDINAL_MAP.get(numstr[-1], 'th')
+```
+
+The slice-based check subsumes the old single-digit `IndexError` path, so string inputs, non-digit-ending inputs, `ext_only=True`, and larger numbers behave as before. Docstring examples now also cover teens and twenties.
+
+Added `agent_tests/test_ordinalize.py` with pytest functions and a `unittest.TestCase` class covering teens (11–13, 111–113, 1011), twenties (20–29, 121–123), basic/large/negative numbers, string passthrough, and `ext_only` behavior.
+
+`python3 benchmark_check.py` passes: visible acceptance checks, 77 existing tests, and 10 new agent tests. Module doctests also pass (29).
+
+STATUS: DONE

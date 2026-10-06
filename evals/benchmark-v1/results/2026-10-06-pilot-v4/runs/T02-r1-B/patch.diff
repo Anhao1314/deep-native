@@ -1,0 +1,32 @@
+diff --git a/more_itertools/more.py b/more_itertools/more.py
+index 940b800..7cfd92d 100755
+--- a/more_itertools/more.py
++++ b/more_itertools/more.py
+@@ -226,13 +226,25 @@ def chunked(iterable, n, strict=False):
+ 
+     To use a fill-in value instead, see the :func:`grouper` recipe.
+ 
++    *n* may be an integer or ``None``.  If *n* is ``None``, the whole
++    iterable is yielded as a single list:
++
++        >>> list(chunked([1, 2, 3, 4, 5], None))
++        [[1, 2, 3, 4, 5]]
++
++    A negative *n* raises ``ValueError``.  *n* values that are not integers,
++    including ``bool``, raise ``TypeError`` before the iterable is consumed.
++
+     If the length of *iterable* is not divisible by *n* and *strict* is
+     ``True``, then ``ValueError`` will be raised before the last
+     list is yielded.
+ 
+     """
+-    if n is not None and n < 0:
+-        raise ValueError('n must be at least 0')
++    if n is not None:
++        if isinstance(n, bool) or not isinstance(n, int):
++            raise TypeError('n must be an integer or None.')
++        if n < 0:
++            raise ValueError('n must be at least 0')
+ 
+     iterator = iter(partial(take, n, iter(iterable)), [])
+     if strict:

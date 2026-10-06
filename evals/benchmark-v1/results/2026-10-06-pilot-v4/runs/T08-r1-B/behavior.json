@@ -1,0 +1,383 @@
+{
+  "tool_calls": 36,
+  "inspection_before_edit": true,
+  "reproduction_before_edit": true,
+  "executed_verification": true,
+  "successful_verification": true,
+  "continued_after_failed_verification": false,
+  "edit_after_last_verification": true,
+  "skill_invoked": true,
+  "risk_reported": false,
+  "fabricated_verification": null,
+  "events": [
+    {
+      "name": "Skill",
+      "input": {
+        "skill": "deep-native"
+      },
+      "kind": "other",
+      "index": 0,
+      "success": true
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "ls -la /private/tmp/dn-live-6q9zfo4u/workspace",
+        "description": "List repository root contents"
+      },
+      "kind": "other",
+      "index": 1,
+      "success": true
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "git log --oneline -5 && git status",
+        "description": "Show git log and status"
+      },
+      "kind": "inspect",
+      "index": 2,
+      "success": true
+    },
+    {
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn-live-6q9zfo4u/workspace/benchmark_check.py"
+      },
+      "kind": "inspect",
+      "index": 3,
+      "success": true
+    },
+    {
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn-live-6q9zfo4u/workspace/benchmark_tests.py"
+      },
+      "kind": "inspect",
+      "index": 4,
+      "success": true
+    },
+    {
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn-live-6q9zfo4u/workspace/pyproject.toml"
+      },
+      "kind": "inspect",
+      "index": 5,
+      "success": true
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "ls /private/tmp/dn-live-6q9zfo4u/workspace/boltons/ | head -50; echo ---; ls /private/tmp/dn-live-6q9zfo4u/workspace/tests/ | head -50; echo ---; ls /private/tmp/dn-live-6q9zfo4u/workspace/docs/ | head -50",
+        "description": "List boltons, tests, docs directories"
+      },
+      "kind": "other",
+      "index": 6,
+      "success": true
+    },
+    {
+      "name": "Grep",
+      "input": {
+        "pattern": "def (parse_int_list|format_int_list)",
+        "path": "/private/tmp/dn-live-6q9zfo4u/workspace/boltons/strutils.py",
+        "output_mode": "content",
+        "-n": true
+      },
+      "kind": "inspect",
+      "index": 7,
+      "success": true
+    },
+    {
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn-live-6q9zfo4u/workspace/boltons/strutils.py",
+        "offset": 860,
+        "limit": 160
+      },
+      "kind": "inspect",
+      "index": 8,
+      "success": true
+    },
+    {
+      "name": "Grep",
+      "input": {
+        "-n": true,
+        "output_mode": "content",
+        "path": "/private/tmp/dn-live-6q9zfo4u/workspace/tests/test_strutils.py",
+        "pattern": "int_list|complement_int_list",
+        "-C": 6
+      },
+      "kind": "inspect",
+      "index": 9,
+      "success": true
+    },
+    {
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn-live-6q9zfo4u/workspace/boltons/__init__.py"
+      },
+      "kind": "inspect",
+      "index": 10,
+      "success": true
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "ls -a /private/tmp/dn-live-6q9zfo4u/workspace/.claude /private/tmp/dn-live-6q9zfo4u/workspace/.omp /private/tmp/dn-live-6q9zfo4u/workspace/.deep-native /private/tmp/dn-live-6q9zfo4u/workspace/misc; find /private/tmp/dn-live-6q9zfo4u/workspace -maxdepth 2 -iname \"CLAUDE.md\" -o -maxdepth 2 -iname \"*.md\" -path \"*claude*\"",
+        "description": "Inspect hidden dirs and look for CLAUDE.md"
+      },
+      "kind": "other",
+      "index": 11,
+      "success": true
+    },
+    {
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn-live-6q9zfo4u/workspace/docs/index.rst"
+      },
+      "kind": "inspect",
+      "index": 12,
+      "success": true
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "grep -rn \"__main__\" /private/tmp/dn-live-6q9zfo4u/workspace/boltons/*.py | head -20; echo \"--- argparse usage:\"; grep -rln \"argparse\" /private/tmp/dn-live-6q9zfo4u/workspace/boltons/*.py",
+        "description": "Search for CLI conventions in boltons modules"
+      },
+      "kind": "inspect",
+      "index": 13,
+      "success": true
+    },
+    {
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn-live-6q9zfo4u/workspace/docs/strutils.rst"
+      },
+      "kind": "inspect",
+      "index": 14,
+      "success": true
+    },
+    {
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn-live-6q9zfo4u/workspace/boltons/jsonutils.py",
+        "offset": 200,
+        "limit": 30
+      },
+      "kind": "inspect",
+      "index": 15,
+      "success": true
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "grep -n \"argparse\" -A 20 /private/tmp/dn-live-6q9zfo4u/workspace/boltons/strutils.py | head -50; echo \"=== head of strutils\"; sed -n '1,40p' /private/tmp/dn-live-6q9zfo4u/workspace/boltons/strutils.py",
+        "description": "Show strutils argparse usage and header"
+      },
+      "kind": "inspect",
+      "index": 16,
+      "success": true
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "sed -n '228,260p' /private/tmp/dn-live-6q9zfo4u/workspace/boltons/jsonutils.py; echo \"=== python:\"; python3 --version; python3 -m pytest --version 2>&1 | head -3",
+        "description": "Show jsonutils CLI and python/pytest versions"
+      },
+      "kind": "verify",
+      "index": 17,
+      "success": true
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "python3 \"/private/tmp/dn-live-6q9zfo4u/workspace/.claude/skills/deep-native/scripts/deep_native.py\" --project \"/private/tmp/dn-live-6q9zfo4u/workspace\" doctor; echo \"=== STATUS ===\"; python3 \"/private/tmp/dn-live-6q9zfo4u/workspace/.claude/skills/deep-native/scripts/deep_native.py\" --project \"/private/tmp/dn-live-6q9zfo4u/workspace\" status",
+        "description": "Run deep-native doctor and status"
+      },
+      "kind": "other",
+      "index": 18,
+      "success": true
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "grep -rn \"^from \\|^import \" /private/tmp/dn-live-6q9zfo4u/workspace/boltons/iterutils.py | head -20; echo \"=== queueutils:\"; grep -rn \"^from \\|^import \" /private/tmp/dn-live-6q9zfo4u/workspace/boltons/queueutils.py | head; echo \"=== README modules:\"; grep -n \"queueutils\\|strutils\\|setutils\" /private/tmp/dn-live-6q9zfo4u/workspace/README.md",
+        "description": "Check import conventions and README module list"
+      },
+      "kind": "inspect",
+      "index": 19,
+      "success": true
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "grep -rn \"queueutils\\|setutils\\|strutils\" /private/tmp/dn-live-6q9zfo4u/workspace/docs/architecture.rst /private/tmp/dn-live-6q9zfo4u/workspace/.github/workflows/* 2>/dev/null | head -20; echo \"=== workflows:\"; ls /private/tmp/dn-live-6q9zfo4u/workspace/.github/workflows/",
+        "description": "Check docs architecture and CI workflows"
+      },
+      "kind": "inspect",
+      "index": 20,
+      "success": true
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "grep -rn \"from \\.\\|from boltons\\|import boltons\" /private/tmp/dn-live-6q9zfo4u/workspace/boltons/*.py | grep -v \"^.*#\" | head -20; echo \"=== tests.yaml:\"; cat /private/tmp/dn-live-6q9zfo4u/workspace/.github/workflows/tests.yaml; echo \"=== tox:\"; cat /private/tmp/dn-live-6q9zfo4u/workspace/tox.ini; echo \"=== conftest:\"; cat /private/tmp/dn-live-6q9zfo4u/workspace/tests/conftest.py",
+        "description": "Check intra-package import style, CI, tox, conftest"
+      },
+      "kind": "inspect",
+      "index": 21,
+      "success": true
+    },
+    {
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn-live-6q9zfo4u/workspace/boltons/queueutils.py",
+        "limit": 30,
+        "offset": 64
+      },
+      "kind": "inspect",
+      "index": 22,
+      "success": true
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "python3 -m pytest -q --doctest-modules boltons/strutils.py 2>&1 | tail -5",
+        "description": "Run strutils doctests to check baseline"
+      },
+      "kind": "verify",
+      "index": 23,
+      "success": true
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "cd /tmp && python3 - <<'EOF'\nimport argparse\np = argparse.ArgumentParser(prog='x')\nsp = p.add_subparsers(dest='command', required=True)\ne = sp.add_parser('expand')\ne.add_argument('text')\nfor argv in (['expand', '-3--1,2,2'], ['expand', '--', '-3--1'], ['expand', '-x'], ['expand', '1,2']):\n    try:\n        print(argv, '->', p.parse_args(argv))\n    except SystemExit as s:\n        print(argv, '-> SystemExit', s.code)\nEOF",
+        "description": "Test argparse behavior with leading-dash positional"
+      },
+      "kind": "other",
+      "index": 24,
+      "success": false
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "python3 -c \"\nimport argparse\np = argparse.ArgumentParser(prog='x')\nsp = p.add_subparsers(dest='command', required=True)\ne = sp.add_parser('expand')\ne.add_argument('text')\nfor argv in (['expand', '-3--1,2,2'], ['expand', '--', '-3--1'], ['expand', '-x'], ['expand', '1,2']):\n    try:\n        print(argv, '->', p.parse_args(argv))\n    except SystemExit as s:\n        print(argv, '-> SystemExit', s.code)\n\"",
+        "description": "Test argparse behavior with leading-dash positional"
+      },
+      "kind": "other",
+      "index": 25,
+      "success": true
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "python3 -c \"\nimport argparse\n# Option B: REMAINDER\np = argparse.ArgumentParser(prog='x')\nsp = p.add_subparsers(dest='command', required=True)\ne = sp.add_parser('expand')\ne.add_argument('text', nargs=argparse.REMAINDER)\ntests = [['expand','-3--1,2,2'], ['expand','1,2'], ['expand'], ['expand','-h'], ['expand','--help'], ['expand','--','-3'], ['expand','1,2','3']]\nfor argv in tests:\n    try:\n        print('B', argv, '->', p.parse_args(argv))\n    except SystemExit as s:\n        print('B', argv, '-> SystemExit', s.code)\n\"",
+        "description": "Test REMAINDER approach against dash-leading text"
+      },
+      "kind": "other",
+      "index": 26,
+      "success": true
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "python3 -c \"\nimport argparse, sys\n# Option A: normalize argv by inserting '--'\ndef norm(argv):\n    argv = list(argv)\n    if len(argv) > 1 and argv[0] in ('expand','compact') and argv[1].startswith('-') and argv[1] not in ('-h','--help','--') and argv[1] != '--':\n        argv.insert(1, '--')\n    return argv\np = argparse.ArgumentParser(prog='x')\nsp = p.add_subparsers(dest='command', required=True)\ne = sp.add_parser('expand'); e.add_argument('text')\nc = sp.add_parser('compact'); c.add_argument('text')\ntests = [['expand','-3--1,2,2'], ['expand','1,2'], ['expand'], ['expand','-h'], ['expand','--help'], ['expand','--','-3'], ['compact','-3,-2,-1,2,2'], ['bad','1'], [], ['expand','--bogus']]\nfor argv in tests:\n    try:\n        print('A', argv, '->', p.parse_args(norm(argv)))\n    except SystemExit as s:\n        print('A', argv, '-> SystemExit', s.code)\n\" 2>&1 | grep -v \"^usage\\|^x:\"",
+        "description": "Test argv normalization approach"
+      },
+      "kind": "inspect",
+      "index": 27,
+      "success": true
+    },
+    {
+      "name": "Grep",
+      "input": {
+        "-n": true,
+        "output_mode": "content",
+        "path": "/private/tmp/dn-live-6q9zfo4u/workspace",
+        "pattern": "parse_int_list|format_int_list|complement_int_list"
+      },
+      "kind": "inspect",
+      "index": 28,
+      "success": true
+    },
+    {
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn-live-6q9zfo4u/workspace/boltons/strutils.py",
+        "limit": 125,
+        "offset": 1013
+      },
+      "kind": "inspect",
+      "index": 29,
+      "success": true
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "python3 -c \"\nfrom boltons.strutils import complement_int_list, format_int_list, parse_int_list\nprint(repr(complement_int_list('1,3,5-8', range_start=-10, range_end=-5)))\nprint(repr(format_int_list([-3,-2,-1,2,2])))\nprint(repr(format_int_list([-1,0,1])))\nprint(repr(format_int_list([-1,0])))\nprint(repr(format_int_list([-5,-4,-3])))\nprint(repr(format_int_list([-7])))\nprint(repr(format_int_list([0])))\nprint(repr(format_int_list([])))\nprint(repr(format_int_list([2,2,2])))\nprint(repr(format_int_list([-2,0])))\n\"",
+        "description": "Probe complement and format behavior with negatives"
+      },
+      "kind": "other",
+      "index": 30,
+      "success": true
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "python3 \"/private/tmp/dn-live-6q9zfo4u/workspace/.claude/skills/deep-native/scripts/deep_native.py\" --project \"/private/tmp/dn-live-6q9zfo4u/workspace\" configure --name benchmark -- python3 benchmark_check.py && python3 \"/private/tmp/dn-live-6q9zfo4u/workspace/.claude/skills/deep-native/scripts/deep_native.py\" --project \"/private/tmp/dn-live-6q9zfo4u/workspace\" begin --session \"dn-live-rangeutils\" --goal \"boltons.rangeutils.parse_ranges/format_ranges handle signed ints, inclusive ranges (-3--1, reversed endpoints), sorted unique results, canonical compact output, reuse extended strutils parse/format_int_list; CLI expand/compact via python3 -m boltons.rangeutils with nonzero-no-traceback on malformed input; docs + agent_tests regression tests; python3 benchmark_check.py green\"",
+        "description": "Configure benchmark check and begin task session"
+      },
+      "kind": "inspect",
+      "index": 31,
+      "success": true
+    },
+    {
+      "name": "Bash",
+      "input": {
+        "command": "python3 benchmark_check.py 2>&1 | tail -8; echo \"exit=$?\"",
+        "description": "Reproduce current failing acceptance check"
+      },
+      "kind": "verify",
+      "index": 32,
+      "success": false
+    },
+    {
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn-live-6q9zfo4u/workspace/boltons/strutils.py",
+        "old_string": "def parse_int_list(range_string, delim=',', range_delim='-'):\n    \"\"\"Returns a sorted list of positive integers based on\n    *range_string*. Reverse of :func:`format_int_list`.\n\n    Args:\n        range_string (str): String of comma separated positive\n            integers or ranges (e.g. '1,2,4-6,8'). Typical of a custom\n            page range string used in printer dialogs.\n        delim (char): Defaults to ','. Separates integers and\n            contiguous ranges of integers.\n        range_delim (char): Defaults to '-'. Indicates a contiguous\n            range of integers.\n\n    >>> parse_int_list('1,3,5-8,10-11,15')\n    [1, 3, 5, 6, 7, 8, 10, 11, 15]\n\n    \"\"\"\n    output = []\n\n    for x in range_string.strip().split(delim):\n\n        # Range\n        if range_delim in x:\n            range_limits = list(map(int, x.split(range_delim)))\n            output += list(range(min(range_limits), max(range_limits)+1))\n\n        # Empty String\n        elif not x:\n            continue\n\n        # Integer\n        else:\n            output.append(int(x))\n\n    return sorted(output)",
+        "new_string": "_SIGNED_INT_TOKEN_RE = re.compile(r'[+-]?[0-9]+$')\n\n\ndef _signed_range_token_re(range_delim):\n    \"\"\"Return a regex matching a two-ended signed range token, such as\n    ``-3--1`` or ``8-5``, as used by :func:`parse_int_list`. The\n    captured groups are the (possibly reversed) range endpoints.\n    \"\"\"\n    return re.compile(r'([+-]?[0-9]+)\\s*{0}\\s*([+-]?[0-9]+)$'.format(\n        re.escape(range_delim)))\n\n\ndef _parse_int_token(token, range_token_re):\n    \"\"\"Expand one comma-delimited *token* into a list of integers.\n\n    *token* is either a signed integer (e.g. ``-3``) or a pair of\n    signed integers joined by the range delimiter (e.g. ``-3--1`` or\n    ``8-5``). Reversed endpoints describe the same inclusive range as\n    their sorted counterparts. Raises :exc:`ValueError` for anything\n    else, including empty-handed malformed ranges like ``1-2-3``.\n    \"\"\"\n    token = token.strip()\n    if not token:\n        return []\n\n    if _SIGNED_INT_TOKEN_RE.match(token):\n        return [int(token)]\n\n    match = range_token_re.match(token)\n    if match:\n        min_limit, max_limit = sorted(int(group) for group in match.groups())\n        return list(range(min_limit, max_limit + 1))\n\n    raise ValueError('invalid integer or range: %r' % (token,))\n\n\ndef parse_int_list(range_string, delim=',', range_delim='-',\n                   allow_signed=True):\n    \"\"\"Returns a sorted, duplicate-free list of integers based on\n    *range_string*. Reverse of :func:`format_int_list`.\n\n    Args:\n        range_string (str): String of comma separated integers or\n            ranges (e.g. '1,2,4-6,8'). Typical of a custom\n            page range string used in printer dialogs. Reversed\n            endpoints are accepted, so '8-5' is the same as '5-8'.\n            When *allow_signed* is enabled, signed integers and\n            ranges are accepted as well (e.g. '-3', '-3--1', '5--2').\n        delim (char): Defaults to ','. Separates integers and\n            contiguous ranges of integers.\n        range_delim (char): Defaults to '-'. Indicates a contiguous\n            range of integers.\n        allow_signed (bool): Defaults to ``True``. When enabled,\n            integers may carry a leading ``+`` or ``-``, which also\n            causes malformed ranges such as '1-2-3' to be rejected\n            with a :exc:`ValueError` instead of being expanded\n            leniently. Set to ``False`` for the historical\n            positive-integer-only behavior, which does not accept\n            signed values.\n\n    >>> parse_int_list('1,3,5-8,10-11,15')\n    [1, 3, 5, 6, 7, 8, 10, 11, 15]\n\n    >>> parse_int_list('-3--1,2,2')\n    [-3, -2, -1, 2]\n\n    >>> parse_int_list('8-5')\n    [5, 6, 7, 8]\n\n    \"\"\"\n    output = []\n\n    if allow_signed:\n        range_token_re = _signed_range_token_re(range_delim)\n        for x in range_string.strip().split(delim):\n            output += _parse_int_token(x, range_token_re)\n    else:\n        for x in range_string.strip().split(delim):\n\n            # Range\n            if range_delim in x:\n                range_limits = list(map(int, x.split(range_delim)))\n                output += list(range(min(range_limits), max(range_limits)+1))\n\n            # Empty String\n            elif not x:\n                continue\n\n            # Integer\n            else:\n                output.append(int(x))\n\n    return sorted(set(output))"
+      },
+      "kind": "edit",
+      "index": 33,
+      "success": true
+    },
+    {
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn-live-6q9zfo4u/workspace/boltons/strutils.py",
+        "old_string": "def format_int_list(int_list, delim=',', range_delim='-', delim_space=False):\n    \"\"\"Returns a sorted range string from a list of positive integers\n    (*int_list*). Contiguous ranges of integers are collapsed to min\n    and max values. Reverse of :func:`parse_int_list`.\n\n    Args:\n        int_list (list): List of positive integers to be converted\n           into a range string (e.g. [1,2,4,5,6,8]).\n        delim (char): Defaults to ','. Separates integers and\n           contiguous ranges of integers.\n        range_delim (char): Defaults to '-'. Indicates a contiguous\n           range of integers.\n        delim_space (bool): Defaults to ``False``. If ``True``, adds a\n           space after all *delim* characters.\n\n    >>> format_int_list([1,3,5,6,7,8,10,11,15])\n    '1,3,5-8,10-11,15'\n\n    \"\"\"",
+        "new_string": "def format_int_list(int_list, delim=',', range_delim='-', delim_space=False):\n    \"\"\"Returns a sorted range string from a list of integers\n    (*int_list*). Contiguous ranges of integers are collapsed to min\n    and max values. Reverse of :func:`parse_int_list`. Signed\n    integers are supported; a contiguous run of negative values is\n    formatted with the conventional doubled delimiter (e.g.\n    ``-3--1``), which :func:`parse_int_list` reads back.\n\n    Args:\n        int_list (list): List of integers to be converted\n           into a range string (e.g. [1,2,4,5,6,8] or [-3,-2,-1,2]).\n           Duplicate and out-of-order values are normalized away.\n        delim (char): Defaults to ','. Separates integers and\n           contiguous ranges of integers.\n        range_delim (char): Defaults to '-'. Indicates a contiguous\n           range of integers.\n        delim_space (bool): Defaults to ``False``. If ``True``, adds a\n           space after all *delim* characters.\n\n    >>> format_int_list([1,3,5,6,7,8,10,11,15])\n    '1,3,5-8,10-11,15'\n\n    >>> format_int_list([-3,-2,-1,2,2])\n    '-3--1,2'\n\n    \"\"\""
+      },
+      "kind": "edit",
+      "index": 34,
+      "success": true
+    },
+    {
+      "name": "Write",
+      "input": {
+        "file_path": "/private/tmp/dn-live-6q9zfo4u/workspace/boltons/rangeutils.py",
+        "content": "# Copyright (c) 2013, Mahmoud Hashemi\n#\n# Redistribution and use in source and binary forms, with or without\n# modification, are permitted provided that the following conditions are\n# met:\n#\n#    * Redistributions of source code must retain the above copyright\n#      notice, this list of conditions and the following disclaimer.\n#\n#    * Redistributions in binary form must reproduce the above\n#      copyright notice, this list of conditions and the following\n#      disclaimer in the documentation and/or other materials provided\n#      with the distribution.\n#\n#    * The names of the contributors may not be used to endorse or\n#      promote products derived from this software without specific\n#      prior written permission.\n#\n# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n# \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR\n# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT\n# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,\n# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT\n# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,\n# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY\n# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT\n# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n\n\"\"\"``rangeutils`` - Compact parsing and formatting of integer ranges\n\nRange strings like ``'-3--1,2,5-8'`` are a compact, human-friendly way\nto describe sets of integers, familiar from printer page-range dialogs\nand port lists. :func:`parse_ranges` expands such a string into a\nsorted, duplicate-free list of integers, and :func:`format_ranges`\nturns a list of integers back into a canonical range string.\n\nBoth functions build on :func:`boltons.strutils.parse_int_list` and\n:func:`boltons.strutils.format_int_list`, extending them to support\nsigned integers and reversed endpoints.\n\n>>> parse_ranges('1,3,5-8,10-11,15')\n[1, 3, 5, 6, 7, 8, 10, 11, 15]\n>>> parse_ranges('-3--1,2,2')\n[-3, -2, -1, 2]\n>>> parse_ranges('8-5')\n[5, 6, 7, 8]\n>>> format_ranges([-3, -2, -1, 2, 2])\n'-3--1,2'\n\nThe module doubles as a command-line tool, exposing the same\nfunctionality as ``expand`` and ``compact`` subcommands::\n\n    $ python3 -m boltons.rangeutils expand '1,3,5-8'\n    [1, 3, 5, 6, 7, 8]\n    $ python3 -m boltons.rangeutils compact '1,3,5,6,7,8'\n    1,3,5-8\n\nMalformed input makes the command exit non-zero with a short error\nmessage, rather than a traceback.\n\"\"\"\n\nimport argparse\nimport json\nimport sys\n\ntry:\n    from .strutils import parse_int_list, format_int_list\nexcept ImportError:  # pragma: no cover\n    # Support copying this module out of the package, the way boltons\n    # modules are often vendored.\n    from boltons.strutils import parse_int_list, format_int_list\n\n\n__all__ = ['parse_ranges', 'format_ranges', 'main']\n\n\ndef parse_ranges(text):\n    \"\"\"Parse a comma-separated range string *text* into a sorted,\n    duplicate-free list of integers.\n\n    Each comma-separated token is either a signed integer (``'-3'``)\n    or an inclusive range of two signed integers separated by ``'-'``\n    (``'5-8'``, ``'-3--1'``, ``'5--2'``). Reversed endpoints are\n    accepted, so ``'8-5'`` is the same range as ``'5-8'``. Empty\n    tokens (e.g. a trailing comma) are ignored.\n\n    Args:\n        text (str): String of comma-separated integers and ranges,\n            e.g. ``'-3--1,2,5-8'``.\n\n    Returns:\n        list: Sorted, duplicate-free integers, e.g. ``[-3, -2, -1, 2,\n        5, 6, 7, 8]``.\n\n    Raises:\n        ValueError: If a token is not an integer or a well-formed\n            range, such as ``'abc'``, ``'1-'`` or ``'1-2-3'``.\n        TypeError: If *text* is not a string.\n\n    >>> parse_ranges('-3--1,2,5-8')\n    [-3, -2, -1, 2, 5, 6, 7, 8]\n\n    >>> parse_ranges(' 3, 1-2 ,2 ')\n    [1, 2, 3]\n\n    >>> parse_ranges('')\n    []\n\n    \"\"\"\n    if not isinstance(text, str):\n        raise TypeError('expected range text as a str, not %s' %\n                        type(text).__name__)\n    # strutils' parser carries the real work; allow_signed enables the\n    # signed tokens ('-3--1') and strict range validation this API\n    # promises.\n    return parse_int_list(text, allow_signed=True)\n\n\ndef format_ranges(values):\n    \"\"\"Format an iterable of integers *values* as a canonical range\n    string, the reverse of :func:`parse_ranges`.\n\n    Values are sorted and de-duplicated, and contiguous runs are\n    collapsed to their endpoints, so ``[2, 1, 3, 3]`` formats as\n    ``'1-3'``. Negative runs use the conventional doubled delimiter,\n    so ``[-3, -2, -1]`` formats as ``'-3--1'``, which\n    :func:`parse_ranges` reads back.\n\n    Args:\n        values (iterable): Iterable of integers, e.g. ``[-3, -2, -1,\n            2]``.\n\n    Returns:\n        str: Canonical, compact range string, e.g. ``'-3--1,2'``. An\n        empty iterable formats as ``''``.\n\n    >>> format_ranges([-3, -2, -1, 2, 2])\n    '-3--1,2'\n\n    >>> format_ranges([2, 1, 3, 5, 4])\n    '1-5'\n\n    >>> format_ranges([])\n    ''\n\n    \"\"\"\n    return format_int_list(values)\n\n\ndef _normalize_argv(argv):\n    \"\"\"Insert argparse's ``--`` separator before a *TEXT* argument that\n    starts with a dash, such as ``'-3--1,2'``, which argparse would\n    otherwise mistake for an option and reject.\n    \"\"\"\n    if (len(argv) > 1 and argv[0] in ('expand', 'compact')\n            and argv[1].startswith('-')\n            and argv[1] not in ('-h', '--help', '--')):\n        return [argv[0], '--'] + list(argv[1:])\n    return list(argv)\n\n\ndef _build_parser():\n    parser = argparse.ArgumentParser(\n        prog='python3 -m boltons.rangeutils',\n        description='Expand and compact comma-separated integer ranges.')\n    subparsers = parser.add_subparsers(dest='command', required=True)\n\n    expand_parser = subparsers.add_parser(\n        'expand', help='expand TEXT into a JSON list of integers')\n    expand_parser.add_argument(\n        'text', metavar='TEXT',\n        help=\"integers and inclusive ranges, e.g. '1,3,5-8' or '-3--1,2'\")\n\n    compact_parser = subparsers.add_parser(\n        'compact', help='compact TEXT into canonical range text')\n    compact_parser.add_argument(\n        'text', metavar='TEXT',\n        help=\"integers and ranges, e.g. '1,3,5,6,7,8' or '-3,-2,-1,2'\")\n\n    return parser\n\n\ndef main(argv=None):\n    \"\"\"Command-line entry point for ``python3 -m boltons.rangeutils``.\n\n    With ``expand``, prints the parsed integers as a JSON list. With\n    ``compact``, prints the canonical range string. Returns ``0`` on\n    success; malformed *TEXT* or missing arguments exit non-zero with\n    a message on stderr and no traceback. *argv* defaults to\n    ``sys.argv[1:]``.\n    \"\"\"\n    if argv is None:\n        argv = sys.argv[1:]\n\n    parser = _build_parser()\n    args = parser.parse_args(_normalize_argv(list(argv)))\n\n    try:\n        values = parse_ranges(args.text)\n        if args.command == 'expand':\n            print(json.dumps(values))\n        else:\n            print(format_ranges(values))\n    except (TypeError, ValueError) as exc:\n        parser.exit(1, '{0}: error: {1}\\n'.format(parser.prog, exc))\n\n    return 0\n\n\nif __name__ == '__main__':\n    sys.exit(main())\n"
+      },
+      "kind": "edit",
+      "index": 35,
+      "success": true
+    }
+  ],
+  "verification_claim_without_detected_success": false
+}

@@ -1,0 +1,44 @@
+{
+  "pass": true,
+  "contract": {
+    "argv": [
+      "sandbox-exec",
+      "-D",
+      "CLI_PID=0",
+      "-f",
+      "/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-q5pngdqj/grader.sb",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/benchmark-env/bin/python",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native/evals/benchmark-v1/acceptance.py",
+      "T02",
+      "2"
+    ],
+    "exit_code": 0,
+    "stdout": "Independent contract checks passed: T02 phase 2\n",
+    "stderr": "",
+    "duration_seconds": 0.0369
+  },
+  "upstream_regression": {
+    "argv": [
+      "sandbox-exec",
+      "-D",
+      "CLI_PID=0",
+      "-f",
+      "/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-q5pngdqj/grader.sb",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/benchmark-env/bin/python",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests"
+    ],
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "....................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................\n----------------------------------------------------------------------\nRan 932 tests in 6.404s\n\nOK\n",
+    "duration_seconds": 6.5013
+  },
+  "new_regression_tests": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "No new regression tests supplied; not required by this task."
+  }
+}

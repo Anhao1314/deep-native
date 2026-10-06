@@ -1,0 +1,17 @@
+All checks pass. Summary of changes:
+
+**Implementation** — `more_itertools/more.py:215` (`chunked`):
+- Added eager validation: `n` must be `None` or an `int` (`bool` explicitly rejected, since it's an `int` subclass) → otherwise `TypeError('n must be an integer or None')`.
+- The type check runs before `iter(iterable)` is touched, so invalid sizes raise before any part of the input is consumed.
+- Existing checks preserved: negative integers still raise `ValueError('n must be at least 0')`; `n=0` still yields nothing without consuming the source; `n=None` still yields one chunk; `strict=True` semantics (divisibility `ValueError`, `n=None` `ValueError`) unchanged.
+- Docstring now documents the accepted types and the error behavior.
+
+**Types** — `more_itertools/more.pyi` already declares `n: int | None`, which matches the accepted types, so no stub change was needed.
+
+**Docs** — added an Unreleased changelog entry in `docs/versions.rst`.
+
+**Tests** — new `agent_tests/test_chunked_validation.py` with 29 cases covering: valid int/int-subclass/`None`/`0` outputs, negative-integer `ValueError`, `bool` and other non-integer `TypeError` (including inside `strict` mode), eager raise at call time, no consumption or even iteration of the source on `TypeError`, and preserved `strict`/`n=0`/`n=None` behavior.
+
+Verification: `python3 benchmark_check.py` → visible acceptance checks passed, 932 unittest/doc tests OK, 29 agent tests passed. Manual spot-checks confirmed `Boom()` iterables are never touched and partially-used iterators remain untouched after a rejected `n`.
+
+STATUS: DONE

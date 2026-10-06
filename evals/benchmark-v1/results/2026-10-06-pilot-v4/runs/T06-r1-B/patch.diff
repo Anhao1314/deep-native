@@ -1,0 +1,129 @@
+diff --git a/boltons/iterutils.py b/boltons/iterutils.py
+index e8ccd61..adefc31 100644
+--- a/boltons/iterutils.py
++++ b/boltons/iterutils.py
+@@ -1361,7 +1361,7 @@ def get_path(root, path, default=_UNSET):
+     try:
+         for seg in path:
+             try:
+-                cur = root[seg]
++                cur = cur[seg]
+             except (KeyError, IndexError) as exc:
+                 raise PathAccessError(exc, seg, path)
+             except TypeError as exc:
+diff --git a/agent_tests/test_get_path_nested_lookup.py b/agent_tests/test_get_path_nested_lookup.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/test_get_path_nested_lookup.py
+@@ -0,0 +1,111 @@
++"""Regression tests for get_path resolving each segment against the
++current (nested) object, rather than against the outer root.
++
++The bug: later path segments were looked up on the original *root*, so a
++nested lookup silently returned a same-named key from the outer mapping
++(or raised a bogus PathAccessError).
++"""
++import pytest
++
++from boltons.iterutils import get_path, PathAccessError
++
++
++class RecordingDict(dict):
++    """Dict that records which keys are looked up on it."""
++
++    def __init__(self, *args, **kwargs):
++        super().__init__(*args, **kwargs)
++        self.lookups = []
++
++    def __getitem__(self, key):
++        self.lookups.append(key)
++        return super().__getitem__(key)
++
++
++def test_later_segment_not_looked_up_on_outer_root():
++    # 'b' exists both at the root and inside root['a']; the inner one wins
++    root = {'a': {'b': 'inner'}, 'b': 'outer'}
++    assert get_path(root, ('a', 'b')) == 'inner'
++
++
++def test_only_first_segment_touches_the_outer_root():
++    root = RecordingDict({'a': {'b': {'c': 'deep'}}})
++    assert get_path(root, ('a', 'b', 'c')) == 'deep'
++    # the outer mapping must be consulted exactly once, for the first seg
++    assert root.lookups == ['a']
++
++
++def test_nested_lookup_where_later_segment_is_absent_from_outer_root():
++    # 'b' is not a root key at all; this used to raise PathAccessError
++    root = {'a': {'b': 1}}
++    assert get_path(root, ('a', 'b')) == 1
++
++
++def test_deep_nesting_across_mappings_and_sequences():
++    root = {'a': {'b': {'c': [[1], [2], [3]]}}, 'b': 99, 'c': 99}
++    assert get_path(root, ('a', 'b', 'c', 2, 0)) == 3
++    assert get_path(root, 'a.b.c.2.0') == 3
++
++
++def test_dotted_string_path_with_list_index_preserved():
++    assert get_path({'key': ['test']}, 'key.0') == 'test'
++    assert get_path({'key': ['test']}, 'key') == ['test']
++
++
++def test_tuple_path_with_list_index_preserved():
++    assert get_path({'a': (1, 2, 3)}, ('a', 2)) == 3
++    assert get_path(['test'], (0,)) == 'test'
++
++
++def test_default_returned_when_nested_lookup_fails():
++    root = {'a': {'b': 1}}
++    assert get_path(root, ('a', 'missing'), default='D') == 'D'
++    assert get_path(root, 'a.missing', default='D') == 'D'
++    assert get_path(root, ('missing', 'x'), default=None) is None
++
++
++def test_path_access_error_details_preserved():
++    root = {'a': {'b': 1}}
++    with pytest.raises(PathAccessError) as excinfo:
++        get_path(root, ('a', 'missing'))
++    pae = excinfo.value
++    assert pae.seg == 'missing'
++    assert pae.path == ('a', 'missing')
++    assert isinstance(pae.exc, KeyError)
++    assert 'missing' in str(pae)
++    # PathAccessError is intentionally an amalgamation of these types
++    assert isinstance(pae, (KeyError, IndexError, TypeError))
++
++    with pytest.raises(PathAccessError) as excinfo:
++        get_path({'a': {'b': [1]}}, ('a', 'b', 9))
++    pae = excinfo.value
++    assert pae.seg == 9
++    assert pae.path == ('a', 'b', 9)
++    assert isinstance(pae.exc, IndexError)
++
++    # a dotted path against a list retries with an int conversion, so the
++    # reported segment is the converted int while the original TypeError
++    # from the string index is preserved in .exc
++    with pytest.raises(PathAccessError) as excinfo:
++        get_path({'a': {'b': [1]}}, 'a.b.9')
++    pae = excinfo.value
++    assert pae.seg == 9
++    assert pae.path == ['a', 'b', '9']
++    assert isinstance(pae.exc, TypeError)
++
++
++def test_nonindexable_parent_error_message_preserved():
++    with pytest.raises(PathAccessError) as excinfo:
++        get_path({'a': 1}, ('a', 'b'))
++    pae = excinfo.value
++    assert pae.seg == 'b'
++    assert isinstance(pae.exc, TypeError)
++    assert 'int' in str(pae)
++    assert get_path({'a': 1}, ('a', 'b'), default='D') == 'D'
++
++
++def test_non_numeric_string_index_into_list_still_fails():
++    with pytest.raises(PathAccessError) as excinfo:
++        get_path({'k': ['a']}, 'k.x')
++    assert excinfo.value.seg == 'x'
++    assert get_path({'k': ['a']}, 'k.x', default='D') == 'D'

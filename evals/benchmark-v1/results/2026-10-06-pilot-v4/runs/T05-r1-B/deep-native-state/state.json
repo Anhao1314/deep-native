@@ -1,0 +1,12 @@
+{
+  "attempt": "",
+  "config_hash": "2e428a9e92f3c656414809ec7099ee07c53ede0769d373e0cff6c449bf8a9f09",
+  "goal": "map_reduce uses a single accumulation loop plus the existing optional reduction phase; behavior (callback order, single-pass consumption, insertion order, exception propagation, defaultdict default_factory None) unchanged; regression tests under agent_tests/; python3 benchmark_check.py passes",
+  "next": "Run deep-native verify; review diff and report.",
+  "note": "Refactored more_itertools/more.py map_reduce: replaced the duplicated valuefunc-is-None / valuefunc-supplied accumulation loops with one loop using 'value = item if valuefunc is None else valuefunc(item)'; reduction phase, default_factory handling and docstring untouched. Added agent_tests/test_map_reduce.py (16 tests) pinning callback order, single-pass consumption counts, key insertion order, exception propagation (keyfunc/valuefunc/reducefunc), falsy non-None valuefunc, reduce phase order, defaultdict(None). Differential old-vs-new run: 3000 random trials, 0 mismatches in results/key order/callback logs/iter+next counts/exception class+message.",
+  "schema": 1,
+  "session": "6b69aa0b-a645-44c4-8cd9-e023cba04893",
+  "status": "active",
+  "task_id": "cfa9abd89f7d49c1b71d9a33c57be8c6",
+  "updated_at": "2026-10-06T05:16:30Z"
+}

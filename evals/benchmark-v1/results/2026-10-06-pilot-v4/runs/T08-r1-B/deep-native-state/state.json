@@ -1,0 +1,12 @@
+{
+  "attempt": "",
+  "config_hash": "9918af3dd1d5c3f74ba7b872936588255df42c28302210c39e4ba655ee967bf5",
+  "goal": "boltons.rangeutils.parse_ranges/format_ranges handle signed ints, inclusive ranges (-3--1, reversed endpoints), sorted unique results, canonical compact output, reuse extended strutils parse/format_int_list; CLI expand/compact via python3 -m boltons.rangeutils with nonzero-no-traceback on malformed input; docs + agent_tests regression tests; python3 benchmark_check.py green",
+  "next": "Inspect and reproduce before editing.",
+  "note": "",
+  "schema": 1,
+  "session": "dn-live-rangeutils",
+  "status": "active",
+  "task_id": "684f0f77568142218a70e324c44bfd68",
+  "updated_at": "2026-10-06T05:25:30Z"
+}

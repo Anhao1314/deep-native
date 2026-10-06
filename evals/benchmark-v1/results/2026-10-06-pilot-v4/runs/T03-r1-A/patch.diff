@@ -1,0 +1,108 @@
+diff --git a/more_itertools/__init__.py b/more_itertools/__init__.py
+index 45df8ad..c8678d0 100644
+--- a/more_itertools/__init__.py
++++ b/more_itertools/__init__.py
+@@ -4,5 +4,3 @@ from .more import *  # noqa
+ from .recipes import *  # noqa
+ 
+ __version__ = '11.1.0'
+-
+-from .more import windowed as windowed_complete
+diff --git a/more_itertools/more.py b/more_itertools/more.py
+index c9871dc..940b800 100755
+--- a/more_itertools/more.py
++++ b/more_itertools/more.py
+@@ -4249,7 +4249,7 @@ def windowed_complete(iterable, n):
+     for i in range(size - n + 1):
+         beginning = seq[:i]
+         middle = seq[i : i + n]
+-        end = seq[i + n + 1 :]
++        end = seq[i + n :]
+         yield beginning, middle, end
+diff --git a/agent_tests/test_windowed_complete.py b/agent_tests/test_windowed_complete.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/test_windowed_complete.py
+@@ -0,0 +1,82 @@
++"""Regression tests for ``windowed_complete``.
++
++The public import (``more_itertools.windowed_complete``) and the module import
++(``more_itertools.more.windowed_complete``) must both yield
++``(prefix, window, suffix)`` tuples whose concatenation is the original
++sequence.  Zero-width windows (``n == 0``) and validation must be preserved.
++"""
++
++import pytest
++
++import more_itertools
++from more_itertools.more import windowed_complete
++
++
++def public_import():
++    return more_itertools.windowed_complete
++
++
++def module_import():
++    return windowed_complete
++
++
++@pytest.mark.parametrize("get_func", [public_import, module_import])
++def test_expected_tuples(get_func):
++    actual = list(get_func()(range(7), 3))
++    expected = [
++        ((), (0, 1, 2), (3, 4, 5, 6)),
++        ((0,), (1, 2, 3), (4, 5, 6)),
++        ((0, 1), (2, 3, 4), (5, 6)),
++        ((0, 1, 2), (3, 4, 5), (6,)),
++        ((0, 1, 2, 3), (4, 5, 6), ()),
++    ]
++    assert actual == expected
++
++
++@pytest.mark.parametrize("get_func", [public_import, module_import])
++@pytest.mark.parametrize("seq", [(), (0,), (0, 1), (0, 1, 2, 3, 4), list(range(6))])
++def test_concatenation_is_original_sequence(get_func, seq):
++    for n in range(len(seq) + 1):
++        windows = list(get_func()(seq, n))
++        assert len(windows) == len(seq) - n + 1
++        for prefix, window, suffix in windows:
++            assert len(window) == n
++            assert prefix + window + suffix == tuple(seq)
++
++
++@pytest.mark.parametrize("get_func", [public_import, module_import])
++def test_zero_width_windows(get_func):
++    actual = list(get_func()([1, 2, 3], 0))
++    expected = [
++        ((), (), (1, 2, 3)),
++        ((1,), (), (2, 3)),
++        ((1, 2), (), (3,)),
++        ((1, 2, 3), (), ()),
++    ]
++    assert actual == expected
++
++
++@pytest.mark.parametrize("get_func", [public_import, module_import])
++def test_full_width_window(get_func):
++    actual = list(get_func()([1, 2, 3], 3))
++    assert actual == [((), (1, 2, 3), ())]
++
++
++@pytest.mark.parametrize("get_func", [public_import, module_import])
++def test_parts_are_tuples(get_func):
++    for parts in get_func()(iter([1, 2, 3, 4]), 2):
++        assert isinstance(parts, tuple)
++        assert all(isinstance(part, tuple) for part in parts)
++
++
++@pytest.mark.parametrize("get_func", [public_import, module_import])
++@pytest.mark.parametrize("n", [-10, -1, 4, 5, 10])
++def test_validation(get_func, n):
++    with pytest.raises(ValueError):
++        list(get_func()([1, 2, 3], n))
++
++
++def test_public_and_module_imports_agree():
++    seq = list(range(8))
++    for n in range(len(seq) + 1):
++        assert list(public_import()(seq, n)) == list(module_import()(seq, n))

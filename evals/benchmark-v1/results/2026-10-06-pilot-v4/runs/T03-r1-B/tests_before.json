@@ -1,0 +1,44 @@
+{
+  "pass": false,
+  "contract": {
+    "argv": [
+      "sandbox-exec",
+      "-D",
+      "CLI_PID=0",
+      "-f",
+      "/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-gdurzdu6/grader.sb",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/benchmark-env/bin/python",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native/evals/benchmark-v1/acceptance.py",
+      "T03",
+      "2"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native/evals/benchmark-v1/acceptance.py\", line 205, in <module>\n    check(sys.argv[1],int(sys.argv[2]) if len(sys.argv)>2 else 2)\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native/evals/benchmark-v1/acceptance.py\", line 78, in check\n    assert list(function(iter(seq),width)) == expected\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-gdurzdu6/workspace/more_itertools/more.py\", line 1055, in windowed\n    raise ValueError('n must be > 0')\nValueError: n must be > 0\n",
+    "duration_seconds": 0.0376
+  },
+  "upstream_regression": {
+    "argv": [
+      "sandbox-exec",
+      "-D",
+      "CLI_PID=0",
+      "-f",
+      "/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-gdurzdu6/grader.sb",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/benchmark-env/bin/python",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": ".........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................FEFFE.............................................................................................................................F.........................................................................................................................................................................................................\n======================================================================\nERROR: test_every_partition (test_more.WindowedCompleteTests.test_every_partition)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-gdurzdu6/workspace/tests/test_more.py\", line 5095, in test_every_partition\n    actual = list(every_partition(seq))\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-gdurzdu6/workspace/more_itertools/more.py\", line 1055, in windowed\n    raise ValueError('n must be > 0')\nValueError: n must be > 0\n\n======================================================================\nERROR: test_zero_length (test_more.WindowedCompleteTests.test_zero_length)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-gdurzdu6/workspace/tests/test_more.py\", line 5073, in test_zero_length\n    actual = list(mi.windowed_complete([1, 2, 3], 0))\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-gdurzdu6/workspace/more_itertools/more.py\", line 1055, in windowed\n    raise ValueError('n must be > 0')\nValueError: n must be > 0\n\n======================================================================\nFAIL: test_basic (test_more.WindowedCompleteTests.test_basic)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-gdurzdu6/workspace/tests/test_more.py\", line 5070, in test_basic\n    self.assertEqual(actual, expected)\nAssertionError: Lists differ: [(1, 2, 3), (2, 3, 4), (3, 4, 5)] != [((), (1, 2, 3), (4, 5)), ((1,), (2, 3, 4), (5,)), ((1, 2), (3, 4, 5), ())]\n\nFirst differing element 0:\n(1, 2, 3)\n((), (1, 2, 3), (4, 5))\n\n- [(1, 2, 3), (2, 3, 4), (3, 4, 5)]\n+ [((), (1, 2, 3), (4, 5)), ((1,), (2, 3, 4), (5,)), ((1, 2), (3, 4, 5), ())]\n\n======================================================================\nFAIL: test_wrong_length (test_more.WindowedCompleteTests.test_wrong_length) (n=6)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-gdurzdu6/workspace/tests/test_more.py\", line 5086, in test_wrong_length\n    with self.assertRaises(ValueError):\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: ValueError not raised\n\n======================================================================\nFAIL: test_wrong_length (test_more.WindowedCompleteTests.test_wrong_length) (n=15)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-gdurzdu6/workspace/tests/test_more.py\", line 5086, in test_wrong_length\n    with self.assertRaises(ValueError):\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: ValueError not raised\n\n======================================================================\nFAIL: windowed_complete (more_itertools.more)\nDoctest: more_itertools.more.windowed_complete\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/doctest.py\", line 2256, in runTest\n    raise self.failureException(self.format_failure(new.getvalue()))\nAssertionError: Failed doctest test for more_itertools.more.windowed_complete\n  File \"/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-gdurzdu6/workspace/more_itertools/more.py\", line 4216, in windowed_complete\n\n----------------------------------------------------------------------\nFile \"/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-gdurzdu6/workspace/more_itertools/more.py\", line 4226, in more_itertools.more.windowed_complete\nFailed example:\n    for beginning, middle, end in windowed_complete(iterable, n):\n        print(beginning, middle, end)\nExpected:\n    () (0, 1, 2) (3, 4, 5, 6)\n    (0,) (1, 2, 3) (4, 5, 6)\n    (0, 1) (2, 3, 4) (5, 6)\n    (0, 1, 2) (3, 4, 5) (6,)\n    (0, 1, 2, 3) (4, 5, 6) ()\nGot:\n    () (0, 1, 2) (4, 5, 6)\n    (0,) (1, 2, 3) (5, 6)\n    (0, 1) (2, 3, 4) (6,)\n    (0, 1, 2) (3, 4, 5) ()\n    (0, 1, 2, 3) (4, 5, 6) ()\n\n\n----------------------------------------------------------------------\nRan 932 tests in 6.746s\n\nFAILED (failures=4, errors=2)\n",
+    "duration_seconds": 6.8475
+  },
+  "new_regression_tests": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "No new regression tests supplied; not required by this task."
+  }
+}

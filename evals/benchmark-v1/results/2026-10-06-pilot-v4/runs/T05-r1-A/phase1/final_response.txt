@@ -1,0 +1,18 @@
+The refactor is complete and verified.
+
+**Implementation** (`more_itertools/more.py:3379-3390`): replaced the two duplicated accumulation loops with a single loop that computes `keyfunc(item)` first, then appends `item if valuefunc is None else valuefunc(item)`. The existing optional reduction phase and `ret.default_factory = None` are untouched.
+
+**Behavior preserved:**
+- Callback order stays interleaved per item (`keyfunc` before `valuefunc`, and no extra callable when `valuefunc is None`)
+- The iterable is consumed exactly once, in one pass
+- `defaultdict` insertion order is identical
+- Exceptions propagate at the same points with the same partial-callback state
+- Result remains a `defaultdict` with `default_factory is None`
+
+**Regression protection** (`agent_tests/test_map_reduce_regression.py`, 20 tests): all four parameter combinations, identity of stored objects when `valuefunc is None`, interleaved callback ordering, iteration/consumption counts via a recording single-pass iterable, re-iterable inputs not processed twice, key insertion order (including through reduction), reducefunc receiving lists in insertion order, exception propagation for `keyfunc`/`valuefunc`/`reducefunc` (including exact exception identity and a one-shot generator case), result type, and missing-key `KeyError` without insertion.
+
+`more.pyi` overloads and `__init__` exports are unchanged since the signature and return types are identical; no docs update was needed for an internal refactor with unchanged semantics.
+
+`python3 benchmark_check.py` passes: benchmark tests, all 932 existing unittest tests, and the 20 new agent tests.
+
+STATUS: DONE

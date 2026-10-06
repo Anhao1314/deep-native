@@ -1,0 +1,12 @@
+{
+  "attempt": "",
+  "config_hash": "5b9581457bd2f5322490d5e6b244630331b50a13f7934dac636905c8d0c65f7b",
+  "goal": "parse_int_list supports signed ints/ranges (-3--1, +2-+4), reversed endpoints, whitespace around tokens/endpoints, keeps sorting/dupes/empty/custom delimiters, raises ValueError on malformed ranges; existing tests unaffected; python3 benchmark_check.py passes",
+  "next": "Inspect and reproduce before editing.",
+  "note": "",
+  "schema": 1,
+  "session": "5e616f00-b1e9-4e04-bf67-5dbb79c76492",
+  "status": "active",
+  "task_id": "9d40c67b121441d2a8f829d04c329e5f",
+  "updated_at": "2026-10-06T04:42:01Z"
+}

@@ -1,0 +1,12 @@
+{
+  "attempt": "",
+  "config_hash": "0bfdacc50fda6a85fde99bf4fb6d515183715a64c8df2aa477677eb340a1f6e6",
+  "goal": "chunked accepts int/None; bool and non-integer n raise TypeError eagerly before consuming iterable; n=0, n=None, negative-int ValueError, strict behavior and valid outputs preserved; types documented",
+  "next": "Inspect and reproduce before editing.",
+  "note": "",
+  "schema": 1,
+  "session": "a6c6edf0-bae8-4a44-b162-a5c2fcfaaf13",
+  "status": "active",
+  "task_id": "6632e07a8615488ca077b2760e17e5d9",
+  "updated_at": "2026-10-06T05:20:09Z"
+}

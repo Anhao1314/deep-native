@@ -1,0 +1,6 @@
+{
+  "run_id": "T08-r2-A",
+  "error_type": "KeyboardInterrupt",
+  "stop_requested_by_user": true,
+  "reason": "Operator interrupt or harness/environment error. Partial artifacts retained; no automatic retry."
+}

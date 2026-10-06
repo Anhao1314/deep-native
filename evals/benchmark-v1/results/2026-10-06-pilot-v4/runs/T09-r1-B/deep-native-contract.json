@@ -1,0 +1,12 @@
+{
+  "checks": [
+    {
+      "argv": [
+        "python3",
+        "benchmark_check.py"
+      ],
+      "name": "acceptance"
+    }
+  ],
+  "schema": 1
+}

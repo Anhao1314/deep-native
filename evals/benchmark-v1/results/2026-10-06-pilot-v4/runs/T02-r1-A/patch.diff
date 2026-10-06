@@ -1,0 +1,183 @@
+diff --git a/docs/versions.rst b/docs/versions.rst
+index 738ff67..a0f7454 100644
+--- a/docs/versions.rst
++++ b/docs/versions.rst
+@@ -9,6 +9,7 @@ Unreleased
+ ----------
+ 
+ * Changes to existing functions:
++    * :func:`chunked` now validates *n* before consuming the input iterable: it raises ``TypeError`` for non-integer values (including ``bool``) and ``ValueError`` for negative integers, while continuing to accept integers and ``None``.
+     * :func:`ichunked` now matches :func:`chunked` for ``n = 0`` and negative *n*: it yields nothing for a zero chunk size (without consuming the source) and raises ``ValueError: n must be at least 0`` instead of leaking :func:`itertools.islice`'s error.
+     * :func:`running_min`, :func:`running_max`, :func:`running_mean`, and :func:`running_statistics` now consistently validate *maxlen* as an integer and support the index protocol.
+     * :func:`numeric_range` now preserves its original values and length when reversed, including floating-point ranges and ranges near datetime limits.
+diff --git a/more_itertools/more.py b/more_itertools/more.py
+index 940b800..b5d857b 100755
+--- a/more_itertools/more.py
++++ b/more_itertools/more.py
+@@ -230,7 +230,16 @@ def chunked(iterable, n, strict=False):
+     ``True``, then ``ValueError`` will be raised before the last
+     list is yielded.
+ 
++    *n* must be an integer or ``None``. A ``TypeError`` is raised, before
++    *iterable* is consumed, if *n* is not an integer (``bool`` values are
++    not accepted) and a ``ValueError`` is raised if *n* is a negative
++    integer. If *n* is ``None``, a single list containing all of the items
++    is yielded.
++
+     """
++    if n is not None and (not isinstance(n, int) or isinstance(n, bool)):
++        raise TypeError('n must be an integer or None')
++
+     if n is not None and n < 0:
+         raise ValueError('n must be at least 0')
+diff --git a/agent_tests/test_chunked_validation.py b/agent_tests/test_chunked_validation.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/test_chunked_validation.py
+@@ -0,0 +1,146 @@
++"""Regression tests for ``chunked()`` size (*n*) validation.
++
++``n`` must be an integer or ``None``.  ``bool`` and all other non-integer
++values raise ``TypeError`` eagerly, before the input iterable is consumed.
++Negative integers keep raising ``ValueError``, and zero, ``None``, and
++``strict`` behavior are unchanged.
++"""
++
++import enum
++
++import pytest
++
++import more_itertools as mi
++
++
++class RecordingIterator:
++    """A one-shot iterator that records how many items were consumed."""
++
++    def __init__(self, items):
++        self._items = iter(items)
++        self.consumed = 0
++
++    def __iter__(self):
++        return self
++
++    def __next__(self):
++        item = next(self._items)
++        self.consumed += 1
++        return item
++
++
++class Uniterable:
++    """An object that fails loudly if it is iterated at all."""
++
++    def __iter__(self):
++        raise AssertionError('the input iterable must not be touched')
++
++
++def test_integer_sizes_still_work():
++    assert list(mi.chunked('ABCDEF', 3)) == [['A', 'B', 'C'], ['D', 'E', 'F']]
++    assert list(mi.chunked('ABCDE', 3)) == [['A', 'B', 'C'], ['D', 'E']]
++    assert list(mi.chunked(range(5), 2)) == [[0, 1], [2, 3], [4]]
++    assert list(mi.chunked([], 3)) == []
++    assert list(mi.chunked([1, 2, 3], 10)) == [[1, 2, 3]]
++
++
++def test_int_subclass_size_is_accepted():
++    class Size(enum.IntEnum):
++        TWO = 2
++
++    assert list(mi.chunked([1, 2, 3], Size.TWO)) == [[1, 2], [3]]
++
++
++def test_none_yields_a_single_chunk():
++    assert list(mi.chunked('ABCDE', None)) == [['A', 'B', 'C', 'D', 'E']]
++    assert list(mi.chunked([], None)) == []
++
++
++def test_zero_yields_nothing():
++    assert list(mi.chunked('ABCDE', 0)) == []
++    assert list(mi.chunked('ABCDE', 0, strict=True)) == []
++
++
++def test_zero_does_not_consume_the_iterable():
++    source = iter([1, 2, 3])
++    assert list(mi.chunked(source, 0)) == []
++    assert list(source) == [1, 2, 3]
++
++
++@pytest.mark.parametrize('n', [-1, -5, -(10**9)])
++def test_negative_integer_raises_value_error(n):
++    with pytest.raises(ValueError, match='n must be at least 0'):
++        mi.chunked('ABCDE', n)
++
++
++@pytest.mark.parametrize('n', [-1, -5])
++def test_negative_integer_raises_value_error_with_strict(n):
++    with pytest.raises(ValueError, match='n must be at least 0'):
++        mi.chunked('ABCDE', n, strict=True)
++
++
++@pytest.mark.parametrize('n', [True, False])
++def test_bool_size_raises_type_error(n):
++    with pytest.raises(TypeError, match='integer'):
++        mi.chunked('ABCDE', n)
++
++
++def test_bool_size_raises_type_error_with_strict():
++    with pytest.raises(TypeError, match='integer'):
++        mi.chunked('ABCDE', True, strict=True)
++
++
++@pytest.mark.parametrize(
++    'n', [2.5, 2.0, 0.0, -1.0, '2', b'2', 2j, [2], (2,), object()]
++)
++def test_non_integer_size_raises_type_error(n):
++    with pytest.raises(TypeError, match='integer'):
++        mi.chunked('ABCDE', n)
++
++
++def test_type_error_is_raised_eagerly():
++    # The error is raised when chunked() is called, not when the returned
++    # iterator is first advanced.
++    with pytest.raises(TypeError):
++        mi.chunked(iter([1, 2, 3]), 1.5)
++
++
++def test_type_error_before_consuming_the_input():
++    source = RecordingIterator([1, 2, 3, 4])
++
++    with pytest.raises(TypeError):
++        mi.chunked(source, True)
++
++    assert source.consumed == 0
++    # The source was left untouched and is still fully usable.
++    assert list(source) == [1, 2, 3, 4]
++
++
++def test_type_error_before_iterating_the_input():
++    with pytest.raises(TypeError):
++        mi.chunked(Uniterable(), 1.5)
++
++
++def test_invalid_size_takes_precedence_over_strict():
++    with pytest.raises(TypeError):
++        mi.chunked('ABCDE', 1.5, strict=True)
++
++
++def test_strict_behavior_preserved():
++    assert list(mi.chunked('ABCDEF', 3, strict=True)) == [
++        ['A', 'B', 'C'],
++        ['D', 'E', 'F'],
++    ]
++    assert list(mi.chunked('ABCDE', 3, strict=False)) == [
++        ['A', 'B', 'C'],
++        ['D', 'E'],
++    ]
++    with pytest.raises(ValueError, match='iterable is not divisible by n'):
++        list(mi.chunked('ABCDE', 3, strict=True))
++
++
++def test_strict_with_none_still_raises_value_error():
++    with pytest.raises(
++        ValueError, match='n must not be None when using strict mode'
++    ):
++        mi.chunked('ABCDE', None, strict=True)

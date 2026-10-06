@@ -1,0 +1,12 @@
+{
+  "attempt": "",
+  "config_hash": "9918af3dd1d5c3f74ba7b872936588255df42c28302210c39e4ba655ee967bf5",
+  "goal": "partition_runs is implemented and exported from more_itertools: yields (key, tuple) for contiguous equal-key runs, key default identity evaluated once per item, single-pass consumption, max_run positive int splits runs with TypeError/ValueError raised before input consumption, documented, and covered by passing regression tests under agent_tests/ (python3 benchmark_check.py green)",
+  "next": "Inspect and reproduce before editing.",
+  "note": "",
+  "schema": 1,
+  "session": "47273dc5-a363-4b2a-8f11-925e7f57a7cb",
+  "status": "active",
+  "task_id": "55cab1f89a7140259b2830c73a8011ce",
+  "updated_at": "2026-10-06T05:10:10Z"
+}

@@ -1,0 +1,7 @@
+running timeout test
+=========================== short test summary info ============================
+FAILED tests/test_socketutils.py::test_socketutils_netstring - PermissionErro...
+FAILED tests/test_socketutils.py::test_socketutils_netstring_timeout - Permis...
+2 failed, 523 passed in 1.43s
+
+[exited with code 144]

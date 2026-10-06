@@ -1,0 +1,12 @@
+{
+  "harness_commit": "6e8967ade5682f19df5b58ab5ee5b72df4e008db",
+  "deep_native_commit": "fda3dd010e7de8f8c1ee1953e006e577464aa3d6",
+  "primary_campaign": true,
+  "prior_campaigns_excluded": [
+    "2026-10-06-pilot",
+    "2026-10-06-pilot-v2",
+    "2026-10-06-pilot-v3"
+  ],
+  "corrections": "Per-run CLAUDE_CODE_TMPDIR and directly audited native Git routing; no Skill/task/budget change. Preparation revision occurred with zero formal calls.",
+  "validation": "102 tests: 101 passed, one optional fixture test skipped; unchanged full grader/reference validation already passed for all 10 tasks. Both real A/B toy preflights passed, excluded from performance."
+}

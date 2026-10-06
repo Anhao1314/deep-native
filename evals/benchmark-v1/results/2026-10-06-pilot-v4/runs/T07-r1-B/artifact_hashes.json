@@ -1,0 +1,23 @@
+{
+  "tests_before.json": "3160b3a3f6e93bc8932f625e4d9d67a9018aa89039a44c981f89e5853667b470",
+  "installation.json": "02eb89b0b1f6b8e07b074c249fd9f5432ec0aee4c75bc8ad633936e51071a13b",
+  "patch.diff": "9d74e3adc6c0ec65de7faa52e9ed2989338b7559ab3bd48c47571bcf43b38cdc",
+  "behavior.json": "929c843f8fb188b79de1fe04071b7aa01efbaed7d0a44d1c7f1fa2236e534e7b",
+  "result.json": "aca7ef29b6a8a5a66353ae77f5c440b6a5d39f2b801594b7cdf5dbd952a58fba",
+  "metadata.json": "d7236f2af8dc2cffe24bfe46089b0ddce41523738d90be0aed6083d35c0716bf",
+  "deep-native-contract.json": "2e428a9e92f3c656414809ec7099ee07c53ede0769d373e0cff6c449bf8a9f09",
+  "final_response.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "tests_after.json": "99054d1a5a507e6d7e6babc55bc66e3264b26997366e149c1d5df1cae2a7bf7e",
+  "local_workspace.txt": "a92f0b9328f403da863530bb7aeba16d24b7bf32d2e1a86e4f8bd4a543989e28",
+  "api_calls.json": "102469fcfb84ae0cc570263d647e66d67b362ab367600e852c2b6c7980eb3969",
+  "deep-native-state/state.json": "5a6e6cb0f27072776fc1653d20727789e37e25553bc4232dea725bd58e601765",
+  "deep-native-state/lock": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "phase1/process_cleanup.json": "5acdd8a579d8e795b80d4490b1e9aef9ced2d61fdb91fc23d7a1c1d035b68c6c",
+  "phase1/session.json": "e1bfa755b9464bd3ee16963bd95395d2a07e9bd1d477873f6f59a67a3af003ff",
+  "phase1/transcript.jsonl": "6bd48370df6e94e723f69a143c58240ba643b960433e3c0397d26b0ff9f42163",
+  "phase1/prompt.txt": "82c063625e8fa3eadcbd3d15af0cf29466fb968a643edefced4ad569c15f701d",
+  "phase1/stderr.txt": "af2f4f95914df9c684b8c6d9f07bfa793cb3ed8a4c9f15c3022ee6363d84537e",
+  "phase1/command.json": "51ada1cfda624e458a755d957f626cf30ff7049b3b529a516c9bc23fc8f58b5a",
+  "phase1/source_observations.json": "cb295f1402de6d527ecb8b06ccc43c0e56d1a1fceac398c779cb9a2aefe10a72",
+  "phase1/final_response.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

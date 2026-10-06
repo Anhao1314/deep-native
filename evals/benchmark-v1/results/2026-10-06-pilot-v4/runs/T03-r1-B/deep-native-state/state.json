@@ -1,0 +1,12 @@
+{
+  "attempt": "",
+  "config_hash": "5b9581457bd2f5322490d5e6b244630331b50a13f7934dac636905c8d0c65f7b",
+  "goal": "more_itertools.windowed_complete yields (prefix, window, suffix) triples from both the public package import and the module import, with prefix+window+suffix == original sequence, preserving zero-width windows and ValueError validation",
+  "next": "Inspect and reproduce before editing.",
+  "note": "",
+  "schema": 1,
+  "session": "ab78998a-2bfc-4f5f-b396-d8a36452f8f6",
+  "status": "active",
+  "task_id": "74693eaf4c0a49c698dc1e5145798ce3",
+  "updated_at": "2026-10-06T05:12:13Z"
+}

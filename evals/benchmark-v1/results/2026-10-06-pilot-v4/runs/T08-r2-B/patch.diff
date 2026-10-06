@@ -1,0 +1,517 @@
+diff --git a/boltons/strutils.py b/boltons/strutils.py
+index 74441c7..82ef59d 100644
+--- a/boltons/strutils.py
++++ b/boltons/strutils.py
+@@ -884,12 +884,18 @@ def args2cmd(args, sep=' '):
+ 
+ 
+ def parse_int_list(range_string, delim=',', range_delim='-'):
+-    """Returns a sorted list of positive integers based on
+-    *range_string*. Reverse of :func:`format_int_list`.
++    """Returns a sorted list of integers based on *range_string*.
++    Reverse of :func:`format_int_list`.
++
++    Integers may be negative, so ranges with negative endpoints, such
++    as ``'-3--1'``, are supported. Ranges with reversed endpoints
++    (e.g. ``'5-2'``) are treated the same as their ascending form.
++    Duplicate values are preserved; see :func:`boltons.rangeutils.parse_ranges`
++    for a sorted, deduplicated variant.
+ 
+     Args:
+-        range_string (str): String of comma separated positive
+-            integers or ranges (e.g. '1,2,4-6,8'). Typical of a custom
++        range_string (str): String of comma separated integers or
++            ranges (e.g. '1,2,4-6,8' or '-3--1,2'). Typical of a custom
+             page range string used in printer dialogs.
+         delim (char): Defaults to ','. Separates integers and
+             contiguous ranges of integers.
+@@ -899,23 +905,38 @@ def parse_int_list(range_string, delim=',', range_delim='-'):
+     >>> parse_int_list('1,3,5-8,10-11,15')
+     [1, 3, 5, 6, 7, 8, 10, 11, 15]
+ 
++    >>> parse_int_list('-3--1,2,2')
++    [-3, -2, -1, 2, 2]
++
+     """
++    if not range_delim:
++        raise ValueError('range_delim must be a non-empty string')
++
++    int_pattern = re.compile(r'[+-]?\d+')
++    range_pattern = re.compile(
++        r'([+-]?\d+)\s*' + re.escape(range_delim) + r'\s*([+-]?\d+)')
++
+     output = []
+ 
+     for x in range_string.strip().split(delim):
++        x = x.strip()
++
++        # Empty String
++        if not x:
++            continue
+ 
+         # Range
+-        if range_delim in x:
+-            range_limits = list(map(int, x.split(range_delim)))
++        range_match = range_pattern.fullmatch(x)
++        if range_match:
++            range_limits = [int(range_match.group(1)),
++                            int(range_match.group(2))]
+             output += list(range(min(range_limits), max(range_limits)+1))
+-
+-        # Empty String
+-        elif not x:
+             continue
+ 
+         # Integer
+-        else:
+-            output.append(int(x))
++        if not int_pattern.fullmatch(x):
++            raise ValueError('invalid integer or integer range: %r' % (x,))
++        output.append(int(x))
+ 
+     return sorted(output)
+ 
+diff --git a/docs/index.rst b/docs/index.rst
+index 17c5155..e516b97 100644
+--- a/docs/index.rst
++++ b/docs/index.rst
+@@ -125,6 +125,7 @@ Section listing
+    namedutils
+    pathutils
+    queueutils
++   rangeutils
+    setutils
+    socketutils
+    statsutils
+diff --git a/agent_tests/conftest.py b/agent_tests/conftest.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/conftest.py
+@@ -0,0 +1,10 @@
++"""Make the in-repo ``boltons`` package importable when ``agent_tests``
++is run without ``python -m pytest``."""
++
++import os
++import sys
++
++REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
++
++if REPO_ROOT not in sys.path:
++    sys.path.insert(0, REPO_ROOT)
+diff --git a/agent_tests/test_rangeutils.py b/agent_tests/test_rangeutils.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/test_rangeutils.py
+@@ -0,0 +1,114 @@
++"""Regression tests for the :mod:`boltons.rangeutils` API."""
++
++import pytest
++
++from boltons import strutils
++from boltons.rangeutils import format_ranges, parse_ranges
++
++
++def test_parse_ranges_negative_range():
++    assert parse_ranges('-3--1,2,2') == [-3, -2, -1, 2]
++
++
++def test_format_ranges_negative_range():
++    assert format_ranges([-3, -2, -1, 2, 2]) == '-3--1,2'
++
++
++def test_parse_ranges_positive_integers_and_ranges():
++    assert parse_ranges('1,3,5-8,10-11,15') == [1, 3, 5, 6, 7, 8, 10, 11, 15]
++
++
++def test_parse_ranges_single_negative_and_mixed():
++    assert parse_ranges('-5') == [-5]
++    assert parse_ranges('-5,3') == [-5, 3]
++    assert parse_ranges('+7,-2') == [-2, 7]
++
++
++def test_parse_ranges_crossing_zero():
++    assert parse_ranges('-2-2') == [-2, -1, 0, 1, 2]
++    assert parse_ranges('1--2') == [-2, -1, 0, 1]
++
++
++def test_parse_ranges_reversed_endpoints():
++    assert parse_ranges('5-2') == [2, 3, 4, 5]
++    assert parse_ranges('8-5') == [5, 6, 7, 8]
++    assert parse_ranges('-1--3') == [-3, -2, -1]
++
++
++def test_parse_ranges_sorted_and_unique():
++    assert parse_ranges('3,1,1,-1,-1,2-3') == [-1, 1, 2, 3]
++    assert parse_ranges('-3--1,-3--1') == [-3, -2, -1]
++
++
++def test_parse_ranges_ignores_whitespace_and_empty_items():
++    assert parse_ranges(' 1 , -3--1 , 2 ') == [-3, -2, -1, 1, 2]
++    assert parse_ranges('1,,2,') == [1, 2]
++    assert parse_ranges(' 5 - 8 ') == [5, 6, 7, 8]
++
++
++def test_parse_ranges_empty_text():
++    assert parse_ranges('') == []
++    assert parse_ranges('   ') == []
++    assert parse_ranges(',') == []
++
++
++def test_parse_ranges_returns_plain_ints():
++    values = parse_ranges('-3--1,2')
++    assert all(type(value) is int for value in values)
++    assert values == sorted(values)
++
++
++@pytest.mark.parametrize('text', [
++    'oops', '1-', '-', '--3', '1-2-3', '1.5', '1 - 2 - 3', '5-', '1,,a',
++])
++def test_parse_ranges_malformed_raises_value_error(text):
++    with pytest.raises(ValueError):
++        parse_ranges(text)
++
++
++def test_format_ranges_sorts_and_dedupes():
++    assert format_ranges([3, 1, 2, 2]) == '1-3'
++    assert format_ranges([2, 2, -3, -2, -1]) == '-3--1,2'
++    assert format_ranges(iter([3, 1, 1])) == '1,3'
++
++
++def test_format_ranges_singletons_and_gaps():
++    assert format_ranges([15, 1, 3]) == '1,3,15'
++    assert format_ranges([10, 11, 12, 1, 3, 2]) == '1-3,10-12'
++
++
++def test_format_ranges_single_negative():
++    assert format_ranges([-7]) == '-7'
++    assert format_ranges([-1, 1]) == '-1,1'
++
++
++def test_format_ranges_empty():
++    assert format_ranges([]) == ''
++
++
++@pytest.mark.parametrize('values', [
++    [], [0], [-7], [1, 2], [-2, -1], [-1, 0], [0, 1], [-2, -1, 0, 1, 2],
++    [-3, -2, -1, 2, 2], [5, 4, 3, 2, 1, 0, -1, -2], [-5, -4, 7, 8, 9],
++    [3, 1, 1, -1], [-3, 1, 2, 3, -1, -2],
++])
++def test_format_ranges_round_trips_through_parse_ranges(values):
++    text = format_ranges(values)
++    assert parse_ranges(text) == sorted(set(values))
++
++
++def test_rangeutils_reuses_strutils_parsers():
++    text = '-3--1,2,2'
++    assert strutils.parse_int_list(text) == [-3, -2, -1, 2, 2]
++    assert parse_ranges(text) == sorted(set(strutils.parse_int_list(text)))
++    assert strutils.format_int_list([-3, -2, -1, 2, 2]) == '-3--1,2'
++    assert format_ranges([-3, -2, -1, 2, 2]) == strutils.format_int_list(
++        [-3, -2, -1, 2, 2])
++
++
++def test_parse_int_list_positive_behavior_unchanged():
++    assert strutils.parse_int_list('1,3,5-8,10-11,15') == \
++        [1, 3, 5, 6, 7, 8, 10, 11, 15]
++    assert strutils.parse_int_list(' 1, 3 ,5-8,10-11,15 ') == \
++        [1, 3, 5, 6, 7, 8, 10, 11, 15]
++    assert strutils.parse_int_list('') == []
++    assert strutils.complement_int_list('1,3,5-8,10-11,15') == '0,2,4,9,12-14'
+diff --git a/agent_tests/test_rangeutils_cli.py b/agent_tests/test_rangeutils_cli.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/test_rangeutils_cli.py
+@@ -0,0 +1,81 @@
++"""Regression tests for the ``python -m boltons.rangeutils`` CLI."""
++
++import json
++import os
++import subprocess
++import sys
++
++import pytest
++
++REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
++
++
++def run_cli(*args):
++    return subprocess.run(
++        [sys.executable, '-m', 'boltons.rangeutils'] + list(args),
++        cwd=REPO_ROOT, capture_output=True, text=True)
++
++
++def test_expand_outputs_json_integer_list():
++    proc = run_cli('expand', '-3--1,2,2')
++    assert proc.returncode == 0
++    assert json.loads(proc.stdout) == [-3, -2, -1, 2]
++    assert proc.stderr == ''
++
++
++def test_expand_positive_ranges_and_duplicates():
++    proc = run_cli('expand', '3,1,5-8,2,2')
++    assert proc.returncode == 0
++    assert json.loads(proc.stdout) == [1, 2, 3, 5, 6, 7, 8]
++
++
++def test_expand_empty_text_outputs_empty_json_list():
++    proc = run_cli('expand', '')
++    assert proc.returncode == 0
++    assert json.loads(proc.stdout) == []
++
++
++def test_expand_accepts_explicit_separator():
++    proc = run_cli('expand', '--', '-3--1,2')
++    assert proc.returncode == 0
++    assert json.loads(proc.stdout) == [-3, -2, -1, 2]
++
++
++def test_compact_outputs_canonical_range_text():
++    proc = run_cli('compact', '2,2,-3,-2,-1')
++    assert proc.returncode == 0
++    assert proc.stdout == '-3--1,2\n'
++    assert proc.stderr == ''
++
++
++def test_compact_accepts_unsorted_gapped_integer_list():
++    proc = run_cli('compact', '15,1,3,2')
++    assert proc.returncode == 0
++    assert proc.stdout == '1-3,15\n'
++
++
++@pytest.mark.parametrize('command,text', [
++    ('expand', 'oops'), ('expand', '1-'), ('expand', '--3'),
++    ('expand', '1-2-3'), ('expand', '1.5'), ('expand', '-'),
++    ('compact', 'oops'), ('compact', '1-'), ('compact', '1-2-3'),
++])
++def test_malformed_input_exits_nonzero_without_traceback(command, text):
++    proc = run_cli(command, text)
++    assert proc.returncode != 0
++    assert 'Traceback' not in proc.stderr
++    assert proc.stderr.strip()
++    assert proc.stdout == ''
++
++
++def test_missing_arguments_exit_nonzero_without_traceback():
++    proc = run_cli()
++    assert proc.returncode != 0
++    assert 'Traceback' not in proc.stderr
++    assert proc.stderr.strip()
++
++
++def test_unknown_command_exits_nonzero_without_traceback():
++    proc = run_cli('frobnicate', '1,2')
++    assert proc.returncode != 0
++    assert 'Traceback' not in proc.stderr
++    assert proc.stderr.strip()
+diff --git a/boltons/rangeutils.py b/boltons/rangeutils.py
+new file mode 100644
+--- /dev/null
++++ b/boltons/rangeutils.py
+@@ -0,0 +1,181 @@
++# Copyright (c) 2013, Mahmoud Hashemi
++#
++# Redistribution and use in source and binary forms, with or without
++# modification, are permitted provided that the following conditions are
++# met:
++#
++#    * Redistributions of source code must retain the above copyright
++#      notice, this list of conditions and the following disclaimer.
++#
++#    * Redistributions in binary form must reproduce the above
++#      copyright notice, this list of conditions and the following
++#      disclaimer in the documentation and/or other materials provided
++#      with the distribution.
++#
++#    * The names of the contributors may not be used to endorse or
++#      promote products derived from this software without specific
++#      prior written permission.
++#
++# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
++# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
++# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
++# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
++# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
++# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
++# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
++# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
++# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
++# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++
++"""``rangeutils`` - Parse and format signed integer ranges.
++
++Range text is a comma-separated list of integers and inclusive
++integer ranges, e.g. ``'1,3,5-8,-3--1,15'``. Both endpoints of a range
++may be negative, so ``'-3--1'`` covers -3, -2, and -1, and endpoints
++may be reversed, so ``'5-2'`` is parsed the same as ``'2-5'``.
++
++>>> parse_ranges('-3--1,2,2')
++[-3, -2, -1, 2]
++>>> format_ranges([-3, -2, -1, 2, 2])
++'-3--1,2'
++
++The same two operations are available from the command line::
++
++    $ python -m boltons.rangeutils expand '-3--1,2,2'
++    [-3, -2, -1, 2]
++    $ python -m boltons.rangeutils compact '2,2,-3,-2,-1'
++    -3--1,2
++
++"""
++
++import argparse
++import json
++import sys
++
++from boltons.strutils import format_int_list, parse_int_list
++
++__all__ = ['parse_ranges', 'format_ranges']
++
++
++def parse_ranges(text):
++    """Parse *text* into a sorted list of unique integers.
++
++    *text* is a comma-separated list of integers and inclusive integer
++    ranges, such as ``'1,3,5-8,-3--1'``. Integers may be negative,
++    range endpoints may be negative (``'-3--1'``), and range endpoints
++    may be reversed (``'5-2'`` is parsed the same as ``'2-5'``).
++    Whitespace around items is ignored, as are empty items
++    (``'1,,2,'``), and duplicate values are collapsed. This is the
++    reverse of :func:`format_ranges`.
++
++    Args:
++        text (str): Range text, e.g. ``'-3--1,2,2'``.
++
++    Returns:
++        list: Sorted list of unique integers. Empty or whitespace-only
++            *text* yields an empty list.
++
++    Raises:
++        ValueError: if *text* contains anything other than integers
++            and inclusive integer ranges.
++
++    >>> parse_ranges('-3--1,2,2')
++    [-3, -2, -1, 2]
++    >>> parse_ranges(' 3 , 1-2 ')
++    [1, 2, 3]
++    >>> parse_ranges('')
++    []
++
++    """
++    return sorted(set(parse_int_list(text)))
++
++
++def format_ranges(values):
++    """Format *values* as canonical range text.
++
++    Accepts any iterable of integers and returns a string of
++    comma-separated integers and inclusive ranges, where runs of two or
++    more contiguous integers are collapsed to ``'min-max'``. Values are
++    sorted and deduplicated, so the output is canonical: each set of
++    integers maps to exactly one string. This is the reverse of
++    :func:`parse_ranges`.
++
++    Args:
++        values (iterable): Iterable of integers, e.g.
++            ``[2, -3, -1, -2, 2]``.
++
++    Returns:
++        str: Range text, e.g. ``'-3--1,2'``. An empty *values*
++            yields an empty string.
++
++    >>> format_ranges([-3, -2, -1, 2, 2])
++    '-3--1,2'
++    >>> format_ranges([10, 11, 12, 1, 3, 2])
++    '1-3,10-12'
++    >>> format_ranges([])
++    ''
++
++    """
++    return format_int_list(values)
++
++
++_COMMAND_NAMES = ('expand', 'compact')
++
++
++def _build_parser():
++    parser = argparse.ArgumentParser(
++        prog='python -m boltons.rangeutils',
++        description='Expand range text into integers, or compact '
++                    'integers into canonical range text.')
++    subparsers = parser.add_subparsers(dest='command', required=True)
++
++    expand_parser = subparsers.add_parser(
++        'expand', help='expand TEXT into a JSON list of integers')
++    expand_parser.add_argument(
++        'text', metavar='TEXT', help='range text, e.g. "-3--1,2"')
++
++    compact_parser = subparsers.add_parser(
++        'compact', help='compact TEXT into canonical range text')
++    compact_parser.add_argument(
++        'text', metavar='TEXT', help='comma-separated integers, '
++                                     'e.g. "2,2,-3,-2,-1"')
++
++    return parser
++
++
++def main(argv=None):
++    """Run the ``python -m boltons.rangeutils`` command-line interface.
++
++    ``expand TEXT`` writes a JSON list of integers to stdout, while
++    ``compact TEXT`` writes canonical range text. Malformed *TEXT*
++    exits with status 2 and a message on stderr, without a traceback.
++    """
++    if argv is None:
++        argv = sys.argv[1:]
++    argv = list(argv)
++
++    # Range text commonly starts with '-', e.g. '-3--1,2'. Shield it
++    # from option parsing with a '--' separator; help flags still work.
++    if len(argv) > 1 and argv[0] in _COMMAND_NAMES \
++            and argv[1] not in ('-h', '--help', '--'):
++        argv.insert(1, '--')
++
++    parser = _build_parser()
++    args = parser.parse_args(argv)
++
++    try:
++        values = parse_ranges(args.text)
++    except ValueError as exc:
++        parser.exit(2, '%s %s: error: %s\n' % (parser.prog, args.command, exc))
++
++    if args.command == 'expand':
++        print(json.dumps(values))
++    else:
++        print(format_ranges(values))
++
++    return 0
++
++
++if __name__ == '__main__':
++    sys.exit(main())
+diff --git a/docs/rangeutils.rst b/docs/rangeutils.rst
+new file mode 100644
+--- /dev/null
++++ b/docs/rangeutils.rst
+@@ -0,0 +1,21 @@
++``rangeutils`` - Signed integer ranges
++======================================
++
++.. automodule:: boltons.rangeutils
++   :members:
++
++Command-line interface
++----------------------
++
++``rangeutils`` is also runnable as a module. ``expand`` writes a JSON
++list of integers to stdout, and ``compact`` writes canonical range
++text::
++
++    $ python -m boltons.rangeutils expand '-3--1,2,2'
++    [-3, -2, -1, 2]
++    $ python -m boltons.rangeutils compact '2,2,-3,-2,-1'
++    -3--1,2
++
++Both commands accept the same range text as :func:`~boltons.rangeutils.parse_ranges`.
++Malformed input exits with a nonzero status and a message on stderr,
++without a traceback.

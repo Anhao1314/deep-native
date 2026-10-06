@@ -1,0 +1,19 @@
+{
+  "tests_before.json": "de0c7ec81f26fde81ef13f1efac6fc0b8568970444cb2708cdeb1daccb257176",
+  "patch.diff": "0b7ed2e67e6b2da1e707fe0d4b7ed57944a694f4f7dfe0b2a548f5b721595647",
+  "behavior.json": "64f240ff499277b1c6ad71491af23d589413bf4ca1944d8c400c8006af2ea1ba",
+  "result.json": "2d2fdb15f9bb1ef650742c2fc0a367e8f7bbf4954fa156c0e47bd5ac1564fc15",
+  "metadata.json": "da80f132fd0977ffe1c8f8b0c7a538b0b81eab31ff0565e124a14b68784f7804",
+  "final_response.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "tests_after.json": "588754d03c8e8b973f972148916a0b207e877790f0490742c2cb908f377fe118",
+  "local_workspace.txt": "d1d7d8cd40f3e00a715b1349a27a6ce9a00427465f8f51474e3cf7fc5831269a",
+  "api_calls.json": "44a462fb79080d583ef1b47ed40147f2da0df25dc06f2313d399727c82b262d3",
+  "phase1/process_cleanup.json": "b7f64ed514e743b61531087958eb7efb2bca5250ab37e4e35f6b3532568446c3",
+  "phase1/session.json": "0afac34ad5dde62238f1af6e92f946175705300ebd32dccb52c6c1eb554aad1b",
+  "phase1/transcript.jsonl": "eb28eca77f7c54d3a84bf9ef38464e0396d18087ea59d2d5a030a1ae8ba5a6f6",
+  "phase1/prompt.txt": "6401694a64edbb4aa9ceedd5ee8bf8e8cd450cb5354a8bd92141a7a9ac0a57c8",
+  "phase1/stderr.txt": "af2f4f95914df9c684b8c6d9f07bfa793cb3ed8a4c9f15c3022ee6363d84537e",
+  "phase1/command.json": "d1ce6a08f9180b44f5a5350126090a79224728f655b0be1279b5b10c9f976003",
+  "phase1/source_observations.json": "bf493dc78835c9dfd2747d04271ad74958b512f70c1d3b2c0641951e2c9bc4b7",
+  "phase1/final_response.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

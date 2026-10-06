@@ -1,0 +1,44 @@
+{
+  "pass": false,
+  "contract": {
+    "argv": [
+      "sandbox-exec",
+      "-D",
+      "CLI_PID=0",
+      "-f",
+      "/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-vncvblwi/grader.sb",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/benchmark-env/bin/python",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native/evals/benchmark-v1/acceptance.py",
+      "T04",
+      "2"
+    ],
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native/evals/benchmark-v1/acceptance.py\", line 205, in <module>\n    check(sys.argv[1],int(sys.argv[2]) if len(sys.argv)>2 else 2)\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native/evals/benchmark-v1/acceptance.py\", line 85, in check\n    assert parse_int_list(' -3 - -1 , +2 - +4 , -7 ') == [-7,-3,-2,-1,2,3,4]\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-vncvblwi/workspace/boltons/strutils.py\", line 909, in parse_int_list\n    range_limits = list(map(int, x.split(range_delim)))\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: invalid literal for int() with base 10: ''\n",
+    "duration_seconds": 0.0315
+  },
+  "upstream_regression": {
+    "argv": [
+      "sandbox-exec",
+      "-D",
+      "CLI_PID=0",
+      "-f",
+      "/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-vncvblwi/grader.sb",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/benchmark-env/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_strutils.py",
+      "tests/test_iterutils.py"
+    ],
+    "exit_code": 0,
+    "stdout": "........................................................................ [ 93%]\n.....                                                                    [100%]\n77 passed in 0.10s\n",
+    "stderr": "",
+    "duration_seconds": 0.2474
+  },
+  "new_regression_tests": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "No new regression tests supplied; not required by this task."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "requested_by_user": true,
+  "stop_after_current_run": "T08-r2-B",
+  "current_run_fully_hashed": true,
+  "runner_signal": "SIGINT",
+  "intent": "Pause new benchmark runs after the already active run finishes normally; preserve all existing data.",
+  "timestamp_utc": "2026-10-06T05:34:40Z"
+}

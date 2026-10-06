@@ -108,6 +108,46 @@ Exit codes: **0** successful command, **1** verification failed, **2** invalid i
 blocked completion or runtime error. Hook errors are reported as warnings with exit 0
 so a broken hook cannot trap the user; they never certify success.
 
+## Preliminary local A/B pilot — paused at 21 runs
+
+**STOP: stop expanding this campaign.** The planned 60-run experiment was
+paused at the user's request. All 21 completed runs are retained:
+A has 10 and B has 11; the matched comparison uses 10 pairs.
+The extra B run, T08 repeat 2, passed and remains visible separately.
+
+![Matched preliminary task success](evals/benchmark-v1/reviews/preliminary-v4-matched.png)
+
+| Observed metric | Raw DeepSeek | DeepSeek + Deep Native |
+| --- | ---: | ---: |
+| Strict success, matched 20 runs | 8/10 (80.0%) | 7/10 (70.0%) |
+| Strict success, all retained runs | 8/10 (80.0%) | 8/11 (72.7%) |
+| Verified completion / explicit DONE | 5/5 | 1/1 |
+| Unknown completion declaration | 5/10 | 10/11 |
+| Median agent seconds, all runs | 108.0 | 103.7 |
+| Median available total tokens, including cache | 465,399 (9/10 available) | 482,782 (9/11 available) |
+| Median tool calls | 29.0 | 36.0 |
+| Actual API dollar cost | unavailable | unavailable |
+
+Across common pairs, median B/A ratios are 1.20 for agent time (10 pairs) and
+1.21 for context-processing tokens (8 pairs). B had 0 quality wins,
+1 loss (T08), and 9 ties. False completion was not observed under the fixed
+final-marker rule; the small DONE denominators and many unknown declarations
+prevent a claim that Deep Native reduces it.
+
+This is a descriptive preliminary snapshot. The formal frozen judgment remains
+INCONCLUSIVE because 60 runs were not completed. The independent grades and artifact
+hashes passed audit, while trace review found 17 sandbox-related shell temporary
+file denials and overly broad automatic verification proxies. These limit causal
+interpretation; no Skill tuning or additional API runs followed the pause.
+
+Claude Code 2.1.289; requested model `deepseek-flash[1m]`, official response model
+`deepseek-flash`; Deep Native fixed at
+`fda3dd010e7de8f8c1ee1953e006e577464aa3d6`.
+
+[Stage report](evals/benchmark-v1/reviews/preliminary-v4.md) · [Chinese report](evals/benchmark-v1/reviews/preliminary-v4.zh-CN.md) ·
+[Machine-readable stage results](evals/benchmark-v1/reviews/preliminary-v4.json) · [Methodology](evals/benchmark-v1/README.md) ·
+[Raw artifacts](evals/benchmark-v1/results/2026-10-06-pilot-v4/runs/)
+
 ## What has and has not been measured
 
 | Experiment | Status |
@@ -115,12 +155,13 @@ so a broken hook cannot trap the user; they never certify success.
 | Runtime, installer, failure-path and fixture-grader tests | See [actual validation report](docs/validation.md) |
 | Offline scripted repair and stale-evidence demo | Executed; [12-step transcript](docs/demo/demo.json) |
 | Three-arm fixture identity / external grader | Tested locally |
-| Actual Claude Code Skill loading and hook lifecycle | **NOT RUN in the authoring environment** |
-| DeepSeek raw vs DeepSeek + Skill vs native Claude | **NOT RUN** |
+| Actual Claude Code Skill loading and hook lifecycle | Live local traces in the preliminary pilot above |
+| DeepSeek raw vs DeepSeek + Skill | Preliminary local A/B above; native Claude comparison not run |
 | Model accuracy, token savings, cost savings, native parity | **No claim** |
 
-The development environment had no Claude executable, model credentials or external
-DNS access. Unit tests and hook payload simulations are **not** live host validation.
+The original v0.1 authoring environment had no Claude executable, model credentials
+or external DNS access. The subsequent preliminary pilot above records live calls.
+Unit tests and hook payload simulations alone are **not** live host validation.
 The [evaluation protocol](evals/README.md) explains how to run the missing comparisons
 without passing off fixture tests as model performance.
 

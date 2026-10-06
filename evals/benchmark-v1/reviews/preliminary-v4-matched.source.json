@@ -1,0 +1,10 @@
+{
+  "source": "outputs/deep-native/evals/benchmark-v1/reviews/preliminary-v4.json",
+  "source_sha256": "dc629fba2cc63974cae8f5d490401983ab45fd439bb6d853c98a01d5b9ed60a0",
+  "cohort": "matched_subset",
+  "A": 8,
+  "A_n": 10,
+  "B": 7,
+  "B_n": 10,
+  "matplotlib": "3.9.4"
+}

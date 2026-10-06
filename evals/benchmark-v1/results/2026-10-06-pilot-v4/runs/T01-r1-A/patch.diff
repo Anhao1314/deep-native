@@ -1,0 +1,138 @@
+diff --git a/boltons/strutils.py b/boltons/strutils.py
+index 5ff4f38..918066b 100644
+--- a/boltons/strutils.py
++++ b/boltons/strutils.py
+@@ -164,18 +164,17 @@ def ordinalize(number, ext_only=False):
+     hi
+     >>> print(ordinalize(1515))
+     1515th
++    >>> print(ordinalize(11), ordinalize(12), ordinalize(13))
++    11th 12th 13th
++    >>> print(ordinalize(21), ordinalize(22), ordinalize(23))
++    21st 22nd 23rd
+     """
+     numstr, ext = str(number), ''
+     if numstr and numstr[-1] in string.digits:
+-        try:
+-            # first check for teens
+-            if numstr[-2] == '2':
+-                ext = 'th'
+-            else:
+-                # all other cases
+-                ext = _ORDINAL_MAP.get(numstr[-1], 'th')
+-        except IndexError:
+-            # single digit numbers (will reach here based on [-2] above)
++        # teens (11, 12, 13) are the exception to the last-digit rule
++        if numstr[-2:] in ('11', '12', '13'):
++            ext = 'th'
++        else:
+             ext = _ORDINAL_MAP.get(numstr[-1], 'th')
+     if ext_only:
+         return ext
+diff --git a/agent_tests/test_ordinalize.py b/agent_tests/test_ordinalize.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/test_ordinalize.py
+@@ -0,0 +1,102 @@
++"""Regression tests for boltons.strutils.ordinalize.
++
++Covers the ordinal-suffix rules for teens (11-13) and numbers ending in
++the twenties (20-29), plus the pre-existing string and ext_only behavior.
++"""
++
++import unittest
++
++import pytest
++
++from boltons.strutils import ordinalize
++
++
++def test_basic_suffixes():
++    assert ordinalize(1) == '1st'
++    assert ordinalize(2) == '2nd'
++    assert ordinalize(3) == '3rd'
++    assert ordinalize(4) == '4th'
++    assert ordinalize(5) == '5th'
++    assert ordinalize(9) == '9th'
++    assert ordinalize(10) == '10th'
++
++
++def test_teens_use_th():
++    assert ordinalize(11) == '11th'
++    assert ordinalize(12) == '12th'
++    assert ordinalize(13) == '13th'
++    assert ordinalize(14) == '14th'
++    # teens embedded in larger numbers also take 'th'
++    assert ordinalize(111) == '111th'
++    assert ordinalize(112) == '112th'
++    assert ordinalize(113) == '113th'
++    assert ordinalize(1011) == '1011th'
++    assert ordinalize(2413) == '2413th'
++
++
++def test_twenties_use_last_digit():
++    assert ordinalize(20) == '20th'
++    assert ordinalize(21) == '21st'
++    assert ordinalize(22) == '22nd'
++    assert ordinalize(23) == '23rd'
++    assert ordinalize(24) == '24th'
++    assert ordinalize(29) == '29th'
++    # twenties embedded in larger numbers
++    assert ordinalize(121) == '121st'
++    assert ordinalize(122) == '122nd'
++    assert ordinalize(123) == '123rd'
++    assert ordinalize(1520) == '1520th'
++
++
++def test_large_and_misc_numbers():
++    assert ordinalize(100) == '100th'
++    assert ordinalize(1000) == '1000th'
++    assert ordinalize(1515) == '1515th'
++    assert ordinalize(3694839230) == '3694839230th'
++    assert ordinalize(-1) == '-1st'
++    assert ordinalize(-11) == '-11th'
++    assert ordinalize(-22) == '-22nd'
++
++
++def test_string_input():
++    assert ordinalize('1') == '1st'
++    assert ordinalize('11') == '11th'
++    assert ordinalize('22') == '22nd'
++    # strings not ending in a digit are returned unchanged
++    assert ordinalize('hi') == 'hi'
++    assert ordinalize('') == ''
++    assert ordinalize('42nd') == '42nd'
++
++
++def test_ext_only():
++    assert ordinalize(1, ext_only=True) == 'st'
++    assert ordinalize(2, ext_only=True) == 'nd'
++    assert ordinalize(3, ext_only=True) == 'rd'
++    assert ordinalize(4, ext_only=True) == 'th'
++    assert ordinalize(11, ext_only=True) == 'th'
++    assert ordinalize(12, ext_only=True) == 'th'
++    assert ordinalize(13, ext_only=True) == 'th'
++    assert ordinalize(22, ext_only=True) == 'nd'
++    assert ordinalize('hi', ext_only=True) == ''
++
++
++class TestOrdinalizeUnittest(unittest.TestCase):
++    def test_teens(self):
++        for number, expected in ((11, '11th'), (12, '12th'), (13, '13th')):
++            self.assertEqual(ordinalize(number), expected)
++            self.assertEqual(ordinalize(number, ext_only=True), 'th')
++
++    def test_twenties(self):
++        for number, expected in ((21, '21st'), (22, '22nd'), (23, '23rd'),
++                                 (24, '24th'), (20, '20th')):
++            self.assertEqual(ordinalize(number), expected)
++
++    def test_ext_only_twenties(self):
++        self.assertEqual(ordinalize(21, ext_only=True), 'st')
++        self.assertEqual(ordinalize(22, ext_only=True), 'nd')
++        self.assertEqual(ordinalize(23, ext_only=True), 'rd')
++        self.assertEqual(ordinalize(24, ext_only=True), 'th')
++
++    def test_non_digit_string_preserved(self):
++        self.assertEqual(ordinalize('hi'), 'hi')
++        self.assertEqual(ordinalize('hi', ext_only=True), '')

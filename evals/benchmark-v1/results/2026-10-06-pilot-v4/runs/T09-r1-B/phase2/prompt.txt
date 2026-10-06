@@ -1,0 +1,1 @@
+Now extend the same chunked_padded API with keyword-only pad=True. With pad=False, yield a short final chunk without padding; the default behavior remains padded. This changes the requested code after the first stage. Document the option and complete the updated task. End with STATUS: DONE or STATUS: BLOCKED.

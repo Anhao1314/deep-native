@@ -1,0 +1,419 @@
+diff --git a/README.rst b/README.rst
+index 870e98c..2daf0f3 100644
+--- a/README.rst
++++ b/README.rst
+@@ -14,6 +14,7 @@ Python iterables.
+ | Grouping               | `chunked <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.chunked>`_,                                                                               |
+ |                        | `ichunked <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.ichunked>`_,                                                                             |
+ |                        | `chunked_even <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.chunked_even>`_,                                                                     |
++|                        | `chunked_padded <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.chunked_padded>`_,                                                                 |
+ |                        | `sliced <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.sliced>`_,                                                                                 |
+ |                        | `constrained_batches <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.constrained_batches>`_,                                                       |
+ |                        | `distribute <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.distribute>`_,                                                                         |
+diff --git a/docs/api.rst b/docs/api.rst
+index 7b40a8e..bd21f86 100644
+--- a/docs/api.rst
++++ b/docs/api.rst
+@@ -16,6 +16,7 @@ These tools yield groups of items from a source iterable.
+ .. autofunction:: chunked
+ .. autofunction:: ichunked
+ .. autofunction:: chunked_even
++.. autofunction:: chunked_padded
+ .. autofunction:: sliced
+ .. autofunction:: constrained_batches(iterable, max_size, max_count=None, get_len=len, strict=True)
+ .. autofunction:: distribute
+diff --git a/more_itertools/more.py b/more_itertools/more.py
+index 940b800..974ae8b 100755
+--- a/more_itertools/more.py
++++ b/more_itertools/more.py
+@@ -71,6 +71,7 @@ __all__ = [
+     'callback_iter',
+     'chunked',
+     'chunked_even',
++    'chunked_padded',
+     'circular_shifts',
+     'classify_unique',
+     'collapse',
+@@ -250,6 +251,57 @@ def chunked(iterable, n, strict=False):
+         return iterator
+ 
+ 
++def chunked_padded(iterable, n, fillvalue=None, *, pad=True):
++    """Break *iterable* into lists of length *n*, padding the last chunk
++    with *fillvalue*:
++
++        >>> list(chunked_padded([1, 2, 3, 4, 5, 6], 3))
++        [[1, 2, 3], [4, 5, 6]]
++        >>> list(chunked_padded([1, 2, 3, 4, 5], 3))
++        [[1, 2, 3], [4, 5, None]]
++
++    Every yielded list has exactly *n* items. Only the final nonempty chunk
++    is padded; if the length of *iterable* is a multiple of *n*, no padding
++    is used. An empty *iterable* yields nothing:
++
++        >>> list(chunked_padded([], 3))
++        []
++        >>> list(chunked_padded([1, 2], 3, fillvalue='?'))
++        [[1, 2, '?']]
++
++    If *pad* is ``False``, the final chunk is not padded and may be shorter
++    than *n*, like :func:`chunked`:
++
++        >>> list(chunked_padded([1, 2, 3, 4, 5], 3, pad=False))
++        [[1, 2, 3], [4, 5]]
++
++    *n* must be a positive integer. ``bool`` values and non-integer values
++    raise ``TypeError``; integers less than 1 raise ``ValueError``.
++
++    The function is lazy: it consumes at most *n* items from *iterable* per
++    chunk, and the object passed as *fillvalue* is inserted as-is, so its
++    identity is preserved in the output.
++
++    """
++    if isinstance(n, bool) or not isinstance(n, int):
++        raise TypeError('n must be a positive integer')
++    if n <= 0:
++        raise ValueError('n must be a positive integer')
++
++    iterator = iter(iterable)
++
++    def ret():
++        while True:
++            chunk = list(islice(iterator, n))
++            if not chunk:
++                return
++            if pad and len(chunk) < n:
++                chunk.extend(repeat(fillvalue, n - len(chunk)))
++            yield chunk
++
++    return ret()
++
++
+ def first(iterable, default=_marker):
+     """Return the first item of *iterable*, or *default* if *iterable* is
+     empty.
+diff --git a/more_itertools/more.pyi b/more_itertools/more.pyi
+index 927cb21..3dd8340 100644
+--- a/more_itertools/more.pyi
++++ b/more_itertools/more.pyi
+@@ -44,6 +44,7 @@ __all__ = [
+     'callback_iter',
+     'chunked',
+     'chunked_even',
++    'chunked_padded',
+     'circular_shifts',
+     'classify_unique',
+     'collapse',
+@@ -178,6 +179,18 @@ def chunked(
+     iterable: Iterable[_T], n: int | None, strict: bool = ...
+ ) -> Iterator[list[_T]]: ...
+ @overload
++def chunked_padded(
++    iterable: Iterable[_T],
++    n: int,
++    fillvalue: None = None,
++    *,
++    pad: bool = ...,
++) -> Iterator[list[_T | None]]: ...
++@overload
++def chunked_padded(
++    iterable: Iterable[_T], n: int, fillvalue: _U, *, pad: bool = ...
++) -> Iterator[list[_T | _U]]: ...
++@overload
+ def first(iterable: Iterable[_T]) -> _T: ...
+ @overload
+ def first(iterable: Iterable[_T], default: _U) -> _T | _U: ...
+diff --git a/agent_tests/test_chunked_padded.py b/agent_tests/test_chunked_padded.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/test_chunked_padded.py
+@@ -0,0 +1,289 @@
++"""Regression tests for ``more_itertools.chunked_padded``.
++
++The function yields lists of length *n*, padding only the final nonempty
++chunk with *fillvalue*.  Empty input yields nothing, *n* must be a positive
++integer (``bool`` and non-integer values raise ``TypeError``), and the
++``pad=False`` keyword-only option disables padding of the final chunk.
++Object identity of *fillvalue* and laziness are part of the contract.
++"""
++
++import inspect
++from itertools import count, islice
++
++import pytest
++
++import more_itertools as mi
++from more_itertools import chunked_padded
++from more_itertools.more import chunked_padded as chunked_padded_more
++
++
++class TestBasicChunking:
++    def test_exact_multiple_has_no_padding(self):
++        assert list(chunked_padded([1, 2, 3, 4, 5, 6], 3)) == [
++            [1, 2, 3],
++            [4, 5, 6],
++        ]
++
++    def test_only_final_nonempty_chunk_is_padded(self):
++        assert list(chunked_padded([1, 2, 3, 4, 5], 3)) == [
++            [1, 2, 3],
++            [4, 5, None],
++        ]
++
++    def test_padding_is_not_applied_to_full_chunks_between_short_ones(self):
++        assert list(chunked_padded(range(7), 3)) == [
++            [0, 1, 2],
++            [3, 4, 5],
++            [6, None, None],
++        ]
++
++    def test_single_short_chunk(self):
++        assert list(chunked_padded([1, 2], 5)) == [[1, 2, None, None, None]]
++
++    def test_n_larger_than_iterable(self):
++        filler = object()
++        result = list(chunked_padded([1], 4, filler))
++        assert len(result) == 1
++        assert len(result[0]) == 4
++        assert result[0][0] == 1
++        assert all(item is filler for item in result[0][1:])
++
++    def test_n_equals_one(self):
++        assert list(chunked_padded([1, 2, 3], 1)) == [[1], [2], [3]]
++        assert list(chunked_padded([1, 2, 3], 1, pad=False)) == [[1], [2], [3]]
++
++    def test_empty_iterable_yields_nothing(self):
++        assert list(chunked_padded([], 3)) == []
++        assert list(chunked_padded(iter([]), 3)) == []
++        assert list(chunked_padded((), 3, pad=False)) == []
++
++    def test_empty_iterable_with_custom_fillvalue_yields_nothing(self):
++        assert list(chunked_padded([], 3, object())) == []
++
++    def test_accepts_arbitrary_iterables(self):
++        def gen():
++            yield from 'ABCDE'
++
++        assert list(chunked_padded(gen(), 3)) == [
++            ['A', 'B', 'C'],
++            ['D', 'E', None],
++        ]
++        assert list(chunked_padded('ABCDE', 3)) == [
++            ['A', 'B', 'C'],
++            ['D', 'E', None],
++        ]
++        assert list(chunked_padded(iter(range(4)), 2)) == [[0, 1], [2, 3]]
++
++    def test_every_chunk_is_a_list_of_exactly_n_items(self):
++        chunks = list(chunked_padded(range(10), 4))
++        assert all(isinstance(chunk, list) for chunk in chunks)
++        assert all(len(chunk) == 4 for chunk in chunks)
++
++    def test_order_is_preserved(self):
++        chunks = list(chunked_padded(range(8), 3))
++        assert [item for chunk in chunks for item in chunk[:3]] == list(range(8))
++
++    def test_infinite_iterable_full_chunks(self):
++        chunks = list(islice(chunked_padded(count(), 3), 3))
++        assert chunks == [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
++
++    def test_infinite_iterable_pad_false(self):
++        chunks = list(islice(chunked_padded(count(), 3, pad=False), 3))
++        assert chunks == [[0, 1, 2], [3, 4, 5], [6, 7, 8]]
++
++
++class TestFillvalue:
++    def test_custom_fillvalue(self):
++        assert list(chunked_padded([1, 2, 3, 4, 5], 3, fillvalue='?')) == [
++            [1, 2, 3],
++            [4, 5, '?'],
++        ]
++        assert list(chunked_padded([1, 2, 3, 4, 5], 3, fillvalue=0)) == [
++            [1, 2, 3],
++            [4, 5, 0],
++        ]
++
++    def test_default_fillvalue_is_none(self):
++        assert list(chunked_padded([1], 2)) == [[1, None]]
++        assert list(chunked_padded([1], 2, fillvalue=None)) == [[1, None]]
++
++    def test_fillvalue_object_identity_is_preserved(self):
++        sentinel = object()
++        chunk = list(chunked_padded([1, 2], 5, fillvalue=sentinel))[0]
++        assert len(chunk) == 5
++        assert all(item is sentinel for item in chunk[2:])
++
++    def test_fillvalue_mutable_object_identity_is_preserved(self):
++        filler = ['fill']
++        chunk = list(chunked_padded([1], 3, fillvalue=filler))[0]
++        assert chunk[0] == 1
++        assert all(item is filler for item in chunk[1:])
++        # The exact same object is reused, not a copy of equal value.
++        chunk[1].append('mutated')
++        assert chunk[2] is filler
++
++    def test_source_items_keep_their_identity(self):
++        items = [object(), object(), object()]
++        chunks = list(chunked_padded(iter(items), 2, fillvalue='pad'))
++        assert chunks[0][0] is items[0]
++        assert chunks[0][1] is items[1]
++        assert chunks[1][0] is items[2]
++
++
++class TestPadFalse:
++    def test_short_final_chunk_without_padding(self):
++        assert list(chunked_padded([1, 2, 3, 4, 5], 3, pad=False)) == [
++            [1, 2, 3],
++            [4, 5],
++        ]
++
++    def test_exact_multiple_unchanged(self):
++        assert list(chunked_padded([1, 2, 3, 4, 5, 6], 3, pad=False)) == [
++            [1, 2, 3],
++            [4, 5, 6],
++        ]
++
++    def test_single_short_chunk(self):
++        assert list(chunked_padded([1, 2], 5, pad=False)) == [[1, 2]]
++
++    def test_fillvalue_is_not_used(self):
++        filler = object()
++        chunks = list(chunked_padded([1, 2], 5, filler, pad=False))
++        assert chunks == [[1, 2]]
++        assert len(chunks[0]) == 2
++        assert all(item is not filler for item in chunks[0])
++
++    def test_empty_iterable_yields_nothing(self):
++        assert list(chunked_padded([], 3, pad=False)) == []
++
++    def test_pad_true_is_the_default(self):
++        assert list(chunked_padded([1, 2], 3)) == list(
++            chunked_padded([1, 2], 3, pad=True)
++        )
++
++    def test_pad_is_keyword_only(self):
++        with pytest.raises(TypeError):
++            chunked_padded([1, 2, 3], 3, None, False)
++
++    def test_pad_false_is_lazy(self):
++        iterator = iter(range(10))
++        chunks = chunked_padded(iterator, 3, pad=False)
++        assert next(chunks) == [0, 1, 2]
++        assert next(iterator) == 3
++
++
++class TestLaziness:
++    def test_construction_does_not_consume_the_iterable(self):
++        iterator = iter([1, 2, 3, 4, 5])
++        chunks = chunked_padded(iterator, 3)
++        # Nothing has been pulled from the source yet.
++        assert next(iterator) == 1
++        # The first chunk therefore starts with the second item.
++        assert list(chunks) == [[2, 3, 4], [5, None, None]]
++
++    def test_consumes_at_most_n_items_per_chunk(self):
++        iterator = iter(range(10))
++        chunks = chunked_padded(iterator, 3)
++        assert next(chunks) == [0, 1, 2]
++        assert next(iterator) == 3
++        assert next(chunks) == [3, 4, 5]
++        assert next(iterator) == 6
++
++    def test_full_chunk_is_yielded_without_probing_for_exhaustion(self):
++        def gen():
++            yield 1
++            yield 2
++            raise RuntimeError('the source was probed too eagerly')
++
++        chunks = chunked_padded(gen(), 2)
++        # The first chunk is full, so the generator must not be advanced
++        # again (which would raise) before the chunk is yielded.
++        assert next(chunks) == [1, 2]
++        with pytest.raises(RuntimeError):
++            next(chunks)
++
++    def test_returns_an_iterator(self):
++        chunks = chunked_padded([1, 2, 3], 2)
++        assert iter(chunks) is chunks
++        assert next(chunks) == [1, 2]
++
++
++class TestNValidation:
++    def test_zero_raises_value_error(self):
++        with pytest.raises(ValueError):
++            chunked_padded([1, 2, 3], 0)
++
++    def test_negative_raises_value_error(self):
++        with pytest.raises(ValueError):
++            chunked_padded([1, 2, 3], -1)
++        with pytest.raises(ValueError):
++            chunked_padded([1, 2, 3], -100)
++
++    @pytest.mark.parametrize('bad_n', [True, False])
++    def test_bool_raises_type_error(self, bad_n):
++        with pytest.raises(TypeError):
++            chunked_padded([1, 2, 3], bad_n)
++
++    @pytest.mark.parametrize('bad_n', [3.0, 2.5, '3', None, 3 + 0j, [3], (3,)])
++    def test_non_integer_raises_type_error(self, bad_n):
++        with pytest.raises(TypeError):
++            chunked_padded([1, 2, 3], bad_n)
++
++    def test_validation_is_eager(self):
++        # The exception is raised by the call itself, before iteration.
++        with pytest.raises(TypeError):
++            chunked_padded([1, 2, 3], 2.0)
++        with pytest.raises(ValueError):
++            chunked_padded([1, 2, 3], 0)
++
++    def test_validation_does_not_consume_the_iterable(self):
++        iterator = iter([1, 2, 3])
++        with pytest.raises(TypeError):
++            chunked_padded(iterator, 1.5)
++        assert list(iterator) == [1, 2, 3]
++
++    def test_invalid_n_raises_even_for_empty_input(self):
++        with pytest.raises(TypeError):
++            chunked_padded([], '3')
++        with pytest.raises(ValueError):
++            chunked_padded([], 0)
++
++    def test_invalid_n_raises_with_pad_false(self):
++        with pytest.raises(TypeError):
++            chunked_padded([1, 2, 3], 2.0, pad=False)
++        with pytest.raises(ValueError):
++            chunked_padded([1, 2, 3], 0, pad=False)
++
++    def test_int_subclass_is_accepted(self):
++        class MyInt(int):
++            pass
++
++        assert list(chunked_padded([1, 2, 3], MyInt(2))) == [[1, 2], [3, None]]
++
++
++class TestAPI:
++    def test_exported_from_package(self):
++        assert 'chunked_padded' in mi.__all__
++        assert mi.chunked_padded is chunked_padded_more
++
++    def test_exported_from_more_module(self):
++        assert 'chunked_padded' in mi.more.__all__
++
++    def test_signature(self):
++        signature = inspect.signature(chunked_padded)
++        parameters = list(signature.parameters.values())
++        assert [parameter.name for parameter in parameters] == [
++            'iterable',
++            'n',
++            'fillvalue',
++            'pad',
++        ]
++        assert parameters[2].default is None
++        assert parameters[3].kind is inspect.Parameter.KEYWORD_ONLY
++        assert parameters[3].default is True
++
++    def test_documented(self):
++        docstring = chunked_padded.__doc__
++        assert docstring is not None
++        for term in ('fillvalue', 'pad', 'n'):
++            assert term in docstring

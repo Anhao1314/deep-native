@@ -1,0 +1,161 @@
+diff --git a/boltons/strutils.py b/boltons/strutils.py
+index 5ff4f38..192ee20 100644
+--- a/boltons/strutils.py
++++ b/boltons/strutils.py
+@@ -164,12 +164,26 @@ def ordinalize(number, ext_only=False):
+     hi
+     >>> print(ordinalize(1515))
+     1515th
++
++    Teen numbers (11-13, and any number ending in them) always take
++    'th', while other numbers follow the last digit:
++
++    >>> print(ordinalize(11))
++    11th
++    >>> print(ordinalize(13))
++    13th
++    >>> print(ordinalize(111))
++    111th
++    >>> print(ordinalize(22))
++    22nd
++    >>> print(ordinalize(23, ext_only=True))
++    rd
+     """
+     numstr, ext = str(number), ''
+     if numstr and numstr[-1] in string.digits:
+         try:
+             # first check for teens
+-            if numstr[-2] == '2':
++            if numstr[-2] == '1':
+                 ext = 'th'
+             else:
+                 # all other cases
+diff --git a/agent_tests/test_strutils_ordinalize.py b/agent_tests/test_strutils_ordinalize.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/test_strutils_ordinalize.py
+@@ -0,0 +1,124 @@
++"""Regression tests for boltons.strutils.ordinalize.
++
++The regression under test: the teen detection in ``ordinalize`` compared
++the tens digit against '2' instead of '1'. That produced '11st', '12nd',
++'13rd' for teens and '21th', '22th', '23th' for numbers ending in 21-23.
++
++These tests pin the corrected English rule and the preserved behavior for
++inputs whose last character is not a digit, plus ``ext_only``.
++"""
++
++import pytest
++
++from boltons.strutils import ordinalize
++
++
++_REFERENCE_SUFFIXES = {1: 'st', 2: 'nd', 3: 'rd'}
++
++
++def reference_ordinal(n):
++    """Independent implementation of the standard English ordinal rule."""
++    if 10 <= n % 100 <= 19:
++        return f'{n}th'
++    return f'{n}{_REFERENCE_SUFFIXES.get(n % 10, "th")}'
++
++
++def test_teens():
++    assert ordinalize(11) == '11th'
++    assert ordinalize(12) == '12th'
++    assert ordinalize(13) == '13th'
++    assert ordinalize(10) == '10th'
++    assert ordinalize(14) == '14th'
++    assert ordinalize(19) == '19th'
++
++
++def test_teens_embedded_in_larger_numbers():
++    assert ordinalize(111) == '111th'
++    assert ordinalize(112) == '112th'
++    assert ordinalize(113) == '113th'
++    assert ordinalize(211) == '211th'
++    assert ordinalize(1011) == '1011th'
++    assert ordinalize(1115) == '1115th'
++    assert ordinalize(913) == '913th'
++
++
++def test_numbers_ending_in_twenty_something():
++    assert ordinalize(21) == '21st'
++    assert ordinalize(22) == '22nd'
++    assert ordinalize(23) == '23rd'
++    assert ordinalize(24) == '24th'
++    assert ordinalize(121) == '121st'
++    assert ordinalize(122) == '122nd'
++    assert ordinalize(123) == '123rd'
++    assert ordinalize(221) == '221st'
++
++
++def test_single_digits_and_round_tens():
++    assert ordinalize(0) == '0th'
++    assert ordinalize(1) == '1st'
++    assert ordinalize(2) == '2nd'
++    assert ordinalize(3) == '3rd'
++    assert ordinalize(4) == '4th'
++    assert ordinalize(9) == '9th'
++    assert ordinalize(20) == '20th'
++    assert ordinalize(30) == '30th'
++    assert ordinalize(100) == '100th'
++    assert ordinalize(101) == '101st'
++    assert ordinalize(102) == '102nd'
++    assert ordinalize(103) == '103rd'
++    assert ordinalize(1000) == '1000th'
++    assert ordinalize(3694839230) == '3694839230th'
++
++
++def test_string_number_inputs():
++    assert ordinalize('11') == '11th'
++    assert ordinalize('22') == '22nd'
++    assert ordinalize('113') == '113th'
++
++
++def test_negative_numbers():
++    assert ordinalize(-1) == '-1st'
++    assert ordinalize(-2) == '-2nd'
++    assert ordinalize(-3) == '-3rd'
++    assert ordinalize(-11) == '-11th'
++    assert ordinalize(-22) == '-22nd'
++
++
++def test_non_numeric_strings_unchanged():
++    assert ordinalize('hi') == 'hi'
++    assert ordinalize('v1.x') == 'v1.x'
++    assert ordinalize('') == ''
++    assert ordinalize('11th') == '11th'
++
++
++def test_string_ending_in_digit_is_still_ordinalized():
++    # Preserved behavior: only a trailing non-digit bypasses ordinalize.
++    assert ordinalize('v1.2') == 'v1.2nd'
++    assert ordinalize('v1.2', ext_only=True) == 'nd'
++
++
++@pytest.mark.parametrize('value', ['hi', 'v1.x', ''])
++def test_ext_only_for_non_numeric_strings_is_empty(value):
++    assert ordinalize(value, ext_only=True) == ''
++    assert ordinalize(value, ext_only=True) == ordinalize(value)[len(value):]
++
++
++def test_ext_only():
++    assert ordinalize(11, ext_only=True) == 'th'
++    assert ordinalize(12, ext_only=True) == 'th'
++    assert ordinalize(13, ext_only=True) == 'th'
++    assert ordinalize(21, ext_only=True) == 'st'
++    assert ordinalize(22, ext_only=True) == 'nd'
++    assert ordinalize(23, ext_only=True) == 'rd'
++    assert ordinalize(4, ext_only=True) == 'th'
++
++
++def test_ext_only_matches_full_output_suffix():
++    for n in list(range(0, 130)) + [111, 112, 113, 1000, 3694839230]:
++        assert ordinalize(n, ext_only=True) == ordinalize(n)[len(str(n)):]
++
++
++def test_matches_reference_rule_sweep():
++    """Sweep 0-1200 against an independently written rule."""
++    for n in range(0, 1201):
++        assert ordinalize(n) == reference_ordinal(n), n

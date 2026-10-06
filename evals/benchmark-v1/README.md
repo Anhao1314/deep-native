@@ -6,11 +6,23 @@ This harness performs real Claude Code calls to the official DeepSeek Anthropic
 endpoint. It does not generate mock agent results. Offline reference repairs only
 validate the independent grader and are never provided to agents.
 
-The primary replacement is [2026-10-06-pilot-v4](results/2026-10-06-pilot-v4/).
-Both arms passed real CLI checks after the native Bash infrastructure repair.
-Earlier campaigns, including v3, remain available as excluded evidence. Generated reports record
-actual completion and validity; a final quality judgment requires all 60 scheduled
-runs and valid evidence.
+The current [Preliminary Pilot](reviews/preliminary-v4.md) is **paused at 21 runs**
+at the user's request. A has 10 runs and B has 11; the matched comparison has
+10 complete pairs (20 runs), with the extra T08-r2-B PASS retained separately.
+The operational recommendation is **STOP expansion**: matched success is A 8/10
+and B 7/10, with zero B wins, one loss and nine ties. The full frozen experiment
+remains INCONCLUSIVE; this stage is descriptive and is not a formal statistical
+conclusion. [Chinese report](reviews/preliminary-v4.zh-CN.md) ·
+[Stage JSON](reviews/preliminary-v4.json) · [CSV](reviews/preliminary-v4.csv).
+
+No configuration or treatment drift was found and all 442 retained artifact files
+passed hash review. Trace review nevertheless found 17 sandbox shell temporary-file
+denials and overly broad automatic verification proxies. Environment consistency
+does not mean ordinary shell compatibility or establish a pure Skill effect.
+[Runtime audit](reviews/2026-10-06-v4-preliminary-runtime-audit.md) and
+[actual execution/claim review](reviews/trace-review-v4.md) preserve these limitations.
+The Skill and frozen scores were not changed; no model calls followed the pause.
+Earlier campaigns remain available as excluded evidence.
 
 ## Scope and frozen design
 
@@ -220,6 +232,14 @@ and protected-test modifications are also counted. Unsupported test-claim langua
 flagged for trace review; it is not automatically labelled fabrication. Full trace
 evidence is preserved for human review.
 
+The preliminary trace supplement found that the frozen verification proxy can
+recognize `pytest --version`, piped import errors, blocked commands and initial
+background returns as passing verification. Raw fields remain unchanged. Actual
+functional checks were reviewed separately with command/output and background
+follow-up evidence: A 8/10 and B 8/11 had a completed passing check. T09 has zero
+actual qualifying observations in either arm, even though the automatic qualifier
+counts one A case. No staleness benefit can be inferred from this sample.
+
 The relay closes active streams and produces its final immutable call snapshot
 before results and token totals are serialized. SSE input/output/cache token
 counts are recorded only when all relevant responses complete; partial interrupted
@@ -307,6 +327,33 @@ v4 call, native Git routing was also checked without calling a model; the prepar
 freeze is retained separately in the campaign's preparation revision record.
 No runs from earlier protocols are pooled into that comparison. [Correction record](CONTRACT-CORRECTIONS.md)
 documents the exclusions and restart requirements.
+
+The user then requested a preliminary readout instead of mechanically completing
+60 calls. The active T08-r2-B finished normally; the runner stopped before the next
+entry launched, as recorded in [user_pause.json](results/2026-10-06-pilot-v4/user_pause.json).
+The generic stop record names T08-r2-A, which has no run artifact or API call. All
+21 finalized runs remain intact and the remaining 39 planned runs were not executed.
+
+## Regenerate the preliminary stage without model calls
+
+```bash
+python3 evals/benchmark-v1/reviews/preliminary-v4.py \
+  --campaign evals/benchmark-v1/results/2026-10-06-pilot-v4 \
+  --expected-runs 21 --output work/preliminary-v4.json \
+  --trace-review evals/benchmark-v1/reviews/trace-review-v4.json \
+  --runtime-review evals/benchmark-v1/reviews/2026-10-06-v4-preliminary-runtime-audit.json
+```
+
+This reads the exact finalized schedule prefix, verifies retained hashes and scores,
+and writes only new review outputs. It does not resume the benchmark. The actual
+execution labels are a post-hoc trace supplement; they do not relabel primary grades.
+The recorded runtime review also checks local retained workspaces and binaries, so
+it requires the recorded machine state for those additional attestations.
+
+The paired figure can be regenerated separately using Matplotlib 3.9.4 and
+`reviews/plot_preliminary.py --input reviews/preliminary-v4.json --output work/matched`
+from this directory. Plotting dependencies were installed in a separate environment
+after the benchmark paused, leaving the frozen agent environment unchanged.
 
 ## Validate the harness without calling a model
 

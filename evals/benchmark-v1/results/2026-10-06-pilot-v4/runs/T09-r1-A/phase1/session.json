@@ -1,0 +1,96 @@
+{
+  "session_id": "6871e9ed-64a7-455f-9b81-17747e01a4e7",
+  "exit_code": 1,
+  "duration_seconds": 92.0212,
+  "interrupted": false,
+  "stop_reason": "max_turns",
+  "observed_assistant_messages": 18,
+  "final_response": "",
+  "cli_result": {
+    "duration_api_ms": 91178,
+    "stop_reason": "tool_use",
+    "session_id": "6871e9ed-64a7-455f-9b81-17747e01a4e7",
+    "total_cost_usd": 0.697282,
+    "usage": {
+      "input_tokens": 24537,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 351744,
+      "output_tokens": 15949,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "deepseek-flash[1m]": {
+        "inputTokens": 24537,
+        "outputTokens": 15949,
+        "cacheReadInputTokens": 351744,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.697282,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 32000,
+        "thinkingTokens": 0,
+        "canonicalModel": "deepseek-flash[1m]",
+        "provider": "firstParty",
+        "costBasis": "unknown"
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "max_turns",
+    "fast_mode_state": "off",
+    "fast_mode_disabled_reason": "sdk_opt_in_required",
+    "subagent_stats": {
+      "spawned": 0,
+      "requested": {
+        "background": 0,
+        "foreground": 0,
+        "unset": 0
+      },
+      "started_in_background": 0,
+      "max_depth": 0,
+      "spawned_by_subagents": 0,
+      "completed": 0,
+      "failed": 0,
+      "killed": {
+        "parent": 0,
+        "user": 0,
+        "system": 0
+      },
+      "refused": {
+        "depth_limit": 0,
+        "concurrency_limit": 0,
+        "budget": 0
+      },
+      "by_type": {}
+    },
+    "is_error": true,
+    "num_turns": 19,
+    "subtype": "error_max_turns",
+    "errors": [
+      "Reached maximum number of turns (18)"
+    ],
+    "type": "result",
+    "duration_ms": 91798,
+    "uuid": "8c45b149-687d-43dd-9779-56f23b78883c",
+    "queued_turn_count": 0,
+    "result_index": 0
+  },
+  "last_observed_verified_source_hash": "5de74a31226823cf0e4f0fb8de92e326401224b7b5b59d28d1ebd40058f2bb6b",
+  "final_source_hash": "8bfa5a8af93ffb182f7b2b10535ad9095edbacf1f83ec6e3ea3e21f4382d086f",
+  "stale_observed_verification": true,
+  "operator_interrupted": false
+}
