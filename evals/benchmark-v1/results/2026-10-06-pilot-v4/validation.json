@@ -1,0 +1,28 @@
+{
+  "local_unit_suite": {
+    "command": "python3.12 -m unittest discover -s tests -v",
+    "tests_run": 102,
+    "passed": 101,
+    "skipped": 1,
+    "duration_seconds": 5.107,
+    "exit_code": 0,
+    "log": "local-test-results.log"
+  },
+  "full_fixture_validation": {
+    "unchanged_grading_code_from_v3": true,
+    "initial_fixtures_rejected": 10,
+    "reference_repairs_accepted": 10,
+    "evidence": "../2026-10-06-pilot-v3/fixture-test-results.log"
+  },
+  "real_toy_preflight": {
+    "arms": [
+      "A",
+      "B"
+    ],
+    "independent_test_pass": true,
+    "successful_agent_verification": true,
+    "native_cwd_write_denials": 0,
+    "B_skill_invoked": true,
+    "excluded_from_formal_sample": true
+  }
+}

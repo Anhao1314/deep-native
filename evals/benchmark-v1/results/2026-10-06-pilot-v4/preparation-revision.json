@@ -1,0 +1,19 @@
+{
+  "formal_runs_at_revision": 0,
+  "reason": "Before the first formal call, directly select audited native Apple Git to avoid successful shim commands emitting denied xcrun cache warnings. No change to tasks, schedule, fixture commits, baseline outcomes, budgets or treatment. Initial preparation freeze retained.",
+  "prior_preparation": "preparation-1/freeze.json",
+  "final_freeze": "freeze.json",
+  "unchanged_input_hashes": [
+    "tasks",
+    "schedule",
+    "treatment"
+  ],
+  "unchanged_baseline_semantics": [
+    "fixture_commit",
+    "protected_hashes",
+    "initial pass false",
+    "each grading check exit status"
+  ],
+  "baseline_file_hash_different_because": "Real repeated preflight grading has different timings and temporary paths. Both original files are retained.",
+  "real_toy_preflight_scope": "Real A/B toy verified native cwd temp correction and successful Bash/test results; native Git path subsequently validated by real offline sandbox commands. All toy calls excluded from formal sample."
+}
