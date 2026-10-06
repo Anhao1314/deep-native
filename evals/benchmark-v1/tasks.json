@@ -1,0 +1,129 @@
+{
+  "schema": 1,
+  "repositories": {
+    "boltons": {
+      "url": "https://github.com/mahmoud/boltons.git",
+      "commit": "4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d"
+    },
+    "more": {
+      "url": "https://github.com/more-itertools/more-itertools.git",
+      "commit": "1ea82a711c69f590054987b5cb194157f8ce8ac4"
+    }
+  },
+  "tasks": [
+    {
+      "id": "T01",
+      "category": "simple_bug_fix",
+      "repo": "boltons",
+      "seeded": true,
+      "files": [
+        "boltons/strutils.py"
+      ],
+      "prompt": "Fix ordinalize in boltons.strutils. A regression gives the wrong English ordinal suffix for teen numbers and numbers ending in the twenties. Preserve its existing string and ext_only behavior.\nWork only on the requested functionality, its documentation, and new regression tests under agent_tests/. Do not change or remove existing tests, benchmark_check.py, benchmark_tests.py, or repository configuration; do not skip tests, hard-code examples, or fetch benchmark answers. You may inspect the repository and use its local tools. The available check command is python3 benchmark_check.py. End your final response with STATUS: DONE if you consider the requested work complete, or STATUS: BLOCKED otherwise.\n"
+    },
+    {
+      "id": "T02",
+      "category": "edge_case_validation",
+      "repo": "more",
+      "seeded": false,
+      "files": [
+        "more_itertools/more.py"
+      ],
+      "prompt": "Tighten chunked size validation: n may be an integer or None, but bool and non-integer values must raise TypeError before consuming the input iterable. Preserve n=0, n=None, negative-integer ValueError, strict behavior, and existing valid outputs. Document the accepted types.\nWork only on the requested functionality, its documentation, and new regression tests under agent_tests/. Do not change or remove existing tests, benchmark_check.py, benchmark_tests.py, or repository configuration; do not skip tests, hard-code examples, or fetch benchmark answers. You may inspect the repository and use its local tools. The available check command is python3 benchmark_check.py. End your final response with STATUS: DONE if you consider the requested work complete, or STATUS: BLOCKED otherwise.\n"
+    },
+    {
+      "id": "T03",
+      "category": "cross_file_bug",
+      "repo": "more",
+      "seeded": true,
+      "files": [
+        "more_itertools/more.py",
+        "more_itertools/__init__.py"
+      ],
+      "prompt": "Fix windowed_complete: its public package import produces the wrong tuple structure, and the implementation drops an item from each suffix. The public and module imports must both yield (prefix, window, suffix) tuples whose concatenation is the original sequence. Preserve zero-width windows and validation.\nWork only on the requested functionality, its documentation, and new regression tests under agent_tests/. Do not change or remove existing tests, benchmark_check.py, benchmark_tests.py, or repository configuration; do not skip tests, hard-code examples, or fetch benchmark answers. You may inspect the repository and use its local tools. The available check command is python3 benchmark_check.py. End your final response with STATUS: DONE if you consider the requested work complete, or STATUS: BLOCKED otherwise.\n"
+    },
+    {
+      "id": "T04",
+      "category": "feature_implementation",
+      "repo": "boltons",
+      "seeded": false,
+      "files": [
+        "boltons/strutils.py"
+      ],
+      "prompt": "Extend parse_int_list to signed integers and signed inclusive ranges, including -3--1, +2-+4, reversed endpoints, and whitespace around tokens and endpoints. Preserve sorting, duplicate entries, empty input and custom literal delimiters. Malformed ranges must raise ValueError. Update its docstring.\nWork only on the requested functionality, its documentation, and new regression tests under agent_tests/. Do not change or remove existing tests, benchmark_check.py, benchmark_tests.py, or repository configuration; do not skip tests, hard-code examples, or fetch benchmark answers. You may inspect the repository and use its local tools. The available check command is python3 benchmark_check.py. End your final response with STATUS: DONE if you consider the requested work complete, or STATUS: BLOCKED otherwise.\n"
+    },
+    {
+      "id": "T05",
+      "category": "refactor_regression",
+      "repo": "more",
+      "seeded": false,
+      "files": [
+        "more_itertools/more.py"
+      ],
+      "prompt": "Refactor map_reduce to remove the duplicated accumulation loops for valuefunc being None versus supplied: use one accumulation loop, then the existing optional reduction phase. Preserve callback order, single-pass iterator consumption, insertion order, exception propagation, and the defaultdict with default_factory None. Add regression protection under agent_tests/.\nWork only on the requested functionality, its documentation, and new regression tests under agent_tests/. Do not change or remove existing tests, benchmark_check.py, benchmark_tests.py, or repository configuration; do not skip tests, hard-code examples, or fetch benchmark answers. You may inspect the repository and use its local tools. The available check command is python3 benchmark_check.py. End your final response with STATUS: DONE if you consider the requested work complete, or STATUS: BLOCKED otherwise.\n"
+    },
+    {
+      "id": "T06",
+      "category": "unfamiliar_repository",
+      "repo": "boltons",
+      "seeded": true,
+      "files": [
+        "boltons/iterutils.py"
+      ],
+      "prompt": "Investigate why get_path on nested mappings unexpectedly looks up later path segments at the outer root. Repair the lookup while preserving dotted list-index paths, tuple paths, defaults and PathAccessError details. Keep the fix focused.\nWork only on the requested functionality, its documentation, and new regression tests under agent_tests/. Do not change or remove existing tests, benchmark_check.py, benchmark_tests.py, or repository configuration; do not skip tests, hard-code examples, or fetch benchmark answers. You may inspect the repository and use its local tools. The available check command is python3 benchmark_check.py. End your final response with STATUS: DONE if you consider the requested work complete, or STATUS: BLOCKED otherwise.\n"
+    },
+    {
+      "id": "T07",
+      "category": "error_recovery",
+      "repo": "more",
+      "seeded": false,
+      "files": [
+        "more_itertools/more.py"
+      ],
+      "transient_failure": true,
+      "prompt": "Start by running python3 benchmark_check.py. Then add a public take_until_inclusive(iterable, pred) iterator: yield through the first item whose predicate is true, including that item, and stop without consuming any later items. Empty input stays empty; predicate is evaluated once per encountered item. Export it from the package and document it. The check environment may have a transient startup failure; complete the task using the available local tools.\nWork only on the requested functionality, its documentation, and new regression tests under agent_tests/. Do not change or remove existing tests, benchmark_check.py, benchmark_tests.py, or repository configuration; do not skip tests, hard-code examples, or fetch benchmark answers. You may inspect the repository and use its local tools. The available check command is python3 benchmark_check.py. End your final response with STATUS: DONE if you consider the requested work complete, or STATUS: BLOCKED otherwise.\n"
+    },
+    {
+      "id": "T08",
+      "category": "multi_step_long_horizon",
+      "repo": "boltons",
+      "seeded": false,
+      "files": [
+        "boltons/strutils.py",
+        "boltons/rangeutils.py"
+      ],
+      "prompt": "Build boltons.rangeutils with parse_ranges(text) and format_ranges(values), supporting signed integers, comma-separated inclusive ranges (including -3--1 and reversed endpoints), sorted unique results, and canonical compact formatting. Reuse and extend strutils.parse_int_list / format_int_list rather than duplicating the parser. Add a CLI: python3 -m boltons.rangeutils expand TEXT outputs a JSON integer list; compact TEXT (a comma-separated integer list) outputs canonical range text. Malformed input must exit nonzero without a traceback. Document and add regression tests for the API and CLI.\nWork only on the requested functionality, its documentation, and new regression tests under agent_tests/. Do not change or remove existing tests, benchmark_check.py, benchmark_tests.py, or repository configuration; do not skip tests, hard-code examples, or fetch benchmark answers. You may inspect the repository and use its local tools. The available check command is python3 benchmark_check.py. End your final response with STATUS: DONE if you consider the requested work complete, or STATUS: BLOCKED otherwise.\n"
+    },
+    {
+      "id": "T09",
+      "category": "verification_staleness",
+      "repo": "more",
+      "seeded": false,
+      "files": [
+        "more_itertools/more.py"
+      ],
+      "phases": true,
+      "prompt": "Add and export chunked_padded(iterable, n, fillvalue=None): yield lists of length n, padding only the final nonempty chunk with fillvalue. Empty input yields nothing; n must be a positive integer and bool/non-integer values raise TypeError. Preserve fillvalue object identity and laziness. Document the API.\nWork only on the requested functionality, its documentation, and new regression tests under agent_tests/. Do not change or remove existing tests, benchmark_check.py, benchmark_tests.py, or repository configuration; do not skip tests, hard-code examples, or fetch benchmark answers. You may inspect the repository and use its local tools. The available check command is python3 benchmark_check.py. End your final response with STATUS: DONE if you consider the requested work complete, or STATUS: BLOCKED otherwise.\n",
+      "continuation": "Now extend the same chunked_padded API with keyword-only pad=True. With pad=False, yield a short final chunk without padding; the default behavior remains padded. This changes the requested code after the first stage. Document the option and complete the updated task. End with STATUS: DONE or STATUS: BLOCKED."
+    },
+    {
+      "id": "T10",
+      "category": "interruption_recovery",
+      "repo": "more",
+      "seeded": false,
+      "files": [
+        "more_itertools/more.py"
+      ],
+      "recovery": true,
+      "prompt": "Add and export partition_runs(iterable, key=None, *, max_run=None): yield (key_value, tuple_of_items) for contiguous equal-key runs. Default key is identity. Evaluate key exactly once per input item and consume the iterable once. If max_run is a positive integer, split long runs into groups of at most that size; None means unlimited. Reject bool/non-integer max_run with TypeError and nonpositive integers with ValueError before consuming input. Preserve item identity, empty input, and callback exception propagation. Document and add regression tests under agent_tests/.\nWork only on the requested functionality, its documentation, and new regression tests under agent_tests/. Do not change or remove existing tests, benchmark_check.py, benchmark_tests.py, or repository configuration; do not skip tests, hard-code examples, or fetch benchmark answers. You may inspect the repository and use its local tools. The available check command is python3 benchmark_check.py. End your final response with STATUS: DONE if you consider the requested work complete, or STATUS: BLOCKED otherwise.\n"
+    }
+  ],
+  "planned_runs": 60,
+  "repeats": 3,
+  "seed": 20261006,
+  "budget": {
+    "wall_seconds": 480,
+    "assistant_turns": 24
+  },
+  "treatment_activation": "Use the installed deep-native skill for this task."
+}
