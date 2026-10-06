@@ -1,0 +1,485 @@
+[
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 6181,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "output_tokens": 189,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 1.9514
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 1410,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 6272,
+      "output_tokens": 363,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 2.1509
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 1772,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 7936,
+      "output_tokens": 208,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 1.6173
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 1622,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 9856,
+      "output_tokens": 154,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 1.6635
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 202,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 11520,
+      "output_tokens": 8769,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 39.4302
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 1000,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 20480,
+      "output_tokens": 123,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 2.0696
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 740,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 21504,
+      "output_tokens": 2482,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 10.1367
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 1259,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 23552,
+      "output_tokens": 4813,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 17.1745
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 144,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 29568,
+      "output_tokens": 1327,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 6.0144
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 553,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 30592,
+      "output_tokens": 255,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 2.6471
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 257,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 31232,
+      "output_tokens": 255,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 2.4215
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 454,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 31488,
+      "output_tokens": 414,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 2.5899
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 189,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 32256,
+      "output_tokens": 69,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 1.868
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 213,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 32384,
+      "output_tokens": 2128,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 11.1783
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 209,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 34688,
+      "output_tokens": 263,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 2.5853
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 946,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 35072,
+      "output_tokens": 2022,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 9.8782
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 195,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 37888,
+      "output_tokens": 154,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 1.8873
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 138,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 38144,
+      "output_tokens": 170,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 2.2273
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 137,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 38400,
+      "output_tokens": 958,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 5.8156
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 280,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 39424,
+      "output_tokens": 213,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 2.5393
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 389,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 39808,
+      "output_tokens": 161,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 1.8477
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 155,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 40320,
+      "output_tokens": 487,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 4.4065
+  },
+  {
+    "path": "/v1/messages?beta=true",
+    "requested_model": "deepseek-flash",
+    "max_tokens": 32000,
+    "thinking": {
+      "type": "adaptive",
+      "display": "updates"
+    },
+    "temperature": null,
+    "usage": {
+      "input_tokens": 213,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 40832,
+      "output_tokens": 723,
+      "service_tier": "standard"
+    },
+    "response_model": "deepseek-flash",
+    "http_status": 200,
+    "complete": true,
+    "duration_seconds": 4.5301
+  }
+]

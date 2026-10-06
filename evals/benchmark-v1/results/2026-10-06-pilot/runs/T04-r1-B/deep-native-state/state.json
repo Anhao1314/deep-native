@@ -1,0 +1,14 @@
+{
+  "attempt": "89490e32880d41b7bb8304fc8350a1d1",
+  "config_hash": "d88420963c18e02c55dab847118e8ccff7288ffdf59c015a73176eaaf8211ecf",
+  "goal": "parse_int_list parses signed ints and signed inclusive ranges (e.g. -3--1, +2-+4), reversed endpoints, whitespace around tokens/endpoints, custom literal delimiters; preserves sorting, duplicates, empty input; raises ValueError on malformed ranges; docstring updated; new regression tests under agent_tests/; python3 benchmark_check.py passes",
+  "next": "Run deep-native verify on frozen bytes, then finish.",
+  "note": "Rewrote parse_int_list body (regex int/range tokens) and docstring in boltons/strutils.py; added agent_tests/test_parse_int_list.py (46 tests). Differential test vs old implementation: 0 mismatches over 20k randomized unsigned inputs. benchmark_check.py: PASS (visible acceptance, 77 pytest tests, 46 agent tests); pytest --doctest-modules boltons/strutils.py: 29 passed.",
+  "risk": "Only the check-scoped suites were run (benchmark_check.py: visible acceptance + tests/test_strutils.py + tests/test_iterutils.py + agent_tests) plus pytest --doctest-modules on boltons/strutils.py; the full tests/ tree was not run because it hangs on unrelated network-dependent tests. Intentional behavior deltas: whitespace-only tokens between delimiters are now skipped instead of raising, and multi-endpoint tokens like '1-2-3' now raise ValueError instead of silently expanding to min..max. Differential test vs the old implementation over 20k randomized unsigned inputs showed 0 mismatches.",
+  "schema": 1,
+  "session": "db0eb385-0ca3-4fc3-aed8-71d003fb4435",
+  "status": "complete",
+  "summary": "Extended boltons.strutils.parse_int_list to signed integers and signed inclusive ranges: tokens are stripped, matched as [+-]?digits or '<int><range_delim><int>' (range_delim escaped, literal), reversed endpoints expand ascending, sorted output, duplicates preserved, empty input returns []; malformed tokens/ranges raise ValueError. Docstring updated with signed/whitespace/ValueError docs and doctests. Added agent_tests/test_parse_int_list.py (46 unittest regression tests).",
+  "task_id": "cfa85b2cce324e66a0eeeed7f09c182a",
+  "updated_at": "2026-10-06T00:21:41Z"
+}

@@ -253,34 +253,7 @@ def live_session(root,home,tmp,python,relay,model,condition,prompt,artifact,seco
     return result,events
 
 def kill_group(proc):
-    # Claude background Bash tools can start a separate process group/session.
-    # Freeze the launcher, then stop/collect its descendants before killing them.
-    # Never kill an unrelated process solely because a stale PID was recorded.
-    if proc.poll() is not None:
-        return
-    try:os.kill(proc.pid,signal.SIGSTOP)
-    except ProcessLookupError:return
-    descendants=set()
-    for _ in range(3):
-        listing=subprocess.run(['ps','-axo','pid=,ppid='],capture_output=True,text=True,check=True).stdout
-        parents={int(parts[0]):int(parts[1]) for line in listing.splitlines() if len(parts:=line.split())==2}
-        owned={proc.pid}
-        while True:
-            added={pid for pid,parent in parents.items() if parent in owned}-owned
-            if not added:break
-            owned.update(added)
-        new=owned-{proc.pid}-descendants
-        for pid in new:
-            try:os.kill(pid,signal.SIGSTOP)
-            except ProcessLookupError:pass
-        descendants.update(new)
-        if not new:break
-    for pid in descendants:
-        try:os.kill(pid,signal.SIGKILL)
-        except ProcessLookupError:pass
     try:os.killpg(proc.pid,signal.SIGKILL)
-    except ProcessLookupError:pass
-    try:os.kill(proc.pid,signal.SIGKILL)
     except ProcessLookupError:pass
 
 def source_fingerprint(root,task_files=None):

@@ -1,0 +1,98 @@
+{
+  "session_id": "39de2caa-8628-44a2-95f5-ba0db051fbdc",
+  "exit_code": 0,
+  "duration_seconds": 291.5402,
+  "interrupted": false,
+  "stop_reason": "completed",
+  "observed_assistant_messages": 23,
+  "final_response": "## Summary\n\n**Implementation — `boltons/strutils.py:886` (`parse_int_list`)**\n- Replaced naive `split(range_delim)` parsing with two regexes: a signed-integer pattern (`[+-]?\\d+`) and an inclusive signed-range pattern that allows whitespace around the range delimiter and both endpoints.\n- Handles `-3--1` → `[-3, -2, -1]`, `+2-+4` → `[2, 3, 4]`, cross-zero ranges (`1--3`), and reversed endpoints (`-1--3`, `+4-+2`) via `min`/`max`.\n- `re.escape(range_delim)` keeps custom delimiters literal (e.g. `..`, `|`, `to`), and `delim`/`range_delim` behave exactly as before for custom values.\n- Sorting, duplicate preservation, empty input/tokens, and leading/trailing delimiters are unchanged.\n- Malformed tokens (`1-`, `-`, `1-2-3`, `--1`, `1..3` with default delimiters, `a-1`, etc.) now raise `ValueError` instead of mis-parsing.\n- Docstring updated: signed/reversed/whitespace semantics, a `Raises:` section, and new doctests, all passing.\n\n**Tests — `agent_tests/test_parse_int_list_signed.py`** (new, 40 tests)\nCover signed integers/ranges, reversed endpoints, whitespace around tokens/endpoints, sorting, duplicates, empty input, custom literal delimiters (multi-char and regex-special), and malformed-input `ValueError` cases.\n\n**Verification**\n- `python3 benchmark_check.py`: visible acceptance checks passed, 77 pytest tests passed, 40 agent tests passed.\n- Full `tests/` suite: 523 passed; the only 2 failures are pre-existing `test_socketutils` sandbox `PermissionError`s unrelated to this change.\n- No existing tests, config, or files other than `boltons/strutils.py` + new `agent_tests/` were touched.\n\nSTATUS: DONE",
+  "cli_result": {
+    "duration_api_ms": 138929,
+    "stop_reason": "end_turn",
+    "session_id": "39de2caa-8628-44a2-95f5-ba0db051fbdc",
+    "total_cost_usd": 1.0773979999999999,
+    "usage": {
+      "input_tokens": 18658,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 633216,
+      "output_tokens": 26700,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "deepseek-flash[1m]": {
+        "inputTokens": 18658,
+        "outputTokens": 26700,
+        "cacheReadInputTokens": 633216,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 1.0773979999999999,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 32000,
+        "thinkingTokens": 0,
+        "canonicalModel": "deepseek-flash[1m]",
+        "provider": "firstParty",
+        "costBasis": "unknown"
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "fast_mode_disabled_reason": "sdk_opt_in_required",
+    "subagent_stats": {
+      "spawned": 0,
+      "requested": {
+        "background": 0,
+        "foreground": 0,
+        "unset": 0
+      },
+      "started_in_background": 0,
+      "max_depth": 0,
+      "spawned_by_subagents": 0,
+      "completed": 0,
+      "failed": 0,
+      "killed": {
+        "parent": 0,
+        "user": 0,
+        "system": 0
+      },
+      "refused": {
+        "depth_limit": 0,
+        "concurrency_limit": 0,
+        "budget": 0
+      },
+      "by_type": {}
+    },
+    "is_error": false,
+    "num_turns": 29,
+    "subtype": "success",
+    "api_error_status": null,
+    "result": "## Summary\n\n**Implementation — `boltons/strutils.py:886` (`parse_int_list`)**\n- Replaced naive `split(range_delim)` parsing with two regexes: a signed-integer pattern (`[+-]?\\d+`) and an inclusive signed-range pattern that allows whitespace around the range delimiter and both endpoints.\n- Handles `-3--1` → `[-3, -2, -1]`, `+2-+4` → `[2, 3, 4]`, cross-zero ranges (`1--3`), and reversed endpoints (`-1--3`, `+4-+2`) via `min`/`max`.\n- `re.escape(range_delim)` keeps custom delimiters literal (e.g. `..`, `|`, `to`), and `delim`/`range_delim` behave exactly as before for custom values.\n- Sorting, duplicate preservation, empty input/tokens, and leading/trailing delimiters are unchanged.\n- Malformed tokens (`1-`, `-`, `1-2-3`, `--1`, `1..3` with default delimiters, `a-1`, etc.) now raise `ValueError` instead of mis-parsing.\n- Docstring updated: signed/reversed/whitespace semantics, a `Raises:` section, and new doctests, all passing.\n\n**Tests — `agent_tests/test_parse_int_list_signed.py`** (new, 40 tests)\nCover signed integers/ranges, reversed endpoints, whitespace around tokens/endpoints, sorting, duplicates, empty input, custom literal delimiters (multi-char and regex-special), and malformed-input `ValueError` cases.\n\n**Verification**\n- `python3 benchmark_check.py`: visible acceptance checks passed, 77 pytest tests passed, 40 agent tests passed.\n- Full `tests/` suite: 523 passed; the only 2 failures are pre-existing `test_socketutils` sandbox `PermissionError`s unrelated to this change.\n- No existing tests, config, or files other than `boltons/strutils.py` + new `agent_tests/` were touched.\n\nSTATUS: DONE",
+    "ttft_ms": 1591,
+    "type": "result",
+    "duration_ms": 291378,
+    "uuid": "7ecd4590-ec9d-47d9-a6d4-32a363748bc1",
+    "ttft_stream_ms": 1157,
+    "time_to_request_ms": 24,
+    "first_content_frame_ms": 1158,
+    "queued_turn_count": 0,
+    "result_index": 0
+  },
+  "last_observed_verified_source_hash": "476b0438285bd68bcbcc0e6d135c1f1724ee723780bfd3e0c63ad34d54f45dc0",
+  "final_source_hash": "476b0438285bd68bcbcc0e6d135c1f1724ee723780bfd3e0c63ad34d54f45dc0",
+  "stale_observed_verification": false
+}

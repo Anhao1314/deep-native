@@ -4,6 +4,8 @@ import json
 import os
 import sys
 import tempfile
+import subprocess
+import time
 import unittest
 from unittest.mock import patch
 from pathlib import Path
@@ -47,6 +49,26 @@ class BenchmarkTests(unittest.TestCase):
         calls[0]['complete']=False
         self.assertIsNone(provider_tokens(calls))
         self.assertIsNone(provider_tokens([]))
+
+    def test_cleanup_kills_detached_descendant(self):
+        with tempfile.TemporaryDirectory() as temp:
+            pidfile=Path(temp)/'child.pid'
+            script='import subprocess,sys,time,pathlib; child=subprocess.Popen([sys.executable,"-c","import time;time.sleep(60)"],start_new_session=True);pathlib.Path(sys.argv[1]).write_text(str(child.pid));time.sleep(60)'
+            parent=subprocess.Popen([sys.executable,'-c',script,str(pidfile)],start_new_session=True)
+            try:
+                deadline=time.monotonic()+10
+                while not pidfile.exists() and time.monotonic()<deadline:time.sleep(.02)
+                self.assertTrue(pidfile.exists())
+                child=int(pidfile.read_text())
+                harness.kill_group(parent);parent.wait(timeout=5)
+                # A killed orphan may briefly be a zombie awaiting init's reaper.
+                for _ in range(50):
+                    state=subprocess.run(['ps','-p',str(child),'-o','stat='],capture_output=True,text=True).stdout.strip()
+                    if not state or state.startswith('Z'):break
+                    time.sleep(.02)
+                self.assertTrue(not state or state.startswith('Z'),state)
+            finally:
+                harness.kill_group(parent)
 
     def test_behavior_links_actual_tool_results(self):
         events=[{'message':{'content':[{'type':'tool_use','id':'a','name':'Read','input':{'file_path':'a.py'}},

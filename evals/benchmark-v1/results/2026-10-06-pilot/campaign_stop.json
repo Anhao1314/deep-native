@@ -1,0 +1,6 @@
+{
+  "reason": "Stopped and excluded whole initial campaign after discovering Claude background children can have a different process group. Runner must terminate descendants as well as the launcher process group before actual recovery tests. No Deep Native or task changes. All artifacts retained; full replacement campaign restarts same schedule.",
+  "completed_runs": 2,
+  "started_runs": 3,
+  "excluded_from_primary_results": true
+}

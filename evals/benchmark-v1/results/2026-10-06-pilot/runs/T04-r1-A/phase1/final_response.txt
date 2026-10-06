@@ -1,0 +1,19 @@
+## Summary
+
+**Implementation — `boltons/strutils.py:886` (`parse_int_list`)**
+- Replaced naive `split(range_delim)` parsing with two regexes: a signed-integer pattern (`[+-]?\d+`) and an inclusive signed-range pattern that allows whitespace around the range delimiter and both endpoints.
+- Handles `-3--1` → `[-3, -2, -1]`, `+2-+4` → `[2, 3, 4]`, cross-zero ranges (`1--3`), and reversed endpoints (`-1--3`, `+4-+2`) via `min`/`max`.
+- `re.escape(range_delim)` keeps custom delimiters literal (e.g. `..`, `|`, `to`), and `delim`/`range_delim` behave exactly as before for custom values.
+- Sorting, duplicate preservation, empty input/tokens, and leading/trailing delimiters are unchanged.
+- Malformed tokens (`1-`, `-`, `1-2-3`, `--1`, `1..3` with default delimiters, `a-1`, etc.) now raise `ValueError` instead of mis-parsing.
+- Docstring updated: signed/reversed/whitespace semantics, a `Raises:` section, and new doctests, all passing.
+
+**Tests — `agent_tests/test_parse_int_list_signed.py`** (new, 40 tests)
+Cover signed integers/ranges, reversed endpoints, whitespace around tokens/endpoints, sorting, duplicates, empty input, custom literal delimiters (multi-char and regex-special), and malformed-input `ValueError` cases.
+
+**Verification**
+- `python3 benchmark_check.py`: visible acceptance checks passed, 77 pytest tests passed, 40 agent tests passed.
+- Full `tests/` suite: 523 passed; the only 2 failures are pre-existing `test_socketutils` sandbox `PermissionError`s unrelated to this change.
+- No existing tests, config, or files other than `boltons/strutils.py` + new `agent_tests/` were touched.
+
+STATUS: DONE

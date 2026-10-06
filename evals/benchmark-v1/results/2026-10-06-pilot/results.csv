@@ -1,0 +1,3 @@
+run_id,task_id,repeat,condition,task_success,declared_done,actually_valid,false_completion,duration_seconds,tool_calls,failure_mode
+T04-r1-A,T04,1,A,PASS,True,True,False,291.5402,28,
+T04-r1-B,T04,1,B,PASS,,True,False,247.248,28,

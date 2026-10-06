@@ -189,6 +189,24 @@ negative interval or no differing paired outcomes after the complete 60 runs,
 INCONCLUSIVE otherwise. Incomplete execution or configuration/activation validity
 issues force INCONCLUSIVE. Recovery/staleness counts are reported separately.
 
+## Retained initial campaign and isolation repair
+
+The first campaign stopped after **2 completed runs and 1 partial run** when
+process inspection showed that Claude's background Bash descendants can have a
+different process group from the launcher. The original runner only killed the
+launcher group, which was insufficient for reliable future forced interruptions.
+The entire initial campaign is excluded from the primary A/B comparison and its
+[artifacts and stop record](results/2026-10-06-pilot/campaign_stop.json) are retained.
+No observed descendant leaked into a subsequent completed run; this repair closes
+the identified termination gap before the recovery tasks are executed.
+
+The replacement campaign is `results/2026-10-06-pilot-v2/` and restarts the entire
+60-run schedule. Task definitions, seed, prompts, budgets, model configuration and
+Deep Native commit remain identical. Only process cleanup changed: stop the
+launcher, collect/stop its descendants (including separate groups), then kill
+the descendants and launcher. An offline real-subprocess test verifies that a
+detached child is terminated. This is a harness isolation repair, not Skill tuning.
+
 ## Validate the harness without calling a model
 
 ```bash

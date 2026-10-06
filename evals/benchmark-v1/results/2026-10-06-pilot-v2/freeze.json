@@ -1,0 +1,14 @@
+{
+  "protocol_sha256": {
+    "fixtures.py": "c6bd898bccb6d477c3003a03d2c80514809ec56d0a02feb61c771a0a9baf81ed",
+    "tasks.json": "785f1024f0538013f87bba87b5d65544e9b1de157f2d33cd0416739b66f21dfb",
+    "acceptance.py": "40e8138405e1c9281ab84b7882d47f1ade27f92a9ac591fe496f2937253233e4",
+    "harness.py": "d304fe3cb945a9261f79a66c33b814088ef57f41fb4ea293b551ea3113a920e0",
+    "transport.py": "5248122d8f3243bacd9dcdceb4ce5b2a2a03b4f01f21368bf774998441c1a495",
+    "analysis.py": "938b35369f6a39a1bfdd21d6edc86ea0fc050e322e65c940c6925abe7a8997b0"
+  },
+  "deep_native_commit": "fda3dd010e7de8f8c1ee1953e006e577464aa3d6",
+  "schedule_sha256": "2910058e667bca92cb03f4b4e94be433ff88b203a7a19460f9b9c82949f69f56",
+  "tasks_sha256": "785f1024f0538013f87bba87b5d65544e9b1de157f2d33cd0416739b66f21dfb",
+  "frozen_at_utc": "2026-10-06T00:29:38Z"
+}

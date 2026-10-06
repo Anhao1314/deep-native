@@ -1,0 +1,59 @@
+{
+  "client_date": "2026-10-06",
+  "platform": "macOS-26.6-arm64-arm-64bit",
+  "machine": "arm64",
+  "python": "Python 3.12.14",
+  "python_base_prefix": "/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none",
+  "node": "v24.19.0",
+  "git": "git version 2.50.1 (Apple Git-155)",
+  "claude": "2.1.289 (Claude Code)",
+  "claude_binary_sha256": "03d66745e3bb69ec727d66023696f3820bc0a00a8a5ba725eb6706d0c67cbe69",
+  "deep_native_commit": "fda3dd010e7de8f8c1ee1953e006e577464aa3d6",
+  "upstream_endpoint": "https://api.deepseek.com/anthropic",
+  "requested_model": "deepseek-flash[1m]",
+  "original_config_keys": [
+    "env",
+    "model",
+    "theme"
+  ],
+  "original_env_names": [
+    "ANTHROPIC_AUTH_TOKEN",
+    "ANTHROPIC_BASE_URL",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL",
+    "ANTHROPIC_MODEL",
+    "CLAUDE_CODE_AUTO_COMPACT_WINDOW",
+    "CLAUDE_CODE_EFFORT_LEVEL",
+    "CLAUDE_CODE_SUBAGENT_MODEL"
+  ],
+  "original_hooks": [],
+  "original_config_sha256": "40e16a0c1ad3ddf5e0231b39887b3966b2b3e3945e8f1023651d1fe62a956440",
+  "managed_settings_present": false,
+  "global_claude_md_present": false,
+  "global_skills_present": false,
+  "global_plugins_present": true,
+  "isolation": "Fresh HOME, config, tmp, worktree; project/local settings only; strict empty MCP; OS denies personal config and benchmark artifacts; loopback relay holds upstream auth in parent memory.",
+  "allowed_tools": [
+    "Bash",
+    "Read",
+    "Edit",
+    "Write",
+    "Glob",
+    "Grep",
+    "Skill"
+  ],
+  "effort": "max",
+  "memory": false,
+  "budget": {
+    "wall_seconds": 480,
+    "assistant_turns": 24
+  },
+  "cost": "unavailable: CLI costBasis unknown; no provider billing receipt",
+  "packages": {
+    "pytest": "8.3.5",
+    "pluggy": "1.6.0",
+    "packaging": "26.3",
+    "iniconfig": "2.3.0"
+  }
+}
