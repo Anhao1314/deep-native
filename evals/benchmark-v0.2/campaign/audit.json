@@ -3,30 +3,31 @@
     "exit_code": 0,
     "stdout": "2.1.289 (Claude Code)\n",
     "stderr": "",
-    "duration_seconds": 0.06124179200196522
+    "duration_seconds": 0.060704417002853006
   },
   "claude_sha256": "03d66745e3bb69ec727d66023696f3820bc0a00a8a5ba725eb6706d0c67cbe69",
   "python": {
     "exit_code": 0,
     "stdout": "Python 3.12.14\n",
     "stderr": "",
-    "duration_seconds": 0.00930858300125692
+    "duration_seconds": 0.005370124999899417
   },
   "packages": {
     "exit_code": 0,
     "stdout": "iniconfig==2.3.0\npackaging==26.3\npluggy==1.6.0\npytest==8.3.5\n",
     "stderr": "",
-    "duration_seconds": 0.11923683400164009
+    "duration_seconds": 0.12132395799926599
   },
   "git": {
     "exit_code": 0,
     "stdout": "git version 2.50.1 (Apple Git-155)\n",
     "stderr": "",
-    "duration_seconds": 0.003750416999537265
+    "duration_seconds": 0.0033645840012468398
   },
   "endpoint": "https://api.deepseek.com/anthropic",
   "model": "deepseek-flash[1m]",
   "skill_candidate": "824c3009e465a1748250f5ed8589e096237dcb08",
-  "created_utc": "2026-10-06T07:11:15Z",
-  "cost": "unavailable; never infer billed cost from CLI estimates"
+  "created_utc": "2026-10-06T07:26:06Z",
+  "cost": "unavailable; never infer billed cost from CLI estimates",
+  "harness_parent_commit": "8f21534"
 }

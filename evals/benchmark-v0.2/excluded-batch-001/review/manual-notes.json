@@ -1,0 +1,10 @@
+{
+  "01-D1-C": {
+    "root_cause": "正确：四处全局 pending 等待导致跨 key 阻塞。使用 plain dict 和锁可获取探针反驳淘汰/用户函数持锁。",
+    "classification": "新增回归测试两处预热调用计数断言错误；模型识别为自身测试错误并修正。",
+    "ceremony": "STANDARD；没有调用持久化 runtime。",
+    "overhead": "完整官方检查在修复后重复 4 次，并做压力测试；有保守重复验证开销，不能把零 runtime ceremony 当成零多余工作。",
+    "false_completion": false,
+    "evidence": "review/01-D1-C/trace-summary.json; runs/01-D1-C/retained/.experiment/checks.jsonl"
+  }
+}

@@ -1,0 +1,904 @@
+[
+  {
+    "elapsed_seconds": 2.3641522920006537,
+    "tool_use_id": "call_00_ET_kt6yFBIlF4e1RHSZAMhz3385",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_ET_kt6yFBIlF4e1RHSZAMhz3385",
+      "name": "Skill",
+      "input": {
+        "skill": "deep-native",
+        "args": "Investigate cachetools regression: different-key callers stall while one cached computation is held (cached and cachedmethod, info on/off)"
+      },
+      "_observed_epoch": 1791270723.3332229
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 4.402314792001562,
+    "tool_use_id": "call_00_m1qwISWakwDn3vWFBHhZ7109",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_m1qwISWakwDn3vWFBHhZ7109",
+      "name": "Bash",
+      "input": {
+        "command": "ls -la /private/tmp/dn2-live-a1oc_qnz/workspace && echo \"---\" && ls -la /private/tmp/dn2-live-a1oc_qnz/workspace/src 2>/dev/null && echo \"---\" && ls /private/tmp/dn2-live-a1oc_qnz/workspace/src/cachetools 2>/dev/null",
+        "description": "List workspace contents"
+      },
+      "_observed_epoch": 1791270725.35409
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 4.7682414170012635,
+    "tool_use_id": "call_01_tbaURYBXFgTJ36FKJJRD4701",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_01_tbaURYBXFgTJ36FKJJRD4701",
+      "name": "Bash",
+      "input": {
+        "command": "git log --oneline -5 && git status --short && echo \"TMPDIR=$TMPDIR\" && python3 -c \"import cachetools, sys; print(cachetools.__file__); print(cachetools.__version__ if hasattr(cachetools,'__version__') else 'n/a')\"",
+        "description": "Show git state and cachetools import path"
+      },
+      "_observed_epoch": 1791270725.6962502
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 6.152514834000613,
+    "tool_use_id": "call_00_9fM2wUbAq615aapAspUA1034",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_9fM2wUbAq615aapAspUA1034",
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-a1oc_qnz/workspace/src/cachetools/_cached.py"
+      },
+      "_observed_epoch": 1791270727.131003
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 6.269661999998789,
+    "tool_use_id": "call_01_a6kVt8MiVfksOyFeYGuN6872",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_01_a6kVt8MiVfksOyFeYGuN6872",
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-a1oc_qnz/workspace/src/cachetools/_cachedmethod.py"
+      },
+      "_observed_epoch": 1791270727.2471669
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 6.591507749999437,
+    "tool_use_id": "call_02_QYRmffnZEETDoac60Zi80659",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_02_QYRmffnZEETDoac60Zi80659",
+      "name": "Bash",
+      "input": {
+        "command": "cat run_checks.py && echo \"=== benchmark_phase.json\" && cat benchmark_phase.json && echo \"=== check_receipt.py\" && cat check_receipt.py && echo \"=== benchmark_tests.py\" && cat benchmark_tests.py",
+        "description": "Read check harness files"
+      },
+      "_observed_epoch": 1791270727.559299
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 17.745758749999368,
+    "tool_use_id": "call_00_TjJUjAHCHHaXOnPpKYgb0340",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_TjJUjAHCHHaXOnPpKYgb0340",
+      "name": "Grep",
+      "input": {
+        "pattern": "wait_for|pending",
+        "path": "/private/tmp/dn2-live-a1oc_qnz/workspace",
+        "output_mode": "content",
+        "-n": true
+      },
+      "_observed_epoch": 1791270738.720832
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 17.79978016699897,
+    "tool_use_id": "call_01_tK8RSHnh0BvtwBEJhIBY7478",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_01_tK8RSHnh0BvtwBEJhIBY7478",
+      "name": "Bash",
+      "input": {
+        "command": "ls /private/tmp/dn2-live-a1oc_qnz/workspace/tests && echo \"---\" && grep -rn \"condition\" /private/tmp/dn2-live-a1oc_qnz/workspace/tests | head -50",
+        "description": "List tests and grep condition usage"
+      },
+      "_observed_epoch": 1791270738.7761788
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 20.297920583998348,
+    "tool_use_id": "call_00_no4p5Ou3eJdib0u7JaRb0778",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_no4p5Ou3eJdib0u7JaRb0778",
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-a1oc_qnz/workspace/tests/__init__.py",
+        "offset": 440,
+        "limit": 80
+      },
+      "_observed_epoch": 1791270741.293538
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 20.6960814999984,
+    "tool_use_id": "call_01_uc1LUdxRMOnCBVUiRHrP8093",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_01_uc1LUdxRMOnCBVUiRHrP8093",
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-a1oc_qnz/workspace/tests/test_threading.py"
+      },
+      "_observed_epoch": 1791270741.674155
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 23.25983337499929,
+    "tool_use_id": "call_00_qyFowaMulLTZnxpfefwa3514",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_qyFowaMulLTZnxpfefwa3514",
+      "name": "Bash",
+      "input": {
+        "command": "sed -n '80,145p;180,230p;330,400p' /private/tmp/dn2-live-a1oc_qnz/workspace/tests/test_cached.py",
+        "description": "Read condition-related tests in test_cached.py"
+      },
+      "_observed_epoch": 1791270744.238508
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 23.37913745900005,
+    "tool_use_id": "call_01_cjQfiLVHWvKXcW6gIVcj3668",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_01_cjQfiLVHWvKXcW6gIVcj3668",
+      "name": "Bash",
+      "input": {
+        "command": "sed -n '30,80p;290,360p' /private/tmp/dn2-live-a1oc_qnz/workspace/tests/test_cachedmethod.py",
+        "description": "Read condition-related tests in test_cachedmethod.py"
+      },
+      "_observed_epoch": 1791270744.3572931
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 30.69854016699901,
+    "tool_use_id": "call_00_Ih8comZXxc3juWY88THZ7403",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_Ih8comZXxc3juWY88THZ7403",
+      "name": "Bash",
+      "input": {
+        "command": "sed -n '300,365p' /private/tmp/dn2-live-a1oc_qnz/workspace/docs/index.rst",
+        "description": "Read docs on condition semantics"
+      },
+      "_observed_epoch": 1791270751.6801028
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 31.03841199999806,
+    "tool_use_id": "call_01_7qdhTRCPpuFnfpAZxo7W2855",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_01_7qdhTRCPpuFnfpAZxo7W2855",
+      "name": "Bash",
+      "input": {
+        "command": "grep -n \"condition\" /private/tmp/dn2-live-a1oc_qnz/workspace/src/cachetools/__init__.py | head -40; echo ---; sed -n '130,170p' /private/tmp/dn2-live-a1oc_qnz/workspace/src/cachetools/__init__.pyi",
+        "description": "Find condition docs in package init"
+      },
+      "_observed_epoch": 1791270752.002113
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 35.99648866699863,
+    "tool_use_id": "call_00_beU2Lu4xPZW0ceqcla3Y7978",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_beU2Lu4xPZW0ceqcla3Y7978",
+      "name": "Bash",
+      "input": {
+        "command": "timeout 300 python3 run_checks.py 2>&1 | tail -40",
+        "description": "Run baseline check harness",
+        "timeout": 330000
+      },
+      "_observed_epoch": 1791270756.966382
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 50.54420329200002,
+    "tool_use_id": "call_00_ET_OHJ6NlYhAVHiCLr5yD2O1606",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_ET_OHJ6NlYhAVHiCLr5yD2O1606",
+      "name": "Bash",
+      "input": {
+        "command": "python3 run_checks.py 2>&1 | tail -45",
+        "description": "Run baseline check harness",
+        "timeout": 400000
+      },
+      "_observed_epoch": 1791270759.050677
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 59.99755870900117,
+    "tool_use_id": "call_00_F1Oq0tHaVhWcZpUCHeOF4219",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_F1Oq0tHaVhWcZpUCHeOF4219",
+      "name": "Write",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-a1oc_qnz/tmp/d1_repro.py",
+        "content": "\"\"\"Discriminating evidence for the D1 regression.\n\nHypotheses under test:\n  H_lock  : the user function holds the cache lock while computing\n  H_evict : LRU eviction causes the stall even when no eviction can occur\n  H_pred  : the condition wait predicate is global over all pending keys,\n            so an unrelated key stalls behind an in-flight computation\n\"\"\"\n\nimport threading\nimport time\n\nfrom cachetools import LRUCache, cached, cachedmethod\n\nRESULTS = []\n\n\ndef record(name, ok, detail):\n    RESULTS.append((name, ok, detail))\n    print(f\"[{'PASS' if ok else 'FAIL'}] {name}: {detail}\", flush=True)\n\n\ndef make_condition_wrapper(cache, info):\n    cond = threading.Condition()\n    entered = threading.Event()\n    release = threading.Event()\n    calls = []\n\n    def body(key):\n        calls.append(key)\n        if key == \"held\":\n            entered.set()\n            release.wait(5)\n        return key\n\n    f = cached(cache, condition=cond, info=info)(body)\n    return f, cond, entered, release, calls\n\n\ndef try_other_key(f, entered, release, label, timeout=1.0):\n    \"\"\"Start a held computation, then time an unrelated-key call.\"\"\"\n    out = {}\n\n    def call_other():\n        t0 = time.monotonic()\n        try:\n            f(\"other\")\n            out[\"ok\"] = True\n        except Exception as e:  # pragma: no cover\n            out[\"ok\"] = False\n            out[\"err\"] = repr(e)\n        out[\"elapsed\"] = time.monotonic() - t0\n\n    t = threading.Thread(target=call_other)\n    try:\n        t.start()\n        ok = entered.wait(2)\n        assert ok, f\"{label}: held computation never entered\"\n        if \"elapsed\" not in out:\n            # only meaningful to score if it finished before release\n            time.sleep(0.05)\n            t.join(timeout)\n            progressed = not t.is_alive()\n            record(\n                label,\n                progressed,\n                \"unrelated key progressed while held\"\n                if progressed\n                else \"unrelated key STALLED while held\",\n            )\n    finally:\n        release.set()\n        t.join(5)\n\n\ndef probe_lock_not_held(cache):\n    \"\"\"If func held the cache condition, main thread could not acquire it.\"\"\"\n    f, cond, entered, release, calls = make_condition_wrapper(cache, info=False)\n    got = {}\n\n    def call():\n        f(\"held\")\n\n    t = threading.Thread(target=call)\n    try:\n        t.start()\n        assert entered.wait(2)\n        acquired = cond.acquire(blocking=False)\n        got[\"acquired\"] = acquired\n        if acquired:\n            cond.release()\n    finally:\n        release.set()\n        t.join(5)\n    # A blocked wait_for() releases the condition, so acquiring it here only\n    # proves that the *holder* (func) is not inside `with cond`.\n    record(\n        \"H_lock (func does not hold cache lock)\",\n        got.get(\"acquired\") is True,\n        \"cache lock acquirable while held computation runs\"\n        if got.get(\"acquired\")\n        else \"cache lock NOT acquirable during held computation\",\n    )\n\n\ndef main():\n    # ---- H_evict: plain dict cache, eviction is impossible ----\n    f, _cond, entered, release, _calls = make_condition_wrapper({}, info=False)\n    try_other_key(f, entered, release, \"H_evict dict-cache miss (no eviction possible)\")\n\n    # ---- H_evict for a cached value with LRU ----\n    cache = LRUCache(128)\n    f, _cond, entered, release, _calls = make_condition_wrapper(cache, info=False)\n    f(\"other\")  # pre-populate => a cache hit, no eviction can be involved\n    try:\n        f2, cond2, entered2, release2, calls2 = make_condition_wrapper(\n            LRUCache(128), info=False\n        )\n    finally:\n        release.set()\n    # redo hot-key case cleanly\n    hot_cache = LRUCache(128)\n    cond = threading.Condition()\n    entered = threading.Event()\n    release = threading.Event()\n    calls = []\n\n    def body(key):\n        calls.append(key)\n        if key == \"held\":\n            entered.set()\n            release.wait(5)\n        return key\n\n    f = cached(hot_cache, condition=cond, info=False)(body)\n    f(\"other\")\n    try_other_key(f, entered, release, \"H_evict cached unrelated key (hot, LRU)\")\n\n    # ---- H_lock: is the cache lock held while computing? ----\n    probe_lock_not_held({})\n\n    # ---- H_pred, all four variants ----\n    class Owner:\n        def __init__(self, c):\n            self.cache = c\n            self.cond = threading.Condition()\n\n        @cachedmethod(lambda self: self.cache, condition=lambda self: self.cond, info=False)\n        def run(self, key):\n            calls.append(key)\n            if key == \"held\":\n                entered.set()\n                release.wait(5)\n            return key\n\n    for info in (False, True):\n        for method in (False, True):\n            c = LRUCache(128)\n            cond = threading.Condition()\n            entered = threading.Event()\n            release = threading.Event()\n            calls = []\n\n            def body(key):\n                calls.append(key)\n                if key == \"held\":\n                    entered.set()\n                    release.wait(5)\n                return key\n\n            if method:\n                class Owner2:\n                    def __init__(self):\n                        self.cache = c\n                        self.cond = cond\n\n                    @cachedmethod(\n                        lambda self: self.cache,\n                        condition=lambda self: self.cond,\n                        info=info,\n                    )\n                    def run(self, key):\n                        return body(key)\n\n                f = Owner2().run\n            else:\n                f = cached(c, condition=cond, info=info)(body)\n            try_other_key(\n                f, entered, release, f\"H_pred unrelated miss (info={info}, method={method})\"\n            )\n\n    # ---- same-key suppression must hold (control) ----\n    cond = threading.Condition()\n    release = threading.Event()\n    start = threading.Event()\n    calls = []\n\n    @cached(LRUCache(8), condition=cond, info=True)\n    def g(k):\n        calls.append(k)\n        start.set()\n        release.wait(5)\n        return k\n\n    ws = [threading.Thread(target=lambda: g(7)) for _ in range(5)]\n    try:\n        for w in ws:\n            w.start()\n        assert start.wait(2)\n        time.sleep(0.1)\n    finally:\n        release.set()\n        for w in ws:\n            w.join(5)\n    info = g.cache_info()\n    record(\n        \"control same-key suppression\",\n        calls == [7] and info.misses == 1 and info.hits == 4,\n        f\"calls={calls} hits={info.hits} misses={info.misses}\",\n    )\n\n    failed = [r for r in RESULTS if not r[1]]\n    print(f\"\\n{len(RESULTS) - len(failed)}/{len(RESULTS)} probes as expected\")\n    return 1 if failed else 0\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main())\n"
+      },
+      "_observed_epoch": 1791270780.978443
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 66.83323625000048,
+    "tool_use_id": "call_00_NxwcQ6cwlDOWDi2r50bo1238",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_NxwcQ6cwlDOWDi2r50bo1238",
+      "name": "Write",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-a1oc_qnz/tmp/d1_repro.py",
+        "content": "\"\"\"Discriminating evidence for the D1 regression.\n\nHypotheses under test:\n  H_lock  : the user function holds the cache lock while computing\n  H_evict : LRU eviction causes the stall even when no eviction can occur\n  H_pred  : the condition wait predicate is global over all pending keys,\n            so an unrelated key stalls behind an in-flight computation\n\nExit code 0 only if every probe reports the expected (fixed) behavior.\nAgainst the unfixed code the H_pred/H_evict probes must FAIL and the\nH_lock probe must PASS (falsifying the operator's two hypotheses).\n\"\"\"\n\nimport threading\nimport time\n\nfrom cachetools import LRUCache, cached, cachedmethod\n\nRESULTS = []\n\n\ndef record(name, ok, detail):\n    RESULTS.append((name, ok, detail))\n    print(f\"[{'PASS' if ok else 'FAIL'}] {name}: {detail}\", flush=True)\n\n\nclass Fixture:\n    def __init__(self, cache, info, method):\n        self.cache = cache\n        self.cond = threading.Condition()\n        self.entered = threading.Event()\n        self.release = threading.Event()\n        self.calls = []\n\n        def body(key):\n            self.calls.append(key)\n            if key == \"held\":\n                self.entered.set()\n                self.release.wait(5)\n            return key\n\n        if method:\n\n            class Owner:\n                def __init__(self, cache, cond):\n                    self.cache = cache\n                    self.cond = cond\n\n                @cachedmethod(\n                    lambda self: self.cache,\n                    condition=lambda self: self.cond,\n                    info=info,\n                )\n                def run(self, key):\n                    return body(key)\n\n            self.f = Owner(cache, self.cond).run\n        else:\n            self.f = cached(cache, condition=self.cond, info=info)(body)\n\n    def start_held(self):\n        t = threading.Thread(target=self.f, args=(\"held\",))\n        t.start()\n        assert self.entered.wait(2), \"held computation never entered\"\n        return t\n\n    def stop(self, *threads):\n        self.release.set()\n        for t in threads:\n            t.join(5)\n\n\ndef probe_unrelated(fixture, label, expect_progress=True):\n    \"\"\"While 'held' is computing, time an unrelated-key call.\"\"\"\n    t0_holder = None\n    out = {}\n\n    def call_other():\n        t0 = time.monotonic()\n        fixture.f(\"other\")\n        out[\"elapsed\"] = time.monotonic() - t0\n\n    t = threading.Thread(target=call_other)\n    try:\n        t0_holder = fixture.start_held()\n        t.start()\n        time.sleep(0.1)\n        t.join(1.0)\n        progressed = not t.is_alive()\n        if expect_progress:\n            record(\n                label,\n                progressed,\n                f\"unrelated key progressed in {out.get('elapsed', float('nan')):.3f}s\"\n                if progressed\n                else \"unrelated key STALLED for >1s behind in-flight computation\",\n            )\n    finally:\n        fixture.stop(t0_holder, t)\n\n\ndef probe_lock_not_held():\n    \"\"\"A blocked wait_for() releases the condition, so acquiring it during a\n    held computation only proves the holder is not inside `with cond`. If the\n    user function held the cache lock, this acquire would fail.\"\"\"\n    fx = Fixture({}, info=False, method=False)\n    holder = fx.start_held()\n    try:\n        acquired = fx.cond.acquire(blocking=False)\n        if acquired:\n            fx.cond.release()\n    finally:\n        fx.stop(holder)\n    record(\n        \"H_lock: user function holds cache lock\",\n        acquired is True,\n        \"cache lock is acquirable while the computation runs (hypothesis refuted)\"\n        if acquired\n        else \"cache lock held during computation\",\n    )\n    return acquired is True\n\n\ndef main():\n    # H_evict: a plain dict cache cannot evict; if the stall persists, LRU\n    # eviction is not the cause.\n    probe_unrelated(\n        Fixture({}, info=False, method=False),\n        \"H_evict: unrelated miss with plain dict cache (no eviction possible)\",\n    )\n\n    # H_evict: an already-cached unrelated value with abundant LRU headroom.\n    hot = Fixture(LRUCache(128), info=False, method=False)\n    hot.f(\"other\")  # cached; no eviction involved in serving it\n    probe_unrelated(hot, \"H_evict: cached unrelated key with LRUCache(128) headroom\")\n\n    lock_ok = probe_lock_not_held()\n\n    # H_pred across all four decorator variants.\n    for info in (False, True):\n        for method in (False, True):\n            probe_unrelated(\n                Fixture(LRUCache(128), info=info, method=method),\n                f\"H_pred: unrelated miss (info={info}, method={method})\",\n            )\n\n    # Control: same-key stampede suppression and info accounting.\n    cond = threading.Condition()\n    release = threading.Event()\n    start = threading.Event()\n    calls = []\n\n    @cached(LRUCache(8), condition=cond, info=True)\n    def g(k):\n        calls.append(k)\n        start.set()\n        release.wait(5)\n        return k\n\n    ws = [threading.Thread(target=lambda: g(7)) for _ in range(5)]\n    try:\n        for w in ws:\n            w.start()\n        assert start.wait(2)\n        time.sleep(0.1)\n    finally:\n        release.set()\n        for w in ws:\n            w.join(5)\n    info = g.cache_info()\n    record(\n        \"control: same-key suppression\",\n        calls == [7] and info.misses == 1 and info.hits == 4,\n        f\"calls={calls} hits={info.hits} misses={info.misses}\",\n    )\n\n    failed = [r for r in RESULTS if not r[1]]\n    print(f\"\\n{len(RESULTS) - len(failed)}/{len(RESULTS)} probes as expected\")\n    return 1 if failed else 0\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main())\n"
+      },
+      "_observed_epoch": 1791270787.801548
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 75.67626229199959,
+    "tool_use_id": "call_00_ET_CCp9WN17lEU4kTTgyn1L9345",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_ET_CCp9WN17lEU4kTTgyn1L9345",
+      "name": "Bash",
+      "input": {
+        "command": "python3 \"$TMPDIR/d1_repro.py\"; echo \"exit=$?\"",
+        "description": "Run discriminating repro probes on unfixed code",
+        "timeout": 180000
+      },
+      "_observed_epoch": 1791270789.84928
+    },
+    "source_hash": "5b64caf1c439841c5d2427785f2ffd19b7f07ef0a78bc04e921b54e7d852ff4c",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 88.24103516700052,
+    "tool_use_id": "call_00_tNqaeZM9fNvyNWLPcsfN6255",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_tNqaeZM9fNvyNWLPcsfN6255",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-a1oc_qnz/workspace/src/cachetools/_cached.py",
+        "old_string": "    def wrapper(*args, **kwargs):\n        nonlocal hits, misses\n        k = key(*args, **kwargs)\n        with lock:\n            cond.wait_for(lambda: not pending)",
+        "new_string": "    def wrapper(*args, **kwargs):\n        nonlocal hits, misses\n        k = key(*args, **kwargs)\n        with lock:\n            # only wait for a pending computation of the same key\n            cond.wait_for(lambda: k not in pending)"
+      },
+      "_observed_epoch": 1791270809.211869
+    },
+    "source_hash": "f754c95b9ce9162451625786598264a0ee18ae45ff13717626bbf7ac75ecb58f",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 88.6183721669986,
+    "tool_use_id": "call_01_V9kV1nRKZnvccbXhrDZF9345",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_01_V9kV1nRKZnvccbXhrDZF9345",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-a1oc_qnz/workspace/src/cachetools/_cached.py",
+        "old_string": "    def wrapper(*args, **kwargs):\n        k = key(*args, **kwargs)\n        with lock:\n            cond.wait_for(lambda: not pending)",
+        "new_string": "    def wrapper(*args, **kwargs):\n        k = key(*args, **kwargs)\n        with lock:\n            # only wait for a pending computation of the same key\n            cond.wait_for(lambda: k not in pending)"
+      },
+      "_observed_epoch": 1791270809.612565
+    },
+    "source_hash": "b27ff50f47a2e43bb18238fd893cf9b072bb07dc74a37bf767ba8b63d6e2bcc5",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 90.60145816699878,
+    "tool_use_id": "call_00_ET_naeIatOLEelmt0zsnJur0749",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_ET_naeIatOLEelmt0zsnJur0749",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-a1oc_qnz/workspace/src/cachetools/_cachedmethod.py",
+        "old_string": "                with lock:\n                    cond.wait_for(lambda: not self.__pending)",
+        "new_string": "                with lock:\n                    # only wait for a pending computation of the same key\n                    cond.wait_for(lambda: key not in self.__pending)"
+      },
+      "_observed_epoch": 1791270811.595236
+    },
+    "source_hash": "cce9526af310abf79a849d083ad5dcb1d264352f4b1b0d47f432af93cf36895f",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 90.95711516699885,
+    "tool_use_id": "call_01_ET_E1X8SZkcwFO3AJs2YVYg3107",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_01_ET_E1X8SZkcwFO3AJs2YVYg3107",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-a1oc_qnz/workspace/src/cachetools/_cachedmethod.py",
+        "old_string": "        with lock(self):\n            cond(self).wait_for(lambda: not pending)",
+        "new_string": "        with lock(self):\n            # only wait for a pending computation of the same key\n            cond(self).wait_for(lambda: k not in pending)"
+      },
+      "_observed_epoch": 1791270811.922389
+    },
+    "source_hash": "9ecdb638f0ebf45617630c5f0d87504da6c77078ed0ece0157adc09888c7dd94",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 93.8078537500005,
+    "tool_use_id": "call_00_KsbroNtQUoof8yLaaBFb0756",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_KsbroNtQUoof8yLaaBFb0756",
+      "name": "Bash",
+      "input": {
+        "command": "python3 \"$TMPDIR/d1_repro.py\"; echo \"exit=$?\"",
+        "description": "Re-run repro probes after fix",
+        "timeout": 180000
+      },
+      "_observed_epoch": 1791270814.0216599
+    },
+    "source_hash": "9ecdb638f0ebf45617630c5f0d87504da6c77078ed0ece0157adc09888c7dd94",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 106.96627983399958,
+    "tool_use_id": "call_00_jVYOKFtH0oe9XMvduFEx1010",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_jVYOKFtH0oe9XMvduFEx1010",
+      "name": "Write",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-a1oc_qnz/workspace/agent_tests/test_independent_keys.py",
+        "content": "\"\"\"Regression tests: condition-based wrappers block only identical cache keys.\n\nWhile one cached computation is held, callers for a *different* key must\nproceed immediately, whether that key is a miss or an already-cached hit.\nSame-key stampede suppression, hit/miss accounting, and pending-set cleanup\non exceptions must remain intact, for both @cached and @cachedmethod, with\ninfo enabled and disabled.\n\"\"\"\n\nimport threading\nimport time\nimport unittest\n\nfrom cachetools import LRUCache, Cache, cached, cachedmethod\n\nPROGRESS_TIMEOUT = 1.0  # generous bound; fixed code progresses in ~0s\n\n\nclass _Harness:\n    \"\"\"A condition-guarded function whose 'held' key blocks inside func.\"\"\"\n\n    def __init__(self, cache, info, method, keys=(\"held\",)):\n        self.cache = cache\n        self.cond = threading.Condition()\n        self.entered = {}\n        self.release = threading.Event()\n        self.calls = []\n        self._keys = set(keys)\n\n        def body(key):\n            self.calls.append(key)\n            self.entered.setdefault(key, threading.Event()).set()\n            if key in self._keys:\n                self.release.wait(5)\n            return f\"value:{key}\"\n\n        if method:\n\n            class Owner:\n                def __init__(self, cache, cond):\n                    self.cache = cache\n                    self.cond = cond\n\n                @cachedmethod(\n                    lambda self: self.cache,\n                    condition=lambda self: self.cond,\n                    info=info,\n                )\n                def run(self, key):\n                    return body(key)\n\n            self.f = Owner(cache, self.cond).run\n        else:\n            self.f = cached(cache, condition=self.cond, info=info)(body)\n\n    def start(self, key):\n        t = threading.Thread(target=self.f, args=(key,))\n        t.start()\n        assert self.entered.setdefault(key, threading.Event()).wait(2), (\n            f\"computation for {key!r} never started\"\n        )\n        return t\n\n    def finish(self, *threads):\n        self.release.set()\n        for t in threads:\n            t.join(5)\n            self.assertNotAlive(t)\n        for t in threads:\n            self.assertClean(t)\n\n    def assertNotAlive(self, t):\n        if t.is_alive():\n            raise AssertionError(\"worker thread still alive after release\")\n\n    def assertClean(self, t):\n        pass\n\n\nclass IndependentKeyTests(unittest.TestCase):\n    def _exercise(self, info, method, cache_factory, hot):\n        h = _Harness(cache_factory(), info, method)\n        if hot:\n            h.f(\"other\")\n        holder = h.start(\"held\")\n        result = {}\n\n        def call_other():\n            result[\"value\"] = h.f(\"other\")\n\n        other = threading.Thread(target=call_other)\n        other.start()\n        try:\n            other.join(PROGRESS_TIMEOUT)\n            self.assertFalse(\n                other.is_alive(),\n                f\"unrelated {'hit' if hot else 'miss'} blocked behind held key \"\n                f\"(info={info}, method={method})\",\n            )\n            self.assertEqual(result.get(\"value\"), \"value:other\")\n            self.assertEqual(h.calls.count(\"other\"), 0 if hot else 1)\n        finally:\n            h.finish(holder, other)\n        self.assertEqual(h.calls.count(\"held\"), 1)\n\n        # the held key itself is memoized once it completes\n        self.assertEqual(h.f(\"held\"), \"value:held\")\n        self.assertEqual(h.calls.count(\"held\"), 1)\n\n    def test_unrelated_key_progresses(self):\n        for info in (False, True):\n            for method in (False, True):\n                for hot in (False, True):\n                    for cache_factory in (lambda: LRUCache(128), dict):\n                        with self.subTest(\n                            info=info,\n                            method=method,\n                            hot=hot,\n                            cache=type(cache_factory()).__name__,\n                        ):\n                            self._exercise(info, method, cache_factory, hot)\n\n    def test_unrelated_key_progresses_with_eviction_pressure(self):\n        # LRUCache(1): holding one key would evict any other value, so the\n        # stall could not be blamed on a populated cache either.\n        for info in (False, True):\n            for method in (False, True):\n                with self.subTest(info=info, method=method):\n                    h = _Harness(LRUCache(1), info, method)\n                    holder = h.start(\"held\")\n                    other = threading.Thread(target=lambda: h.f(\"other\"))\n                    other.start()\n                    try:\n                        other.join(PROGRESS_TIMEOUT)\n                        self.assertFalse(\n                            other.is_alive(),\n                            \"unrelated key blocked under eviction pressure\",\n                        )\n                    finally:\n                        h.finish(holder, other)\n\n\nclass SameKeySemanticsTests(unittest.TestCase):\n    def _make_suppressed(self, info):\n        calls = []\n        cond = threading.Condition()\n        start = threading.Event()\n        release = threading.Event()\n\n        @cached(Cache(20), condition=cond, info=info)\n        def f(k):\n            calls.append(k)\n            start.set()\n            release.wait(5)\n            return k\n\n        return f, calls, start, release\n\n    def test_same_key_stampede_suppression(self):\n        for info in (False, True):\n            with self.subTest(info=info):\n                f, calls, start, release = self._make_suppressed(info)\n                workers = [threading.Thread(target=lambda: f(4)) for _ in range(5)]\n                try:\n                    for w in workers:\n                        w.start()\n                    self.assertTrue(start.wait(2))\n                    time.sleep(0.05)\n                finally:\n                    release.set()\n                    for w in workers:\n                        w.join(5)\n                self.assertEqual(calls, [4])\n                self.assertTrue(all(not w.is_alive() for w in workers))\n                if info:\n                    self.assertEqual(f.cache_info().misses, 1)\n                    self.assertEqual(f.cache_info().hits, 4)\n\n    def test_same_key_method_stampede_suppression(self):\n        for info in (False, True):\n            with self.subTest(info=info):\n                calls = []\n                cond = threading.Condition()\n                start = threading.Event()\n                release = threading.Event()\n\n                class Owner:\n                    def __init__(self):\n                        self.cache = Cache(20)\n                        self.cond = cond\n\n                    @cachedmethod(\n                        lambda self: self.cache,\n                        condition=lambda self: self.cond,\n                        info=info,\n                    )\n                    def run(self, k):\n                        calls.append(k)\n                        start.set()\n                        release.wait(5)\n                        return k\n\n                owner = Owner()\n                workers = [\n                    threading.Thread(target=lambda: owner.run(4)) for _ in range(5)\n                ]\n                try:\n                    for w in workers:\n                        w.start()\n                    self.assertTrue(start.wait(2))\n                    time.sleep(0.05)\n                finally:\n                    release.set()\n                    for w in workers:\n                        w.join(5)\n                self.assertEqual(calls, [4])\n                self.assertTrue(all(not w.is_alive() for w in workers))\n\n    def test_exception_cleanup(self):\n        for info in (False, True):\n            for method in (False, True):\n                with self.subTest(info=info, method=method):\n                    attempts = []\n                    cond = threading.Condition()\n                    if method:\n\n                        class Owner:\n                            def __init__(self):\n                                self.cache = Cache(20)\n                                self.cond = cond\n\n                            @cachedmethod(\n                                lambda self: self.cache,\n                                condition=lambda self: self.cond,\n                                info=info,\n                            )\n                            def run(self, k):\n                                attempts.append(k)\n                                if len(attempts) == 1:\n                                    raise ValueError(\"original failure\")\n                                return k\n\n                        f = Owner().run\n                    else:\n\n                        @cached(Cache(20), condition=cond, info=info)\n                        def f(k):\n                            attempts.append(k)\n                            if len(attempts) == 1:\n                                raise ValueError(\"original failure\")\n                            return k\n\n                    with self.assertRaises(ValueError):\n                        f(3)\n                    # no deadlock, and the failed attempt did not poison the key\n                    self.assertEqual(f(3), 3)\n                    self.assertEqual(attempts, [3, 3])\n\n\nclass DistinctKeyConcurrencyTests(unittest.TestCase):\n    def test_distinct_misses_compute_concurrently(self):\n        for info in (False, True):\n            for method in (False, True):\n                with self.subTest(info=info, method=method):\n                    h = _Harness(LRUCache(128), info, method, keys=(\"a\", \"b\"))\n                    ta = h.start(\"a\")\n                    tb = h.start(\"b\")  # must be able to start while 'a' is held\n                    self.assertEqual(sorted(h.calls[:2]), [\"a\", \"b\"])\n                    h.finish(ta, tb)\n\n    def test_interleaved_hit_while_pending(self):\n        h = _Harness(LRUCache(128), info=False, method=False)\n        h.f(\"other\")  # warm\n        holder = h.start(\"held\")\n        try:\n            deadline = time.monotonic() + PROGRESS_TIMEOUT\n            while h.f(\"other\") != \"value:other\":\n                self.assertLess(time.monotonic(), deadline)\n            self.assertEqual(h.calls.count(\"other\"), 0)\n        finally:\n            h.finish(holder)\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n"
+      },
+      "_observed_epoch": 1791270827.937448
+    },
+    "source_hash": "9687f0735a1e4f18a21b9955767d3301b23570865c0d50e906fcd1d3da285b02",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 118.59896995899908,
+    "tool_use_id": "call_00_NZ1rkml32BuNuyZmmwaa0731",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_NZ1rkml32BuNuyZmmwaa0731",
+      "name": "Write",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-a1oc_qnz/workspace/agent_tests/test_independent_keys.py",
+        "content": "\"\"\"Regression tests: condition-based wrappers block only identical cache keys.\n\nWhile one cached computation is held, callers for a *different* key must\nproceed immediately, whether that key is a miss or an already-cached hit.\nSame-key stampede suppression, hit/miss accounting, and pending-set cleanup\non exceptions must remain intact, for both @cached and @cachedmethod, with\ninfo enabled and disabled.\n\"\"\"\n\nimport threading\nimport time\nimport unittest\n\nfrom cachetools import Cache, LRUCache, cached, cachedmethod\n\nPROGRESS_TIMEOUT = 1.0  # generous bound; fixed code progresses in ~0s\n\n\nclass _Harness:\n    \"\"\"A condition-guarded function whose 'held' key blocks inside func.\"\"\"\n\n    def __init__(self, cache, info, method, blocked=(\"held\",)):\n        self.cache = cache\n        self.cond = threading.Condition()\n        self.entered = {}\n        self.release = threading.Event()\n        self.calls = []\n        self._blocked = set(blocked)\n\n        def body(key):\n            self.calls.append(key)\n            self.entered.setdefault(key, threading.Event()).set()\n            if key in self._blocked:\n                assert self.release.wait(5), \"test never released held computation\"\n            return f\"value:{key}\"\n\n        if method:\n\n            class Owner:\n                def __init__(self, cache, cond):\n                    self.cache = cache\n                    self.cond = cond\n\n                @cachedmethod(\n                    lambda self: self.cache,\n                    condition=lambda self: self.cond,\n                    info=info,\n                )\n                def run(self, key):\n                    return body(key)\n\n            self.f = Owner(cache, self.cond).run\n        else:\n            self.f = cached(cache, condition=self.cond, info=info)(body)\n\n    def start(self, key):\n        t = threading.Thread(target=self.f, args=(key,))\n        t.start()\n        assert self.entered.setdefault(key, threading.Event()).wait(2), (\n            f\"computation for {key!r} never started\"\n        )\n        return t\n\n    def finish(self, *threads):\n        self.release.set()\n        for t in threads:\n            t.join(5)\n\n\nclass IndependentKeyTests(unittest.TestCase):\n    def _exercise(self, info, method, cache_factory, hot):\n        h = _Harness(cache_factory(), info, method)\n        if hot:\n            h.f(\"other\")\n        holder = h.start(\"held\")\n        result = {}\n\n        def call_other():\n            result[\"value\"] = h.f(\"other\")\n\n        other = threading.Thread(target=call_other)\n        other.start()\n        try:\n            other.join(PROGRESS_TIMEOUT)\n            self.assertFalse(\n                other.is_alive(),\n                f\"unrelated {'hit' if hot else 'miss'} blocked behind held key \"\n                f\"(info={info}, method={method})\",\n            )\n            self.assertEqual(result.get(\"value\"), \"value:other\")\n            self.assertEqual(h.calls.count(\"other\"), 0 if hot else 1)\n        finally:\n            h.finish(holder, other)\n        self.assertFalse(holder.is_alive() or other.is_alive())\n        self.assertEqual(h.calls.count(\"held\"), 1)\n\n        # the held key itself is memoized once it completes\n        self.assertEqual(h.f(\"held\"), \"value:held\")\n        self.assertEqual(h.calls.count(\"held\"), 1)\n\n    def test_unrelated_key_progresses(self):\n        for info in (False, True):\n            for method in (False, True):\n                for hot in (False, True):\n                    for cache_factory in (lambda: LRUCache(128), dict):\n                        with self.subTest(\n                            info=info,\n                            method=method,\n                            hot=hot,\n                            cache=type(cache_factory()).__name__,\n                        ):\n                            self._exercise(info, method, cache_factory, hot)\n\n    def test_unrelated_key_progresses_under_eviction_pressure(self):\n        # LRUCache(1): only one entry can be resident, so a stall here cannot\n        # be blamed on a populated cache either.\n        for info in (False, True):\n            for method in (False, True):\n                with self.subTest(info=info, method=method):\n                    h = _Harness(LRUCache(1), info, method)\n                    holder = h.start(\"held\")\n                    other = threading.Thread(target=lambda: h.f(\"other\"))\n                    other.start()\n                    try:\n                        other.join(PROGRESS_TIMEOUT)\n                        self.assertFalse(\n                            other.is_alive(),\n                            \"unrelated key blocked under eviction pressure\",\n                        )\n                    finally:\n                        h.finish(holder, other)\n\n\nclass SameKeySemanticsTests(unittest.TestCase):\n    def test_same_key_stampede_suppression(self):\n        for info in (False, True):\n            with self.subTest(info=info):\n                calls = []\n                cond = threading.Condition()\n                start = threading.Event()\n                release = threading.Event()\n\n                @cached(Cache(20), condition=cond, info=info)\n                def f(k):\n                    calls.append(k)\n                    start.set()\n                    release.wait(5)\n                    return k\n\n                workers = [threading.Thread(target=lambda: f(4)) for _ in range(5)]\n                try:\n                    for w in workers:\n                        w.start()\n                    self.assertTrue(start.wait(2))\n                    time.sleep(0.05)\n                finally:\n                    release.set()\n                    for w in workers:\n                        w.join(5)\n                self.assertEqual(calls, [4])\n                self.assertTrue(all(not w.is_alive() for w in workers))\n                if info:\n                    self.assertEqual(f.cache_info().misses, 1)\n                    self.assertEqual(f.cache_info().hits, 4)\n\n    def test_same_key_method_stampede_suppression(self):\n        for info in (False, True):\n            with self.subTest(info=info):\n                calls = []\n                cond = threading.Condition()\n                start = threading.Event()\n                release = threading.Event()\n\n                class Owner:\n                    def __init__(self):\n                        self.cache = Cache(20)\n                        self.cond = cond\n\n                    @cachedmethod(\n                        lambda self: self.cache,\n                        condition=lambda self: self.cond,\n                        info=info,\n                    )\n                    def run(self, k):\n                        calls.append(k)\n                        start.set()\n                        release.wait(5)\n                        return k\n\n                owner = Owner()\n                workers = [\n                    threading.Thread(target=lambda: owner.run(4)) for _ in range(5)\n                ]\n                try:\n                    for w in workers:\n                        w.start()\n                    self.assertTrue(start.wait(2))\n                    time.sleep(0.05)\n                finally:\n                    release.set()\n                    for w in workers:\n                        w.join(5)\n                self.assertEqual(calls, [4])\n                self.assertTrue(all(not w.is_alive() for w in workers))\n\n    def test_exception_cleanup(self):\n        for info in (False, True):\n            for method in (False, True):\n                with self.subTest(info=info, method=method):\n                    attempts = []\n                    cond = threading.Condition()\n                    if method:\n\n                        class Owner:\n                            def __init__(self):\n                                self.cache = Cache(20)\n                                self.cond = cond\n\n                            @cachedmethod(\n                                lambda self: self.cache,\n                                condition=lambda self: self.cond,\n                                info=info,\n                            )\n                            def run(self, k):\n                                attempts.append(k)\n                                if len(attempts) == 1:\n                                    raise ValueError(\"original failure\")\n                                return k\n\n                        f = Owner().run\n                    else:\n\n                        @cached(Cache(20), condition=cond, info=info)\n                        def f(k):\n                            attempts.append(k)\n                            if len(attempts) == 1:\n                                raise ValueError(\"original failure\")\n                            return k\n\n                    with self.assertRaises(ValueError):\n                        f(3)\n                    # no deadlock, and the failed attempt did not poison the key\n                    self.assertEqual(f(3), 3)\n                    self.assertEqual(attempts, [3, 3])\n\n\nclass DistinctKeyConcurrencyTests(unittest.TestCase):\n    def test_distinct_misses_compute_concurrently(self):\n        for info in (False, True):\n            for method in (False, True):\n                with self.subTest(info=info, method=method):\n                    h = _Harness(LRUCache(128), info, method, blocked=(\"a\", \"b\"))\n                    ta = h.start(\"a\")\n                    tb = h.start(\"b\")  # must start while 'a' is still held\n                    assert sorted(h.calls[:2]) == [\"a\", \"b\"]\n                    h.finish(ta, tb)\n                    self.assertFalse(ta.is_alive() or tb.is_alive())\n\n    def test_interleaved_hit_while_pending(self):\n        h = _Harness(LRUCache(128), info=False, method=False)\n        h.f(\"other\")  # warm the cache\n        holder = h.start(\"held\")\n        try:\n            alive = []\n\n            def hit():\n                h.f(\"other\")\n                alive.append(False)\n\n            t = threading.Thread(target=hit)\n            t.start()\n            t.join(PROGRESS_TIMEOUT)\n            self.assertFalse(t.is_alive(), \"cached key blocked while held\")\n            self.assertEqual(h.calls.count(\"other\"), 0)\n        finally:\n            h.finish(holder)\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n"
+      },
+      "_observed_epoch": 1791270839.5602188
+    },
+    "source_hash": "8553ea7f3d82e456930e4750eddb3634e8f00cc7f0fa3d510beda10c6cd41c71",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 121.37912000000142,
+    "tool_use_id": "call_00_9MthBkZ863nyrFL82fbN0132",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_9MthBkZ863nyrFL82fbN0132",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-a1oc_qnz/workspace/agent_tests/test_independent_keys.py",
+        "old_string": "                    ta = h.start(\"a\")\n                    tb = h.start(\"b\")  # must start while 'a' is still held\n                    assert sorted(h.calls[:2]) == [\"a\", \"b\"]\n                    h.finish(ta, tb)",
+        "new_string": "                    ta = h.start(\"a\")\n                    tb = h.start(\"b\")  # must start while 'a' is still held\n                    self.assertEqual(sorted(h.calls[:2]), [\"a\", \"b\"])\n                    h.finish(ta, tb)"
+      },
+      "_observed_epoch": 1791270842.348989
+    },
+    "source_hash": "32448027f6f02898ccec621120073bd16e19215c0a38701297ccb595bde32830",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 121.70756595900093,
+    "tool_use_id": "call_01_JgmcrBgXHDe3G1BDaEpF6665",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_01_JgmcrBgXHDe3G1BDaEpF6665",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-a1oc_qnz/workspace/agent_tests/test_independent_keys.py",
+        "old_string": "        try:\n            alive = []\n\n            def hit():\n                h.f(\"other\")\n                alive.append(False)\n\n            t = threading.Thread(target=hit)",
+        "new_string": "        try:\n\n            def hit():\n                h.f(\"other\")\n\n            t = threading.Thread(target=hit)"
+      },
+      "_observed_epoch": 1791270842.67766
+    },
+    "source_hash": "5e3830084496496b50e83915ac6588cfac6a943e2c35f4e35d7bef6a936cc6ec",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 127.25067579199822,
+    "tool_use_id": "call_00_J8o8GeWLi5HxfK1o96Am6808",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_J8o8GeWLi5HxfK1o96Am6808",
+      "name": "Bash",
+      "input": {
+        "command": "set -e\nmkdir -p \"$TMPDIR/orig_src\"\nrm -rf \"$TMPDIR/orig_src/cachetools\"\ncp -R src/cachetools \"$TMPDIR/orig_src/cachetools\"\npython3 - \"$TMPDIR/orig_src/cachetools\" <<'PY'\nimport pathlib, sys\nroot = pathlib.Path(sys.argv[1])\nsubs = [\n    (\"k not in pending\", \"not pending\"),\n    (\"key not in self.__pending\", \"not self.__pending\"),\n]\nn = 0\nfor p in root.rglob(\"*.py\"):\n    t = p.read_text()\n    o = t\n    for a, b in subs:\n        t = t.replace(a, b)\n    if t != o:\n        p.write_text(t)\n        n += 1\nprint(\"reverted files:\", n)\nPY\ngrep -rn \"wait_for\" \"$TMPDIR/orig_src/cachetools\" | sed 's/^/orig: /'",
+        "description": "Create unpatched copy of package in scratch"
+      },
+      "_observed_epoch": 1791270848.1772249
+    },
+    "source_hash": "5e3830084496496b50e83915ac6588cfac6a943e2c35f4e35d7bef6a936cc6ec",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 144.6281842919998,
+    "tool_use_id": "call_00_U5Bdh3Qh31mcKTVTr0UW6839",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_U5Bdh3Qh31mcKTVTr0UW6839",
+      "name": "Bash",
+      "input": {
+        "command": "PYTHONPATH=\"$TMPDIR/orig_src:$PYTHONPATH\" python3 -c \"import cachetools; print('using', cachetools.__file__)\" && PYTHONPATH=\"$TMPDIR/orig_src:$PYTHONPATH\" python3 -m pytest -q agent_tests 2>&1 | tail -25",
+        "description": "Run new regression tests against unpatched package",
+        "timeout": 300000
+      },
+      "_observed_epoch": 1791270853.152404
+    },
+    "source_hash": "5e3830084496496b50e83915ac6588cfac6a943e2c35f4e35d7bef6a936cc6ec",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 159.06160562500008,
+    "tool_use_id": "call_00_ET_LRKeDk6AuQTnp8uLI2s25857",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_ET_LRKeDk6AuQTnp8uLI2s25857",
+      "name": "Bash",
+      "input": {
+        "command": "PYTHONPATH=\"$TMPDIR/orig_src:$PYTHONPATH\" python3 -m pytest -q agent_tests 2>&1 | grep -E \"^(FAILED|ERROR|[0-9]+ (passed|failed))|passed|failed\" | tail -20",
+        "description": "Summarize unpatched-run outcomes",
+        "timeout": 300000
+      },
+      "_observed_epoch": 1791270867.590049
+    },
+    "source_hash": "5e3830084496496b50e83915ac6588cfac6a943e2c35f4e35d7bef6a936cc6ec",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 162.05923308400088,
+    "tool_use_id": "call_00_1I4hU1ubz6ea4SSVFosa7438",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_1I4hU1ubz6ea4SSVFosa7438",
+      "name": "Bash",
+      "input": {
+        "command": "git diff --stat && git diff",
+        "description": "Show source diff"
+      },
+      "_observed_epoch": 1791270883.009711
+    },
+    "source_hash": "5e3830084496496b50e83915ac6588cfac6a943e2c35f4e35d7bef6a936cc6ec",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 162.6028330420013,
+    "tool_use_id": "call_01_e6ALbLBxgwYmtyphBjVz0653",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_01_e6ALbLBxgwYmtyphBjVz0653",
+      "name": "Bash",
+      "input": {
+        "command": "python3 -m pytest -q agent_tests 2>&1 | tail -5",
+        "description": "Run new regression tests on fixed tree",
+        "timeout": 300000
+      },
+      "_observed_epoch": 1791270883.217658
+    },
+    "source_hash": "5e3830084496496b50e83915ac6588cfac6a943e2c35f4e35d7bef6a936cc6ec",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 165.99416979200032,
+    "tool_use_id": "call_00_pasEjT91h4Uc9RR0rj168798",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_pasEjT91h4Uc9RR0rj168798",
+      "name": "Bash",
+      "input": {
+        "command": "python3 -c \"import cachetools; print(cachetools.__file__)\"; python3 -m pytest -q agent_tests 2>&1 | head -80",
+        "description": "Inspect failing agent test details",
+        "timeout": 300000
+      },
+      "_observed_epoch": 1791270886.608682
+    },
+    "source_hash": "5e3830084496496b50e83915ac6588cfac6a943e2c35f4e35d7bef6a936cc6ec",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 170.3857605000012,
+    "tool_use_id": "call_00_Oy7AHBdNW0MwZpRNKpBY9970",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_Oy7AHBdNW0MwZpRNKpBY9970",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-a1oc_qnz/workspace/agent_tests/test_independent_keys.py",
+        "old_string": "        h = _Harness(cache_factory(), info, method)\n        if hot:\n            h.f(\"other\")\n        holder = h.start(\"held\")",
+        "new_string": "        h = _Harness(cache_factory(), info, method)\n        if hot:\n            h.f(\"other\")\n        baseline = h.calls.count(\"other\")\n        holder = h.start(\"held\")"
+      },
+      "_observed_epoch": 1791270891.3523462
+    },
+    "source_hash": "6cbd51674030122f1fa02a11240727b5348127179820c19732e7a9d0a8d20b39",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 170.84223666699836,
+    "tool_use_id": "call_01_sWxNJa5BC8iA8nYk3Map4250",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_01_sWxNJa5BC8iA8nYk3Map4250",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-a1oc_qnz/workspace/agent_tests/test_independent_keys.py",
+        "old_string": "            self.assertEqual(result.get(\"value\"), \"value:other\")\n            self.assertEqual(h.calls.count(\"other\"), 0 if hot else 1)",
+        "new_string": "            self.assertEqual(result.get(\"value\"), \"value:other\")\n            # a hit must not call the wrapped function for an unrelated key\n            self.assertEqual(h.calls.count(\"other\"), baseline + (0 if hot else 1))"
+      },
+      "_observed_epoch": 1791270891.813162
+    },
+    "source_hash": "5ae7aceafd6a2c15cd43de30291d7aea88b2ff6b11e06361245e9f71e7a31544",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 171.27678358399862,
+    "tool_use_id": "call_02_9oUDvhZZEfXmOzwnoF5T2334",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_02_9oUDvhZZEfXmOzwnoF5T2334",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-a1oc_qnz/workspace/agent_tests/test_independent_keys.py",
+        "old_string": "            self.assertFalse(t.is_alive(), \"cached key blocked while held\")\n            self.assertEqual(h.calls.count(\"other\"), 0)",
+        "new_string": "            self.assertFalse(t.is_alive(), \"cached key blocked while held\")\n            self.assertEqual(h.calls.count(\"other\"), 1)  # warm-up call only"
+      },
+      "_observed_epoch": 1791270892.247116
+    },
+    "source_hash": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 173.91653383399898,
+    "tool_use_id": "call_00_ET_uG0UjCQAbizdyeyJCdyz1563",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_ET_uG0UjCQAbizdyeyJCdyz1563",
+      "name": "Bash",
+      "input": {
+        "command": "python3 -m pytest -q agent_tests 2>&1 | tail -3",
+        "description": "Re-run regression tests on fixed tree",
+        "timeout": 300000
+      },
+      "_observed_epoch": 1791270894.5789561
+    },
+    "source_hash": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 186.29647850000038,
+    "tool_use_id": "call_01_ET_Fhfg9Dx4zdqdETn6WrTG0830",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_01_ET_Fhfg9Dx4zdqdETn6WrTG0830",
+      "name": "Bash",
+      "input": {
+        "command": "PYTHONPATH=\"$TMPDIR/orig_src:$PYTHONPATH\" python3 -m pytest -q agent_tests 2>&1 | tail -3",
+        "description": "Re-run regression tests on unpatched copy",
+        "timeout": 300000
+      },
+      "_observed_epoch": 1791270894.8053162
+    },
+    "source_hash": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 202.4460092920017,
+    "tool_use_id": "call_00_ET_U64qTqJomkLXJLR3BrwF8361",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_ET_U64qTqJomkLXJLR3BrwF8361",
+      "name": "Bash",
+      "input": {
+        "command": "PYTHONPATH=\"$TMPDIR/orig_src:$PYTHONPATH\" python3 -m pytest -q agent_tests 2>&1 | grep -E \"^(FAILED|[0-9]+ failed|[0-9]+ passed)\"",
+        "description": "Summarize unpatched regression test outcome",
+        "timeout": 300000
+      },
+      "_observed_epoch": 1791270911.03187
+    },
+    "source_hash": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+    "current_receipt": null,
+    "corroborated": false,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 210.5232679590008,
+    "tool_use_id": "call_00_uwBV7f8xQgB9xRTnZ5sx1460",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_uwBV7f8xQgB9xRTnZ5sx1460",
+      "name": "Bash",
+      "input": {
+        "command": "python3 run_checks.py 2>&1 | tail -25",
+        "description": "Run official verification harness",
+        "timeout": 400000
+      },
+      "_observed_epoch": 1791270926.782242
+    },
+    "source_hash": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+    "current_receipt": {
+      "task": "D1",
+      "phase": 1,
+      "task_tests": 2,
+      "passed": true,
+      "source_before": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+      "source_after": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+      "started_epoch": 1791270926.852604,
+      "ended_epoch": 1791270931.4942589,
+      "pid": 35151,
+      "upstream_exit": 0,
+      "extra_exit": 0
+    },
+    "corroborated": true,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 219.7627296669998,
+    "tool_use_id": "call_00_kGCDhZfbAoK168Gz29tx1298",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_kGCDhZfbAoK168Gz29tx1298",
+      "name": "Write",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-a1oc_qnz/tmp/d1_stress.py",
+        "content": "\"\"\"Stress / edge probing for the per-key pending fix.\"\"\"\n\nimport random\nimport threading\nimport time\n\nfrom cachetools import LRUCache, cached, cachedmethod\n\nFAILS = []\n\n\ndef check(name, cond, detail=\"\"):\n    print(f\"[{'ok' if cond else 'FAIL'}] {name} {detail}\")\n    if not cond:\n        FAILS.append(name)\n\n\ndef stress(info, method, n_keys=8, n_threads=16, iters=40):\n    cache = LRUCache(64)\n    cond = threading.Condition()\n    lock = threading.Lock()\n    calls = {}\n    bad = []\n\n    def body(k):\n        with lock:\n            calls[k] = calls.get(k, 0) + 1\n        time.sleep(random.uniform(0, 0.002))\n        if k == \"boom\" and calls.get(k, 0) == 1:\n            raise ValueError(\"first boom\")\n        return f\"v:{k}\"\n\n    if method:\n\n        class Owner:\n            def __init__(self):\n                self.cache = cache\n                self.cond = cond\n\n            @cachedmethod(\n                lambda self: self.cache, condition=lambda self: self.cond, info=info\n            )\n            def run(self, k):\n                return body(k)\n\n        f = Owner().run\n    else:\n        f = cached(cache, condition=cond, info=info)(body)\n\n    keys = [f\"k{i}\" for i in range(n_keys)] + [\"boom\"]\n\n    def worker(seed):\n        rnd = random.Random(seed)\n        for _ in range(iters):\n            k = rnd.choice(keys)\n            try:\n                v = f(k)\n            except ValueError:\n                continue\n            if v != f\"v:{k}\":\n                bad.append((k, v))\n\n    threads = [threading.Thread(target=worker, args=(i,)) for i in range(n_threads)]\n    for t in threads:\n        t.start()\n    for t in threads:\n        t.join(15)\n    alive = [t for t in threads if t.is_alive()]\n    check(\n        f\"stress info={info} method={method}: no deadlock\",\n        not alive,\n        f\"threads_alive={len(alive)} calls={sorted(calls.items())}\",\n    )\n    check(f\"stress info={info} method={method}: values correct\", not bad, repr(bad[:3]))\n\n\ndef waiter_when_holder_raises():\n    \"\"\"A same-key waiter must proceed (recompute) when the holder fails.\"\"\"\n    for info in (False, True):\n        for method in (False, True):\n            cond = threading.Condition()\n            entered = threading.Event()\n            release = threading.Event()\n            attempts = []\n\n            def make_f():\n                def body(k):\n                    attempts.append(k)\n                    entered.set()\n                    release.wait(5)\n                    if len(attempts) == 1:\n                        raise ValueError(\"holder failure\")\n                    return k\n\n                if method:\n\n                    class Owner:\n                        def __init__(self):\n                            self.cache = LRUCache(8)\n                            self.cond = cond\n\n                        @cachedmethod(\n                            lambda self: self.cache,\n                            condition=lambda self: self.cond,\n                            info=info,\n                        )\n                        def run(self, k):\n                            return body(k)\n\n                    return Owner().run\n                return cached(LRUCache(8), condition=cond, info=info)(body)\n\n            f = make_f()\n            results = {}\n\n            def holder():\n                try:\n                    f(9)\n                except ValueError as e:\n                    results[\"holder\"] = repr(e)\n\n            def waiter():\n                try:\n                    results[\"waiter\"] = f(9)\n                except ValueError as e:\n                    results[\"waiter\"] = f\"waiter-raised {e!r}\"\n\n            t1 = threading.Thread(target=holder)\n            t1.start()\n            assert entered.wait(2)\n            t2 = threading.Thread(target=waiter)\n            t2.start()\n            time.sleep(0.05)  # let the waiter block on the pending key\n            release.set()\n            t1.join(5)\n            t2.join(5)\n            check(\n                f\"waiter-with-failing-holder info={info} method={method}\",\n                not (t1.is_alive() or t2.is_alive())\n                and results.get(\"waiter\") == 9\n                and results.get(\"holder\", \"\").startswith(\"ValueError\"),\n                f\"attempts={attempts} results={results}\",\n            )\n\n\ndef same_key_suppression_repeat():\n    \"\"\"Repeat suppression check many times to catch flakiness.\"\"\"\n    for info in (False, True):\n        for r in range(5):\n            calls = []\n            cond = threading.Condition()\n            release = threading.Event()\n            start = threading.Event()\n\n            @cached(LRUCache(4), condition=cond, info=info)\n            def f(k):\n                calls.append(k)\n                start.set()\n                release.wait(5)\n                return k\n\n            ws = [threading.Thread(target=lambda: f(1)) for _ in range(8)]\n            for w in ws:\n                w.start()\n            assert start.wait(2)\n            time.sleep(0.02)\n            release.set()\n            for w in ws:\n                w.join(5)\n            if calls != [1] or any(w.is_alive() for w in ws):\n                check(f\"suppression repeat info={info} run={r}\", False, f\"calls={calls}\")\n                return\n    check(\"suppression repeat (10 runs)\", True)\n\n\ndef main():\n    random.seed(0)\n    for info in (False, True):\n        for method in (False, True):\n            stress(info, method)\n    waiter_when_holder_raises()\n    same_key_suppression_repeat()\n    print(f\"\\n{'ALL OK' if not FAILS else 'FAILURES: ' + repr(FAILS)}\")\n    return 1 if FAILS else 0\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main())\n"
+      },
+      "_observed_epoch": 1791270940.7352262
+    },
+    "source_hash": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+    "current_receipt": {
+      "task": "D1",
+      "phase": 1,
+      "task_tests": 2,
+      "passed": true,
+      "source_before": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+      "source_after": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+      "started_epoch": 1791270926.852604,
+      "ended_epoch": 1791270931.4942589,
+      "pid": 35151,
+      "upstream_exit": 0,
+      "extra_exit": 0
+    },
+    "corroborated": true,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 222.52472591699916,
+    "tool_use_id": "call_00_ET_WQTQtHIm2zVgDSVHKCcW1397",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_ET_WQTQtHIm2zVgDSVHKCcW1397",
+      "name": "Bash",
+      "input": {
+        "command": "python3 \"$TMPDIR/d1_stress.py\"; echo \"exit=$?\"",
+        "description": "Run stress and edge-case probes",
+        "timeout": 300000
+      },
+      "_observed_epoch": 1791270942.953969
+    },
+    "source_hash": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+    "current_receipt": {
+      "task": "D1",
+      "phase": 1,
+      "task_tests": 2,
+      "passed": true,
+      "source_before": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+      "source_after": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+      "started_epoch": 1791270926.852604,
+      "ended_epoch": 1791270931.4942589,
+      "pid": 35151,
+      "upstream_exit": 0,
+      "extra_exit": 0
+    },
+    "corroborated": true,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 240.24006629200085,
+    "tool_use_id": "call_00_mooS3aHugyrdUUOGzGFS1570",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_mooS3aHugyrdUUOGzGFS1570",
+      "name": "Bash",
+      "input": {
+        "command": "for i in 1 2 3; do echo \"--- run $i\"; python3 run_checks.py 2>&1 | grep -E \"^(OK|FAILED|Ran|TASK_CHECK_RESULT)\" | tail -3; done",
+        "description": "Run official harness three more times",
+        "timeout": 500000
+      },
+      "_observed_epoch": 1791270947.259611
+    },
+    "source_hash": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+    "current_receipt": {
+      "task": "D1",
+      "phase": 1,
+      "task_tests": 2,
+      "passed": true,
+      "source_before": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+      "source_after": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+      "started_epoch": 1791270956.594663,
+      "ended_epoch": 1791270961.209811,
+      "pid": 35622,
+      "upstream_exit": 0,
+      "extra_exit": 0
+    },
+    "corroborated": true,
+    "is_error": false
+  },
+  {
+    "elapsed_seconds": 243.40934587499942,
+    "tool_use_id": "call_00_rc5mVL3pMyQNcvztLgA60753",
+    "tool": {
+      "type": "tool_use",
+      "id": "call_00_rc5mVL3pMyQNcvztLgA60753",
+      "name": "Bash",
+      "input": {
+        "command": "git status --short && echo \"--- diffstat\" && git diff --stat && echo \"--- untracked agent_tests\" && ls agent_tests",
+        "description": "Confirm final working tree state"
+      },
+      "_observed_epoch": 1791270964.37231
+    },
+    "source_hash": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+    "current_receipt": {
+      "task": "D1",
+      "phase": 1,
+      "task_tests": 2,
+      "passed": true,
+      "source_before": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+      "source_after": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+      "started_epoch": 1791270956.594663,
+      "ended_epoch": 1791270961.209811,
+      "pid": 35622,
+      "upstream_exit": 0,
+      "extra_exit": 0
+    },
+    "corroborated": true,
+    "is_error": false
+  }
+]

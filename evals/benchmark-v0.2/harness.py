@@ -105,7 +105,7 @@ def freeze():
   arms=list(ARMS);rng.shuffle(arms)
   for arm in arms:schedule.append({'run_id':f'{len(schedule)+1:02d}-{task["id"]}-{arm}','task_id':task['id'],'arm':arm})
  endpoint,model,_=config()
- audit={'claude':cmd(['claude','--version']),'claude_sha256':sha(Path(shutil.which('claude')).resolve()),'python':cmd([PYTHON,'--version']),'packages':cmd([PYTHON,'-m','pip','freeze']),'git':cmd([GIT,'--version']),'endpoint':endpoint,'model':model,'skill_candidate':git(REPO,'rev-parse','HEAD'),'created_utc':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'cost':'unavailable; never infer billed cost from CLI estimates'}
+ audit={'claude':cmd(['claude','--version']),'claude_sha256':sha(Path(shutil.which('claude')).resolve()),'python':cmd([PYTHON,'--version']),'packages':cmd([PYTHON,'-m','pip','freeze']),'git':cmd([GIT,'--version']),'endpoint':endpoint,'model':model,'skill_candidate':ARMS['C'],'harness_parent_commit':git(REPO,'rev-parse','HEAD'),'created_utc':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'cost':'unavailable; never infer billed cost from CLI estimates'}
  dump(OUT/'audit.json',audit);dump(OUT/'manifest.json',manifest());dump(OUT/'schedule.json',schedule)
  files=list(HERE.glob('*.py'))+list((OUT/'treatments').rglob('*'))+[OUT/'audit.json',OUT/'manifest.json',OUT/'schedule.json',OUT/'calibration.json',OUT/'preflight.json',OUT/'process-preflight.json']
  dump(OUT/'freeze.json',{str(p.relative_to(HERE)):sha(p) for p in files if p.is_file()})

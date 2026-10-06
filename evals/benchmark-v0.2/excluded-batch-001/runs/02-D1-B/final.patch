@@ -1,0 +1,44 @@
+diff --git a/src/cachetools/_cached.py b/src/cachetools/_cached.py
+index 8c873e5..cfe26a7 100644
+--- a/src/cachetools/_cached.py
++++ b/src/cachetools/_cached.py
+@@ -21,7 +21,7 @@ def _condition_info(func, cache, key, lock, cond, info):
+         nonlocal hits, misses
+         k = key(*args, **kwargs)
+         with lock:
+-            cond.wait_for(lambda: not pending)
++            cond.wait_for(lambda: k not in pending)
+             try:
+                 result = cache[k]
+                 hits += 1
+@@ -150,7 +150,7 @@ def _condition(func, cache, key, lock, cond):
+     def wrapper(*args, **kwargs):
+         k = key(*args, **kwargs)
+         with lock:
+-            cond.wait_for(lambda: not pending)
++            cond.wait_for(lambda: k not in pending)
+             try:
+                 result = cache[k]
+                 return result
+diff --git a/src/cachetools/_cachedmethod.py b/src/cachetools/_cachedmethod.py
+index c02de34..2a626ab 100644
+--- a/src/cachetools/_cachedmethod.py
++++ b/src/cachetools/_cachedmethod.py
+@@ -162,7 +162,7 @@ def _condition_info(method, cache, key, lock, cond, info):
+                 key = self.cache_key(*args, **kwargs)
+ 
+                 with lock:
+-                    cond.wait_for(lambda: not self.__pending)
++                    cond.wait_for(lambda: key not in self.__pending)
+                     try:
+                         result = cache[key]
+                         self.__hits += 1
+@@ -276,7 +276,7 @@ def _condition(method, cache, key, lock, cond):
+         c = cache(self)
+         k = key(self, *args, **kwargs)
+         with lock(self):
+-            cond(self).wait_for(lambda: not pending)
++            cond(self).wait_for(lambda: k not in pending)
+             try:
+                 return c[k]
+             except KeyError:

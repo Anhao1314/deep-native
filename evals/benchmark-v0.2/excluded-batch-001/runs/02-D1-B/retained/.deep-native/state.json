@@ -1,0 +1,14 @@
+{
+  "attempt": "f63ec0379f484792ab8aa72703139a64",
+  "config_hash": "5487792df5a0803e4aaba0ea5f3f2412e769e4bec4f5ee03b9a105d76dad2f95",
+  "goal": "Restore independent-key progress for cachetools cached/cachedmethod with condition set (info on and off) while preserving same-key stampede suppression, hit/miss accounting, exception cleanup and public behavior; python3 run_checks.py must pass (task tests + upstream + agent_tests).",
+  "next": "Run deep-native verify (python3 run_checks.py) on the frozen worktree, then review diff and finish.",
+  "note": "Reproduced D1: all 8 subtests of benchmark_tests.test_independent_keys_and_cached_hits fail; upstream 338 pass. Discriminating evidence (TMPDIR scratch): lock is acquirable while held call runs and cache has no eviction pressure (0-1/128), yet the unrelated caller is parked in Condition.wait_for on the global predicate 'not pending' at src/cachetools/_cached.py:24,153 and _cachedmethod.py:165,279. Fixed predicate to wait only for the caller's own key. Added agent_tests/test_independent_key_progress.py (4 tests) which fails on pre-fix source (independent-key + concurrency tests) and passes after.",
+  "risk": "Pre-existing, out-of-scope limitation confirmed but not changed: with a real threading.Condition plus a distinct lock= object, notify_all() is called without holding the condition's lock (upstream tests only use mock lock/condition). Regression tests use short (0.3s) observation windows for suppression, which is directional: they cannot false-fail on a correct implementation, but an extremely slow machine could miss a broken one.",
+  "schema": 1,
+  "session": "27c6b2c6-f7b9-4646-91b6-62847b61bca4",
+  "status": "complete",
+  "summary": "Restored independent-key progress for condition-based caching: the wait predicate in src/cachetools/_cached.py (_condition_info/_condition) and src/cachetools/_cachedmethod.py (_condition_info/_condition) now waits only for the caller's own cache key (k not in pending) instead of any pending computation. Added agent_tests/test_independent_key_progress.py (4 tests, 16 subTest cases) covering decorator x info x hot-key progress, distinct-key concurrency, same-key stampede suppression with hit/miss accounting, and same-key recovery after a failed computation.",
+  "task_id": "a526eb831bcc4382a4dc1ca5133e3a52",
+  "updated_at": "2026-10-06T07:21:39Z"
+}

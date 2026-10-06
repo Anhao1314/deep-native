@@ -1,0 +1,26 @@
+{
+  "run_id": "01-D1-C",
+  "task_id": "D1",
+  "arm": "C",
+  "task": {
+    "id": "D1",
+    "family": "hard_root_cause",
+    "files": [
+      "src/cachetools/_cached.py",
+      "src/cachetools/_cachedmethod.py"
+    ],
+    "prompt": "Investigate a regression in cachetools: while one cached function or method computation is held, callers for a different key can stall, including already cached values. The operator suspects LRU eviction or the user function holding the cache lock; treat this as an unconfirmed hypothesis. Restore independent-key progress for cached and cachedmethod, with info both enabled and disabled. Preserve same-key stampede suppression, cache hits/misses, exception cleanup and existing public behavior. Reproduce with discriminating evidence and add regression protection. Work only on the stated functionality. Do not change upstream tests, benchmark_tests.py, benchmark_phase.json, or the check receipt implementation. You may add agent_tests/ and documentation. Do not hard-code answers, skip tests, or weaken acceptance. The project is imported from src/ (PYTHONPATH is already set). Use python3 run_checks.py for meaningful task and upstream verification; report checks actually executed. Scratch paths must use the writable per-run $TMPDIR rather than global /tmp. End your final response with STATUS: DONE or STATUS: BLOCKED."
+  },
+  "fixture_commit": "93a5738b0ce02b285c960e1b8fd9599a4693ec9d",
+  "treatment_commit": "824c3009e465a1748250f5ed8589e096237dcb08",
+  "workspace": "/private/tmp/dn2-live-a1oc_qnz/workspace",
+  "started_utc": "2026-10-06T07:12:00Z",
+  "model": "deepseek-flash[1m]",
+  "endpoint": "https://api.deepseek.com/anthropic",
+  "budget": {
+    "assistant_attempts": 48,
+    "wall_seconds": 900,
+    "phase1_max_attempts": 28,
+    "phase1_max_seconds": 540
+  }
+}

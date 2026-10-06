@@ -1,0 +1,142 @@
+{
+  "run_id": "02-D1-B",
+  "task_id": "D1",
+  "arm": "B",
+  "strict_pass": true,
+  "functional_pass": true,
+  "final_verified": false,
+  "phase_reached": 1,
+  "scope_violations": [],
+  "protected_integrity": true,
+  "files_changed": [
+    "agent_tests/test_independent_key_progress.py",
+    "src/cachetools/_cached.py",
+    "src/cachetools/_cachedmethod.py"
+  ],
+  "tool_calls": 60,
+  "duration_seconds": 329.0960242500005,
+  "provider_tokens": {
+    "input_tokens": 54723,
+    "output_tokens": 35317,
+    "cache_read_input_tokens": 2659200,
+    "cache_creation_input_tokens": 0,
+    "total_tokens": 2749240
+  },
+  "cost": null,
+  "sessions": [
+    {
+      "session_id": "27c6b2c6-f7b9-4646-91b6-62847b61bca4",
+      "exit_code": 0,
+      "duration_seconds": 329.0960242500005,
+      "stop_reason": "normal_exit",
+      "qualified_interruption": null,
+      "final_response": "## Root cause (confirmed, not the operator's hypothesis)\n\nThe stall is in the `condition`-based wrappers' wait predicate, not eviction or the user function holding the lock.\n\nDiscriminating evidence (scratch script in `$TMPDIR/dn2-evidence/reproduce_regression.py`):\n- **Eviction refuted** — cache held 0–1 of 128 entries while the unrelated caller stalled; nothing to evict.\n- **\"User function holds the cache lock\" refuted** — the cache lock was acquirable within 1 ms while the held computation was running (the body is invoked outside the `with lock` block).\n- **Actual cause** — the blocked caller's stack was parked in `Condition.wait_for` on a *decorator-global* predicate: `lambda: not pending` (`src/cachetools/_cached.py:24,153`, `_cachedmethod.py:165,279`). One key being computed gated every other key, including already-cached ones, contradicting `docs/index.rst:335` (\"prevent concurrent execution … with *identical* parameters, or cache keys\").\n\n## Change\n\nFour one-line edits: the predicate now waits only for the caller's own key (`k not in pending` / `key not in self.__pending`), still under the lock, with `pending` cleanup and `notify_all()` unchanged:\n\n- `src/cachetools/_cached.py` — `_condition_info`, `_condition`\n- `src/cachetools/_cachedmethod.py` — `_condition_info` (descriptor path), `_condition` (incl. deprecated classmethod path)\n\nAdded `agent_tests/test_independent_key_progress.py` (4 tests / 16 subTest cases): independent-key progress for `cached`/`cachedmethod` × `info∈{False,True}` × cold/hot key, true concurrency of distinct keys (barrier), same-key stampede suppression with hit/miss accounting, and recovery of a same-key waiter after the holder raises. Pre-fix, this file fails on both progress tests while the suppression/exception tests pass; post-fix all pass. Frozen `benchmark_tests.py`, `benchmark_phase.json`, `run_checks.py`, `check_receipt.py` and upstream tests were not touched.\n\n## Checks actually executed\n\n| Command | Result |\n|---|---|\n| `python3 run_checks.py` (baseline, pre-fix) | task tests FAIL (8/8 subtests), upstream 338 pass |\n| `python3 run_checks.py` (final) | task tests OK, upstream 338 pass, agent_tests 4 pass, `upstream_exit=0`, `extra_exit=0`, source fingerprint stable |\n| `python3 -m pytest -q agent_tests` pre-fix (fix patch reverted, then re-applied) | 2 failed / 2 passed → tests discriminate |\n| `python3 -m pytest -q agent_tests` ×5 | 4 passed each run, stable |\n| deep-native `verify` (check `python3 run_checks.py`, timeout 300) | `status: passed`, exit 0, worktree hash before == after |\n\nEvidence: `.deep-native/attempts/f63ec0379f484792ab8aa72703139a64.json`; scratch reproduction under `$TMPDIR/dn2-evidence/` (not committed).\n\n## Remaining risk\n\n- Pre-existing, out-of-scope, unchanged: with a real `threading.Condition` **plus a distinct `lock=`**, `notify_all()` is called without holding the condition's lock (upstream tests only use mock lock/condition). Fixing it would alter lock-count behavior encoded in the frozen upstream tests, so I left it and noted it.\n- The suppression assertions use 0.3 s observation windows; they cannot false-fail a correct implementation, but an extremely slow machine could mask a broken one.\n\nSTATUS: DONE",
+      "cli_result": {
+        "duration_api_ms": 245811,
+        "stop_reason": "end_turn",
+        "session_id": "27c6b2c6-f7b9-4646-91b6-62847b61bca4",
+        "total_cost_usd": 2.4861400000000002,
+        "usage": {
+          "input_tokens": 54723,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 2659200,
+          "output_tokens": 35317,
+          "output_tokens_details": {
+            "thinking_tokens": 0
+          },
+          "server_tool_use": {
+            "web_search_requests": 0,
+            "web_fetch_requests": 0
+          },
+          "service_tier": "standard",
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 0,
+            "ephemeral_5m_input_tokens": 0
+          },
+          "inference_geo": "",
+          "iterations": [],
+          "speed": "standard",
+          "fallback_credit": null
+        },
+        "modelUsage": {
+          "deepseek-flash[1m]": {
+            "inputTokens": 54723,
+            "outputTokens": 35317,
+            "cacheReadInputTokens": 2659200,
+            "cacheCreationInputTokens": 0,
+            "webSearchRequests": 0,
+            "costUSD": 2.4861400000000002,
+            "contextWindow": 1000000,
+            "maxOutputTokens": 32000,
+            "thinkingTokens": 0,
+            "canonicalModel": "deepseek-flash[1m]",
+            "provider": "firstParty",
+            "costBasis": "unknown"
+          }
+        },
+        "permission_denials": [],
+        "terminal_reason": "completed",
+        "fast_mode_state": "off",
+        "fast_mode_disabled_reason": "sdk_opt_in_required",
+        "subagent_stats": {
+          "spawned": 0,
+          "requested": {
+            "background": 0,
+            "foreground": 0,
+            "unset": 0
+          },
+          "started_in_background": 0,
+          "max_depth": 0,
+          "spawned_by_subagents": 0,
+          "completed": 0,
+          "failed": 0,
+          "killed": {
+            "parent": 0,
+            "user": 0,
+            "system": 0
+          },
+          "refused": {
+            "depth_limit": 0,
+            "concurrency_limit": 0,
+            "budget": 0
+          },
+          "by_type": {}
+        },
+        "is_error": false,
+        "num_turns": 62,
+        "subtype": "success",
+        "api_error_status": null,
+        "result": "## Root cause (confirmed, not the operator's hypothesis)\n\nThe stall is in the `condition`-based wrappers' wait predicate, not eviction or the user function holding the lock.\n\nDiscriminating evidence (scratch script in `$TMPDIR/dn2-evidence/reproduce_regression.py`):\n- **Eviction refuted** — cache held 0–1 of 128 entries while the unrelated caller stalled; nothing to evict.\n- **\"User function holds the cache lock\" refuted** — the cache lock was acquirable within 1 ms while the held computation was running (the body is invoked outside the `with lock` block).\n- **Actual cause** — the blocked caller's stack was parked in `Condition.wait_for` on a *decorator-global* predicate: `lambda: not pending` (`src/cachetools/_cached.py:24,153`, `_cachedmethod.py:165,279`). One key being computed gated every other key, including already-cached ones, contradicting `docs/index.rst:335` (\"prevent concurrent execution … with *identical* parameters, or cache keys\").\n\n## Change\n\nFour one-line edits: the predicate now waits only for the caller's own key (`k not in pending` / `key not in self.__pending`), still under the lock, with `pending` cleanup and `notify_all()` unchanged:\n\n- `src/cachetools/_cached.py` — `_condition_info`, `_condition`\n- `src/cachetools/_cachedmethod.py` — `_condition_info` (descriptor path), `_condition` (incl. deprecated classmethod path)\n\nAdded `agent_tests/test_independent_key_progress.py` (4 tests / 16 subTest cases): independent-key progress for `cached`/`cachedmethod` × `info∈{False,True}` × cold/hot key, true concurrency of distinct keys (barrier), same-key stampede suppression with hit/miss accounting, and recovery of a same-key waiter after the holder raises. Pre-fix, this file fails on both progress tests while the suppression/exception tests pass; post-fix all pass. Frozen `benchmark_tests.py`, `benchmark_phase.json`, `run_checks.py`, `check_receipt.py` and upstream tests were not touched.\n\n## Checks actually executed\n\n| Command | Result |\n|---|---|\n| `python3 run_checks.py` (baseline, pre-fix) | task tests FAIL (8/8 subtests), upstream 338 pass |\n| `python3 run_checks.py` (final) | task tests OK, upstream 338 pass, agent_tests 4 pass, `upstream_exit=0`, `extra_exit=0`, source fingerprint stable |\n| `python3 -m pytest -q agent_tests` pre-fix (fix patch reverted, then re-applied) | 2 failed / 2 passed → tests discriminate |\n| `python3 -m pytest -q agent_tests` ×5 | 4 passed each run, stable |\n| deep-native `verify` (check `python3 run_checks.py`, timeout 300) | `status: passed`, exit 0, worktree hash before == after |\n\nEvidence: `.deep-native/attempts/f63ec0379f484792ab8aa72703139a64.json`; scratch reproduction under `$TMPDIR/dn2-evidence/` (not committed).\n\n## Remaining risk\n\n- Pre-existing, out-of-scope, unchanged: with a real `threading.Condition` **plus a distinct `lock=`**, `notify_all()` is called without holding the condition's lock (upstream tests only use mock lock/condition). Fixing it would alter lock-count behavior encoded in the frozen upstream tests, so I left it and noted it.\n- The suppression assertions use 0.3 s observation windows; they cannot false-fail a correct implementation, but an extremely slow machine could mask a broken one.\n\nSTATUS: DONE",
+        "ttft_ms": 2570,
+        "type": "result",
+        "duration_ms": 328851,
+        "uuid": "0ab3c12b-3803-4b26-8dd7-d79b207a1856",
+        "ttft_stream_ms": 2259,
+        "time_to_request_ms": 17,
+        "first_content_frame_ms": 2260,
+        "queued_turn_count": 0,
+        "result_index": 0
+      },
+      "final_hash": "237bae707c99d50e9cdcc56aadebc66cd09794bbcdb9fa382265c960c4d9ba76",
+      "corroborated_receipt_epochs": [
+        1791271086.705695,
+        1791271173.941827,
+        1791271184.576732,
+        1791271281.849696
+      ]
+    }
+  ],
+  "final_receipt": {
+    "task": "D1",
+    "phase": 1,
+    "task_tests": 2,
+    "passed": true,
+    "source_before": "237bae707c99d50e9cdcc56aadebc66cd09794bbcdb9fa382265c960c4d9ba76",
+    "source_after": "237bae707c99d50e9cdcc56aadebc66cd09794bbcdb9fa382265c960c4d9ba76",
+    "started_epoch": 1791271284.187833,
+    "ended_epoch": 1791271291.020865,
+    "pid": 45373,
+    "upstream_exit": 0,
+    "extra_exit": 0
+  }
+}

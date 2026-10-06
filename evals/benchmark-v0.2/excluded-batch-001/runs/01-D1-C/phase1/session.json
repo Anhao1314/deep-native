@@ -1,0 +1,99 @@
+{
+  "session_id": "8e09413f-ba92-43d8-8bb2-998b69b86398",
+  "exit_code": 0,
+  "duration_seconds": 249.98109750000003,
+  "stop_reason": "normal_exit",
+  "qualified_interruption": null,
+  "final_response": "## Root cause\n\n`_condition*` wrappers used a **global** wait predicate, `cond.wait_for(lambda: not pending)`. `wait_for` only returns when *every* in-flight computation finishes, so any held key blocked all other callers — even cache hits for unrelated keys. Callers were never reaching the cache lookup while another key was pending.\n\nThe operator's hypotheses were both refuted by discriminating probes (run against the unfixed code):\n- **LRU eviction — refuted**: the stall reproduced with a plain `dict` cache (eviction impossible) and for an already-cached key with `LRUCache(128)` headroom.\n- **User function holding the lock — refuted**: the cache condition was acquirable (`acquire(blocking=False)`) while the user function ran; `func` executes outside `with lock`.\n- **Confirmed mechanism**: cross-key stall in all four variants (cached/cachedmethod × info on/off), with same-key suppression intact. The docs (`docs/index.rst`) already specify per-key waiting (\"identical parameters, or cache keys\"), so this was a regression against documented behavior.\n\n## Change\n\nOne predicate per condition variant (`src/cachetools/_cached.py:24,154`, `src/cachetools/_cachedmethod.py:165,280`):\n\n```python\n# only wait for a pending computation of the same key\ncond.wait_for(lambda: k not in pending)          # was: not pending\n```\n\n8 insertions, 4 deletions across 2 files; no other behavior touched.\n\n## Evidence\n\n| Check | Result |\n|---|---|\n| `python3 run_checks.py` (4 runs) | `passed: true` each; task tests 2/2 OK, upstream **338 passed**, agent_tests 7 passed, fingerprint stable |\n| `python3 run_checks.py` before fix (baseline) | 8/8 independent-key combos failed; same-key test passed |\n| Regression tests vs. unpatched copy (`$TMPDIR/orig_src`) | 4 independent-key tests **fail**, 3 same-key controls pass → tests discriminate the bug |\n| Regression tests vs. fixed tree | 7/7 pass |\n| `$TMPDIR/d1_repro.py` (discriminating probes) | 2/8 → 8/8 |\n| `$TMPDIR/d1_stress.py` | 16 threads × 8 keys × 4 variants: no deadlock, one computation per key; waiter recomputes when holder raises (attempts `[9, 9]`); 10 suppression repeats exact |\n\nAdded `agent_tests/test_independent_keys.py`: unrelated-key progress for miss/hit across cached/cachedmethod, info on/off, `LRUCache(128)`/`LRUCache(1)`/plain `dict`; concurrent distinct-key overlap; same-key stampede suppression and hit/miss accounting; exception cleanup and interleaved-hit cases. No upstream test, benchmark, receipt, or config file was modified.\n\n**Residual risk**: the pre-existing unsynchronized `pending` access when `lock is not cond` is unchanged by this fix (out of scope); same-thread recursive re-entry on the same key still waits on its own pending marker, as before.\n\nSTATUS: DONE",
+  "cli_result": {
+    "duration_api_ms": 159401,
+    "stop_reason": "end_turn",
+    "session_id": "8e09413f-ba92-43d8-8bb2-998b69b86398",
+    "total_cost_usd": 1.4268210000000003,
+    "usage": {
+      "input_tokens": 35137,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 1183872,
+      "output_tokens": 26368,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "deepseek-flash[1m]": {
+        "inputTokens": 35137,
+        "outputTokens": 26368,
+        "cacheReadInputTokens": 1183872,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 1.4268210000000003,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 32000,
+        "thinkingTokens": 0,
+        "canonicalModel": "deepseek-flash[1m]",
+        "provider": "firstParty",
+        "costBasis": "unknown"
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "fast_mode_disabled_reason": "sdk_opt_in_required",
+    "subagent_stats": {
+      "spawned": 0,
+      "requested": {
+        "background": 0,
+        "foreground": 0,
+        "unset": 0
+      },
+      "started_in_background": 0,
+      "max_depth": 0,
+      "spawned_by_subagents": 0,
+      "completed": 0,
+      "failed": 0,
+      "killed": {
+        "parent": 0,
+        "user": 0,
+        "system": 0
+      },
+      "refused": {
+        "depth_limit": 0,
+        "concurrency_limit": 0,
+        "budget": 0
+      },
+      "by_type": {}
+    },
+    "is_error": false,
+    "num_turns": 47,
+    "subtype": "success",
+    "api_error_status": null,
+    "result": "## Root cause\n\n`_condition*` wrappers used a **global** wait predicate, `cond.wait_for(lambda: not pending)`. `wait_for` only returns when *every* in-flight computation finishes, so any held key blocked all other callers — even cache hits for unrelated keys. Callers were never reaching the cache lookup while another key was pending.\n\nThe operator's hypotheses were both refuted by discriminating probes (run against the unfixed code):\n- **LRU eviction — refuted**: the stall reproduced with a plain `dict` cache (eviction impossible) and for an already-cached key with `LRUCache(128)` headroom.\n- **User function holding the lock — refuted**: the cache condition was acquirable (`acquire(blocking=False)`) while the user function ran; `func` executes outside `with lock`.\n- **Confirmed mechanism**: cross-key stall in all four variants (cached/cachedmethod × info on/off), with same-key suppression intact. The docs (`docs/index.rst`) already specify per-key waiting (\"identical parameters, or cache keys\"), so this was a regression against documented behavior.\n\n## Change\n\nOne predicate per condition variant (`src/cachetools/_cached.py:24,154`, `src/cachetools/_cachedmethod.py:165,280`):\n\n```python\n# only wait for a pending computation of the same key\ncond.wait_for(lambda: k not in pending)          # was: not pending\n```\n\n8 insertions, 4 deletions across 2 files; no other behavior touched.\n\n## Evidence\n\n| Check | Result |\n|---|---|\n| `python3 run_checks.py` (4 runs) | `passed: true` each; task tests 2/2 OK, upstream **338 passed**, agent_tests 7 passed, fingerprint stable |\n| `python3 run_checks.py` before fix (baseline) | 8/8 independent-key combos failed; same-key test passed |\n| Regression tests vs. unpatched copy (`$TMPDIR/orig_src`) | 4 independent-key tests **fail**, 3 same-key controls pass → tests discriminate the bug |\n| Regression tests vs. fixed tree | 7/7 pass |\n| `$TMPDIR/d1_repro.py` (discriminating probes) | 2/8 → 8/8 |\n| `$TMPDIR/d1_stress.py` | 16 threads × 8 keys × 4 variants: no deadlock, one computation per key; waiter recomputes when holder raises (attempts `[9, 9]`); 10 suppression repeats exact |\n\nAdded `agent_tests/test_independent_keys.py`: unrelated-key progress for miss/hit across cached/cachedmethod, info on/off, `LRUCache(128)`/`LRUCache(1)`/plain `dict`; concurrent distinct-key overlap; same-key stampede suppression and hit/miss accounting; exception cleanup and interleaved-hit cases. No upstream test, benchmark, receipt, or config file was modified.\n\n**Residual risk**: the pre-existing unsynchronized `pending` access when `lock is not cond` is unchanged by this fix (out of scope); same-thread recursive re-entry on the same key still waits on its own pending marker, as before.\n\nSTATUS: DONE",
+    "ttft_ms": 1824,
+    "type": "result",
+    "duration_ms": 249712,
+    "uuid": "419e21c1-999c-4c36-8c86-acf5c509dcaa",
+    "ttft_stream_ms": 955,
+    "time_to_request_ms": 18,
+    "first_content_frame_ms": 955,
+    "queued_turn_count": 0,
+    "result_index": 0
+  },
+  "final_hash": "d5c558fd33ef754d43524c4244d26390b72b14058133e4c398c73e25aa4b694a",
+  "corroborated_receipt_epochs": [
+    1791270931.4942589,
+    1791270961.209811
+  ]
+}

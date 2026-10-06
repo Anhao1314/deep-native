@@ -1,0 +1,21 @@
+{
+  "pass": true,
+  "contract": {
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) ... ok\ntest_same_key_suppression_and_exception_cleanup (__main__.DebugTests.test_same_key_suppression_and_exception_cleanup) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.074s\n\nOK\n",
+    "duration_seconds": 0.11250179099806701
+  },
+  "upstream": {
+    "exit_code": 0,
+    "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.17s\n",
+    "stderr": "",
+    "duration_seconds": 4.271331541000109
+  },
+  "agent_tests": {
+    "exit_code": 0,
+    "stdout": "....                                                                     [100%]\n4 passed in 2.46s\n",
+    "stderr": "",
+    "duration_seconds": 2.5511597500008065
+  }
+}

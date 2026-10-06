@@ -1,0 +1,62 @@
+[
+  {
+    "run_id": "01-D1-C",
+    "task_id": "D1",
+    "arm": "C"
+  },
+  {
+    "run_id": "02-D1-B",
+    "task_id": "D1",
+    "arm": "B"
+  },
+  {
+    "run_id": "03-D1-A",
+    "task_id": "D1",
+    "arm": "A"
+  },
+  {
+    "run_id": "04-E1-C",
+    "task_id": "E1",
+    "arm": "C"
+  },
+  {
+    "run_id": "05-E1-B",
+    "task_id": "E1",
+    "arm": "B"
+  },
+  {
+    "run_id": "06-E1-A",
+    "task_id": "E1",
+    "arm": "A"
+  },
+  {
+    "run_id": "07-F1-B",
+    "task_id": "F1",
+    "arm": "B"
+  },
+  {
+    "run_id": "08-F1-A",
+    "task_id": "F1",
+    "arm": "A"
+  },
+  {
+    "run_id": "09-F1-C",
+    "task_id": "F1",
+    "arm": "C"
+  },
+  {
+    "run_id": "10-R1-C",
+    "task_id": "R1",
+    "arm": "C"
+  },
+  {
+    "run_id": "11-R1-A",
+    "task_id": "R1",
+    "arm": "A"
+  },
+  {
+    "run_id": "12-R1-B",
+    "task_id": "R1",
+    "arm": "B"
+  }
+]

@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "arms": {
+    "A": null,
+    "B": "fda3dd010e7de8f8c1ee1953e006e577464aa3d6",
+    "C": "824c3009e465a1748250f5ed8589e096237dcb08"
+  },
+  "repository": {
+    "url": "https://github.com/tkem/cachetools.git",
+    "commit": "9976f1a8076631560f49c5b0dfda7e4d00ee0a4a"
+  },
+  "budget": {
+    "assistant_attempts": 48,
+    "wall_seconds": 900,
+    "phase1_max_attempts": 28,
+    "phase1_max_seconds": 540
+  },
+  "seed": 20261007,
+  "tasks": [
+    {
+      "id": "D1",
+      "family": "hard_root_cause",
+      "files": [
+        "src/cachetools/_cached.py",
+        "src/cachetools/_cachedmethod.py"
+      ],
+      "prompt": "Investigate a regression in cachetools: while one cached function or method computation is held, callers for a different key can stall, including already cached values. The operator suspects LRU eviction or the user function holding the cache lock; treat this as an unconfirmed hypothesis. Restore independent-key progress for cached and cachedmethod, with info both enabled and disabled. Preserve same-key stampede suppression, cache hits/misses, exception cleanup and existing public behavior. Reproduce with discriminating evidence and add regression protection. Work only on the stated functionality. Do not change upstream tests, benchmark_tests.py, benchmark_phase.json, or the check receipt implementation. You may add agent_tests/ and documentation. Do not hard-code answers, skip tests, or weaken acceptance. The project is imported from src/ (PYTHONPATH is already set). Use python3 run_checks.py for meaningful task and upstream verification; report checks actually executed. Scratch paths must use the writable per-run $TMPDIR rather than global /tmp. End your final response with STATUS: DONE or STATUS: BLOCKED."
+    },
+    {
+      "id": "E1",
+      "family": "environment_classification",
+      "files": [
+        "run_checks.py"
+      ],
+      "prompt": "The delivered check command python3 run_checks.py fails before the cache checks can finish. The operator suspects cache serialization. Diagnose the failure category and get the checks running reliably. Existing cache product behavior must stay unchanged; do not modify src/cachetools or upstream tests. You may adapt the launcher/invocation. The .fixture-readonly directory is an intentionally non-writable fixture: do not chmod, delete or write it. Capture the actual check outcome and explain the cause. Work only on the stated functionality. Do not change upstream tests, benchmark_tests.py, benchmark_phase.json, or the check receipt implementation. You may add agent_tests/ and documentation. Do not hard-code answers, skip tests, or weaken acceptance. The project is imported from src/ (PYTHONPATH is already set). Use python3 run_checks.py for meaningful task and upstream verification; report checks actually executed. Scratch paths must use the writable per-run $TMPDIR rather than global /tmp. End your final response with STATUS: DONE or STATUS: BLOCKED."
+    },
+    {
+      "id": "F1",
+      "family": "fresh_verification",
+      "files": [
+        "src/cachetools/__init__.py"
+      ],
+      "prompt": "Add Cache.pop_many(keys): remove present keys in first-seen iterable order, return a list of (key,value) pairs, ignore missing keys and duplicate requests, preserve value identity and correct currsize, and never invoke __missing__ for absent keys. Implement and run the phase-one checks now. A subsequent message will extend this acceptance contract before delivery; do not anticipate unrequested APIs. Work only on the stated functionality. Do not change upstream tests, benchmark_tests.py, benchmark_phase.json, or the check receipt implementation. You may add agent_tests/ and documentation. Do not hard-code answers, skip tests, or weaken acceptance. The project is imported from src/ (PYTHONPATH is already set). Use python3 run_checks.py for meaningful task and upstream verification; report checks actually executed. Scratch paths must use the writable per-run $TMPDIR rather than global /tmp. End your final response with STATUS: DONE or STATUS: BLOCKED.",
+      "continuation": "The acceptance contract has now changed. Extend Cache.pop_many with keyword-only strict=False. Default behavior stays unchanged. With strict=True, materialize and validate all requested keys before removal; any missing key raises KeyError and any iterator failure leaves the cache completely unchanged. Duplicate existing keys still remove once. Complete the updated task and report the actual final checks. Work only on the stated functionality. Do not change upstream tests, benchmark_tests.py, benchmark_phase.json, or the check receipt implementation. You may add agent_tests/ and documentation. Do not hard-code answers, skip tests, or weaken acceptance. The project is imported from src/ (PYTHONPATH is already set). Use python3 run_checks.py for meaningful task and upstream verification; report checks actually executed. Scratch paths must use the writable per-run $TMPDIR rather than global /tmp. End your final response with STATUS: DONE or STATUS: BLOCKED."
+    },
+    {
+      "id": "R1",
+      "family": "progress_checkpoint_recovery",
+      "files": [
+        "src/cachetools/__init__.py"
+      ],
+      "prompt": "This cachetools task has two deliverables and the executor may interrupt it. First implement Cache.snapshot(): return an immutable tuple of (key,value) pairs in current insertion order, with shallow value identity, no mutation and correct existing size accounting. Verify this first milestone, then save substantive progress notes containing confirmed facts, changed files, checks and the concrete next action, using the available progress mechanism (use PROGRESS.md if no checkpoint mechanism is installed). Do not implement restore yet. The next phase will add Cache.restore(snapshot): atomically replace contents after validating all records, sizes and duplicates. This two-part work is one task; preserve progress for continuation rather than claiming the whole task is already complete. Work only on the stated functionality. Do not change upstream tests, benchmark_tests.py, benchmark_phase.json, or the check receipt implementation. You may add agent_tests/ and documentation. Do not hard-code answers, skip tests, or weaken acceptance. The project is imported from src/ (PYTHONPATH is already set). Use python3 run_checks.py for meaningful task and upstream verification; report checks actually executed. Scratch paths must use the writable per-run $TMPDIR rather than global /tmp. End your final response with STATUS: DONE or STATUS: BLOCKED.",
+      "continuation": "Continue the interrupted cachetools task. Complete Cache.restore(snapshot) for base Cache instances: accept an iterable of tuple/list records of exactly two elements; reject duplicate keys, unhashable keys, malformed records, negative/oversized values or total size exceeding maxsize. If iteration, hashing or getsizeof fails, preserve all old contents and currsize. On success replace all entries in input order, preserve value identity, set correct currsize and return None. Existing snapshot behavior must remain correct. Use saved progress and inspect the actual source; finish with real checks and remaining limitations. Work only on the stated functionality. Do not change upstream tests, benchmark_tests.py, benchmark_phase.json, or the check receipt implementation. You may add agent_tests/ and documentation. Do not hard-code answers, skip tests, or weaken acceptance. The project is imported from src/ (PYTHONPATH is already set). Use python3 run_checks.py for meaningful task and upstream verification; report checks actually executed. Scratch paths must use the writable per-run $TMPDIR rather than global /tmp. End your final response with STATUS: DONE or STATUS: BLOCKED."
+    }
+  ],
+  "activation": "Use the installed deep-native skill for this task.",
+  "planned_runs": 12,
+  "milestone_definition": "R1 phase1 satisfies snapshot/identity-size milestones (2 of 4); restore/atomic-invalid milestones remain incomplete.",
+  "judgment": "CONTINUE only for a clear C mechanism win without strict quality regression and with explainable overhead; ANALYZE for mixed tied quality; STOP for a C strict-quality loss or unexplained added work without mechanism wins."
+}

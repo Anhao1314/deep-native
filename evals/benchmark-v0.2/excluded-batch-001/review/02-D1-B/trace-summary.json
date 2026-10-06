@@ -1,0 +1,1071 @@
+{
+  "run_id": "02-D1-B",
+  "strict_pass": true,
+  "functional_pass": true,
+  "final_verified": false,
+  "tool_calls": 60,
+  "duration_seconds": 329.0960242500005,
+  "provider_tokens": {
+    "input_tokens": 54723,
+    "output_tokens": 35317,
+    "cache_read_input_tokens": 2659200,
+    "cache_creation_input_tokens": 0,
+    "total_tokens": 2749240
+  },
+  "files_changed": [
+    "agent_tests/test_independent_key_progress.py",
+    "src/cachetools/_cached.py",
+    "src/cachetools/_cachedmethod.py"
+  ],
+  "scope_violations": [],
+  "tool_distribution": {
+    "Skill": 1,
+    "Bash": 31,
+    "Read": 12,
+    "Grep": 3,
+    "Write": 2,
+    "Edit": 11
+  },
+  "runtime_calls": 7,
+  "repeated_exact_commands": {},
+  "assistant_text": [
+    {
+      "text": "I'll start by invoking the deep-native skill as instructed.",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:5"
+    },
+    {
+      "text": "Now let me reproduce the regression with the project's own check:",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:5855"
+    },
+    {
+      "text": "Reproduced: all 8 subtests of the task test fail; upstream suite passes. Now let me build discriminating evidence for the cause (operator hypothesis: LRU eviction or user function holding the cache lock):",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:7624"
+    },
+    {
+      "text": "Evidence is conclusive. The stall is not eviction (cache 0/128 or 1/128 entries) and not lock contention (lock acquirable while the computation runs); the caller is parked in `Condition.wait_for` on the decorator's **global** `pending` predicate. Now the fix — wait on the caller's own key only:",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:8205"
+    },
+    {
+      "text": "Fix verified. Now let me add regression protection in `agent_tests/`:",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:14109"
+    },
+    {
+      "text": "Now let me confirm the new tests genuinely discriminate — they must fail against the pre-fix source:",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:14900"
+    },
+    {
+      "text": "The regression tests fail pre-fix exactly where expected (independent-key progress + concurrency), while the same-key/exception tests still pass — good discrimination. Restoring the fix:",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:14968"
+    },
+    {
+      "text": "Let me extend coverage to the documented `lock` + `condition` combination and re-verify:",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:18032"
+    },
+    {
+      "text": "That experiment surfaced a *separate, pre-existing* limitation: with a real `threading.Condition` plus a distinct `lock`, the existing code notifies without holding the condition's lock (upstream tests only use mock lock/cond, so this is untested upstream). That's outside the stated scope — and \"fixing\" it would change lock-count behavior encoded in the frozen upstream tests. I'll keep my regression matrix on the documented condition-only path:",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:20099"
+    },
+    {
+      "text": "## Root cause (confirmed, not the operator's hypothesis)\n\nThe stall is in the `condition`-based wrappers' wait predicate, not eviction or the user function holding the lock.\n\nDiscriminating evidence (scratch script in `$TMPDIR/dn2-evidence/reproduce_regression.py`):\n- **Eviction refuted** — cache held 0–1 of 128 entries while the unrelated caller stalled; nothing to evict.\n- **\"User function holds the cache lock\" refuted** — the cache lock was acquirable within 1 ms while the held computation was running (the body is invoked outside the `with lock` block).\n- **Actual cause** — the blocked caller's stack was parked in `Condition.wait_for` on a *decorator-global* predicate: `lambda: not pending` (`src/cachetools/_cached.py:24,153`, `_cachedmethod.py:165,279`). One key being computed gated every other key, including already-cached ones, contradicting `docs/index.rst:335` (\"prevent concurrent execution … with *identical* parameters, or cache keys\").\n\n## Change\n\nFour one-line edits: the predicate now waits only for the caller's own key (`k not in pending` / `key not in self.__pending`), still under the lock, with `pending` cleanup and `notify_all()` unchanged:\n\n- `src/cachetools/_cached.py` — `_condition_info`, `_condition`\n- `src/cachetools/_cachedmethod.py` — `_condition_info` (descriptor path), `_condition` (incl. deprecated classmethod path)\n\nAdded `agent_tests/test_independent_key_progress.py` (4 tests / 16 subTest cases): independent-key progress for `cached`/`cachedmethod` × `info∈{False,True}` × cold/hot key, true concurrency of distinct keys (barrier), same-key stampede suppression with hit/miss accounting, and recovery of a same-key waiter after the holder raises. Pre-fix, this file fails on both progress tests while the suppression/exception tests pass; post-fix all pass. Frozen `benchmark_tests.py`, `benchmark_phase.json`, `run_checks.py`, `check_receipt.py` and upstream tests were not touched.\n\n## Checks actually executed\n\n| Command | Result |\n|---|---|\n| `python3 run_checks.py` (baseline, pre-fix) | task tests FAIL (8/8 subtests), upstream 338 pass |\n| `python3 run_checks.py` (final) | task tests OK, upstream 338 pass, agent_tests 4 pass, `upstream_exit=0`, `extra_exit=0`, source fingerprint stable |\n| `python3 -m pytest -q agent_tests` pre-fix (fix patch reverted, then re-applied) | 2 failed / 2 passed → tests discriminate |\n| `python3 -m pytest -q agent_tests` ×5 | 4 passed each run, stable |\n| deep-native `verify` (check `python3 run_checks.py`, timeout 300) | `status: passed`, exit 0, worktree hash before == after |\n\nEvidence: `.deep-native/attempts/f63ec0379f484792ab8aa72703139a64.json`; scratch reproduction under `$TMPDIR/dn2-evidence/` (not committed).\n\n## Remaining risk\n\n- Pre-existing, out-of-scope, unchanged: with a real `threading.Condition` **plus a distinct `lock=`**, `notify_all()` is called without holding the condition's lock (upstream tests only use mock lock/condition). Fixing it would alter lock-count behavior encoded in the frozen upstream tests, so I left it and noted it.\n- The suppression assertions use 0.3 s observation windows; they cannot false-fail a correct implementation, but an extremely slow machine could mask a broken one.\n\nSTATUS: DONE",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:22877"
+    }
+  ],
+  "tools": [
+    {
+      "type": "tool_use",
+      "id": "call_00_ET_girAeKrBx7lOfVq7WSxc9394",
+      "name": "Skill",
+      "input": {
+        "skill": "deep-native"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:6"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_VGUEwS3SNn73awkp517I7241",
+      "name": "Bash",
+      "input": {
+        "command": "ls -la /private/tmp/dn2-live-6h5xy_8e/workspace",
+        "description": "List workspace contents"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:112"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_01_FuRePRFx7gepZw53rpY30852",
+      "name": "Bash",
+      "input": {
+        "command": "git log --oneline -5 && git status",
+        "description": "Show git log and status"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:114"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_zYIkUH2PoIchAHnwjFPj8247",
+      "name": "Bash",
+      "input": {
+        "command": "find /private/tmp/dn2-live-6h5xy_8e/workspace/src /private/tmp/dn2-live-6h5xy_8e/workspace/tests -type f | head -50",
+        "description": "List source and test files"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:150"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_01_cm4mbn8f2hhXFUiaJdUx2485",
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/run_checks.py"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:152"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_02_7ZTiCvSvHCoL0k5bVCA19710",
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/benchmark_tests.py"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:154"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_03_Rs7JThaqKOA8ajeHUAa27051",
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/benchmark_phase.json"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:156"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_04_rEpQY2RinHyHxU81OtlR1351",
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/check_receipt.py"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:158"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_gtZowqDkjvKfpOYgfcLh6432",
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/_cached.py"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:192"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_01_4iR7Ii3IIREh7sTHjNhM8783",
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/_cachedmethod.py"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:194"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_vGrrJaoel7UQMNFN0dAk9408",
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/tests/test_cached.py"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:2917"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_01_8MehPjl8FzjNYfFhqyMV2848",
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/tests/test_cachedmethod.py"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:2918"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_41224R8rG9An7bDzhpXU6329",
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/tests/__init__.py"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:2956"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_01_hrspt6BbcxRs1ApxvSKE0794",
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/tests/test_threading.py"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:2958"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_EK8FW1roRhxl168hwTC99683",
+      "name": "Grep",
+      "input": {
+        "pattern": "condition|pending|concurren|stampede",
+        "path": "/private/tmp/dn2-live-6h5xy_8e/workspace/CHANGELOG.rst",
+        "output_mode": "content",
+        "-n": true,
+        "-i": true
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:3534"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_01_3xErrHc210f7zZlg70Sp8828",
+      "name": "Grep",
+      "input": {
+        "pattern": "condition",
+        "path": "/private/tmp/dn2-live-6h5xy_8e/workspace/docs",
+        "output_mode": "content",
+        "-n": true,
+        "-C": 4
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:3536"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_NKmtTnNgUf3y7OKSb0Gt4295",
+      "name": "Bash",
+      "input": {
+        "command": "python3 \"/private/tmp/dn2-live-6h5xy_8e/workspace/.claude/skills/deep-native/scripts/deep_native.py\" --project \"/private/tmp/dn2-live-6h5xy_8e/workspace\" doctor 2>&1 | head -40; echo \"---STATUS---\"; python3 \"/private/tmp/dn2-live-6h5xy_8e/workspace/.claude/skills/deep-native/scripts/deep_native.py\" --project \"/private/tmp/dn2-live-6h5xy_8e/workspace\" status 2>&1 | head -40",
+        "description": "Run deep-native doctor and status"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:4057"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_01_6KEV3vDOraINxCNqMnd18047",
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/docs/index.rst",
+        "offset": 299,
+        "limit": 70
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:4059"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_4UOxL2D9Fl9aTCMzMHWo5356",
+      "name": "Bash",
+      "input": {
+        "command": "git log --all --oneline | head -20; echo \"--- branches ---\"; git branch -a; echo \"--- PYTHONPATH ---\"; echo \"$PYTHONPATH\"; python3 -c \"import sys; print(sys.version); print(sys.path)\"; echo \"--- pip show ---\"; python3 -m pip show cachetools 2>&1 | head -10",
+        "description": "Check git refs, python path, and installed cachetools"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:4501"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_01_jCVNwutiQIxGWXKTnQca6221",
+      "name": "Bash",
+      "input": {
+        "command": "ls -la /private/tmp/dn2-live-6h5xy_8e/workspace/.deep-native 2>/dev/null; find /private/tmp/dn2-live-6h5xy_8e/workspace/.deep-native -type f | head; echo \"--- tmpdir ---\"; echo \"TMPDIR=$TMPDIR\"",
+        "description": "Inspect deep-native state directory and TMPDIR"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:4503"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_MZxLehmaGqRL9qqKIYqX9125",
+      "name": "Bash",
+      "input": {
+        "command": "head -60 /private/tmp/dn2-live-6h5xy_8e/workspace/CHANGELOG.rst",
+        "description": "Read top of changelog"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:5684"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_01_5VWoOwAnEZdibZBUjPuu9323",
+      "name": "Grep",
+      "input": {
+        "pattern": "wait_for|pending",
+        "path": "/private/tmp/dn2-live-6h5xy_8e/workspace/src",
+        "output_mode": "content",
+        "-n": true
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:5686"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_vGjXYXFMF9sRjHvuC56d5807",
+      "name": "Bash",
+      "input": {
+        "command": "timeout 300 python3 run_checks.py 2>&1 | tail -30",
+        "description": "Run baseline project checks",
+        "timeout": 320000
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:5856"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_ET_aE3K1s6QlbpFm8pkpQad3943",
+      "name": "Bash",
+      "input": {
+        "command": "python3 run_checks.py 2>&1 | tail -30",
+        "description": "Run baseline project checks",
+        "timeout": 320000
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:5859"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_EWZOQzs2NMlIqXexiAL46755",
+      "name": "Bash",
+      "input": {
+        "command": "mkdir -p \"$TMPDIR/dn2-evidence\" && echo \"$TMPDIR/dn2-evidence\"",
+        "description": "Create scratch evidence dir under per-run TMPDIR"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:7625"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_ET_HlxCMkzYtzFEQtrU1kNK6929",
+      "name": "Write",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/tmp/dn2-evidence/reproduce_regression.py",
+        "content": "\"\"\"Discriminating reproduction for the \"held computation stalls other keys\" regression.\n\nHypotheses under test (operator's, unconfirmed):\n  H1: LRU eviction causes the stall.\n  H2: the user function holds the cache lock, so the lock is unavailable.\n\nDiscriminating observations gathered below:\n  * cache never evicts (LRUCache(128), 2 keys, no size pressure), yet the stall\n    happens -> H1 refuted.\n  * while the held computation is running, an independent caller can acquire\n    the cache lock/condition lock within milliseconds -> H2 refuted.\n  * the stalled caller's stack is parked inside Condition.wait_for in the\n    decorator's wrapper, on the predicate `not pending` (shared across keys).\n\nRun:  python3 reproduce_regression.py\n\"\"\"\n\nimport sys\nimport threading\nimport time\nimport traceback\n\nsys.path.insert(0, \"/private/tmp/dn2-live-6h5xy_8e/workspace/src\")\n\nfrom cachetools import LRUCache, cached, cachedmethod\n\n\ndef describe(label, value):\n    print(f\"{label}: {value}\")\n\n\ndef run(func_factory, hot_key, hot_cache=None):\n    \"\"\"Return (lock_acquired_while_held, call_returned, stack_text, cache_len).\"\"\"\n    entered = threading.Event()\n    release = threading.Event()\n    returned = threading.Event()\n    errors = []\n\n    def body(key):\n        if key == \"held\":\n            entered.set()\n            release.wait(5)\n        return key\n\n    f, cache, cond = func_factory(body)\n\n    if hot_cache is not None:\n        f(hot_key)  # pre-populate the unrelated key\n\n    result = {}\n\n    def call_other():\n        try:\n            f(hot_key)\n            returned.set()\n        except Exception as exc:  # pragma: no cover - diagnostic\n            errors.append(repr(exc))\n\n    holder = threading.Thread(target=body_target, args=(f,), daemon=True)\n    caller = threading.Thread(target=call_other, daemon=True)\n\n    holder.start()\n    assert entered.wait(2), \"held computation never entered\"\n    caller.start()\n    time.sleep(0.3)\n\n    # H2 probe: is the cache lock available while the computation is held?\n    acquired = cond.acquire(timeout=1.0)\n    if acquired:\n        cond.release()\n    result[\"lock_acquired_while_held\"] = acquired\n\n    result[\"other_call_returned_within_300ms\"] = returned.wait(0.3)\n\n    # Capture where the stalled caller is parked.\n    frames = sys._current_frames()\n    stack = []\n    for tid, frame in frames.items():\n        if tid == caller.ident:\n            stack = traceback.format_stack(frame)\n    result[\"caller_stack\"] = \"\".join(stack)\n    result[\"cache_len\"] = len(cache)\n    result[\"cache_maxsize\"] = getattr(cache, \"maxsize\", None)\n    result[\"errors\"] = errors\n\n    release.set()\n    holder.join(5)\n    caller.join(5)\n    result[\"holder_alive\"] = holder.is_alive()\n    result[\"caller_alive\"] = caller.is_alive()\n    return result\n\n\ndef body_target(f):\n    try:\n        f(\"held\")\n    except Exception as exc:  # pragma: no cover - diagnostic\n        print(\"holder error:\", exc)\n\n\ndef cached_case(body):\n    cache = LRUCache(128)\n    cond = threading.Condition()\n    return cached(cache, condition=cond)(body), cache, cond\n\n\ndef cachedmethod_case(body):\n    cache = LRUCache(128)\n    cond = threading.Condition()\n\n    class Owner:\n        def __init__(self):\n            self.cache = cache\n            self.cond = cond\n\n        @cachedmethod(\n            lambda self: self.cache,\n            condition=lambda self: self.cond,\n            info=False,\n        )\n        def run(self, key):\n            return body(key)\n\n    owner = Owner()\n    return owner.run, cache, cond\n\n\ndef main():\n    failures = []\n    for name, factory in [(\"cached\", cached_case), (\"cachedmethod\", cachedmethod_case)]:\n        for hot, hot_cache in [(\"miss\", None), (\"hit\", \"other\")]:\n            label = f\"{name}/{hot}\"\n            r = run(factory, \"other\", hot_cache=hot_cache)\n            print(f\"--- {label} ---\")\n            describe(\"  lock acquired while computation held\", r[\"lock_acquired_while_held\"])\n            describe(\"  unrelated call returned while held\", r[\"other_call_returned_within_300ms\"])\n            describe(\"  cache len/maxsize\", f\"{r['cache_len']}/{r['cache_maxsize']}\")\n            print(\"  stalled caller stack (top frame = where it blocks):\")\n            for line in r[\"caller_stack\"].splitlines()[-6:]:\n                print(\"   \", line.strip())\n            if r[\"errors\"]:\n                print(\"  errors:\", r[\"errors\"])\n            if not r[\"lock_acquired_while_held\"] or not r[\"other_call_returned_within_300ms\"]:\n                failures.append(label)\n\n    print()\n    if failures:\n        print(\"REGRESSION PRESENT in:\", \", \".join(failures))\n        print(\"=> stall is not lock contention (lock was acquirable) and not eviction\")\n        print(\"=> independent-key progress is broken in the decorator wait predicate\")\n        return 1\n    print(\"INDEPENDENT PROGRESS OK for all cases\")\n    return 0\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main())\n"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:7628"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_ET_NckTEqZz1rf2ZpeiOl8v9768",
+      "name": "Bash",
+      "input": {
+        "command": "cd \"$TMPDIR/dn2-evidence\" && python3 reproduce_regression.py 2>&1 | tail -60",
+        "description": "Run discriminating reproduction (pre-fix)",
+        "timeout": 120000
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:7631"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_nIeS0BByMst0Zm2MDgDg3854",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/_cached.py",
+        "old_string": "    def wrapper(*args, **kwargs):\n        nonlocal hits, misses\n        k = key(*args, **kwargs)\n        with lock:\n            cond.wait_for(lambda: not pending)",
+        "new_string": "    def wrapper(*args, **kwargs):\n        nonlocal hits, misses\n        k = key(*args, **kwargs)\n        with lock:\n            cond.wait_for(lambda: k not in pending)"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:8206"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_01_0s9fbK5ZwJrh7PbHmaGm4329",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/_cached.py",
+        "old_string": "    def wrapper(*args, **kwargs):\n        k = key(*args, **kwargs)\n        with lock:\n            cond.wait_for(lambda: not pending)",
+        "new_string": "    def wrapper(*args, **kwargs):\n        k = key(*args, **kwargs)\n        with lock:\n            cond.wait_for(lambda: k not in pending)"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:8208"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_ET_bHxzD8L41ymtWSRmxyHJ9580",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/_cachedmethod.py",
+        "old_string": "                    cond.wait_for(lambda: not self.__pending)",
+        "new_string": "                    cond.wait_for(lambda: key not in self.__pending)"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:8211"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_01_ET_RnFpA47Dcn0xUDnE9Sfs8780",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/_cachedmethod.py",
+        "old_string": "        with lock(self):\n            cond(self).wait_for(lambda: not pending)",
+        "new_string": "        with lock(self):\n            cond(self).wait_for(lambda: k not in pending)"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:8213"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_dLBuVkRSnST1G3JMrd4m5950",
+      "name": "Bash",
+      "input": {
+        "command": "cd \"$TMPDIR/dn2-evidence\" && python3 reproduce_regression.py 2>&1 | tail -12",
+        "description": "Re-run discriminating reproduction (post-fix)",
+        "timeout": 120000
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:8240"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_kUMgpUbC3htl5zB7kwGN5908",
+      "name": "Bash",
+      "input": {
+        "command": "python3 run_checks.py 2>&1 | tail -12",
+        "description": "Run project checks after fix",
+        "timeout": 320000
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:8277"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_ie1uDwcGUwVi12kuWMKx3372",
+      "name": "Write",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/agent_tests/test_independent_key_progress.py",
+        "content": "\"\"\"Regression tests for independent-key progress with condition-based caching.\n\nThe ``condition`` argument of ``@cached``/``@cachedmethod`` suppresses\nconcurrent execution of the wrapped function or method with *identical*\nparameters, i.e. cache keys (see docs/index.rst).  A regression made the\nwrappers wait for *any* pending computation (``wait_for(lambda: not pending)``),\nwhich serialized unrelated keys and even stalled callers of already cached\nvalues.\n\nThese tests pin the documented behavior for both decorators, with ``info``\nenabled and disabled, without weakening the same-key stampede suppression,\nhit/miss accounting, or exception cleanup.\n\"\"\"\n\nimport threading\nimport time\nimport unittest\n\nfrom cachetools import LRUCache, cached, cachedmethod\n\n\ndef make_cached(body, info, cond, cache=None):\n    if cache is None:\n        cache = LRUCache(128)\n    return cached(cache, condition=cond, info=info)(body), cache\n\n\ndef make_cachedmethod(body, info, cond, cache=None):\n    if cache is None:\n        cache = LRUCache(128)\n\n    class Owner:\n        def __init__(self):\n            self.cache = cache\n            self.cond = cond\n\n        @cachedmethod(\n            lambda self: self.cache,\n            condition=lambda self: self.cond,\n            info=info,\n        )\n        def run(self, key):\n            return body(key)\n\n    return Owner().run, cache\n\n\nclass IndependentKeyProgressTest(unittest.TestCase):\n    \"\"\"A held computation must not stall callers for a different key.\"\"\"\n\n    DECORATORS = (make_cached, make_cachedmethod)\n\n    TIMEOUT = 5\n\n    def exercise(self, factory, info, hot):\n        entered = threading.Event()\n        release = threading.Event()\n        cond = threading.Condition()\n        calls = []\n        errors = []\n        results = {}\n\n        def body(key):\n            calls.append(key)\n            if key == \"held\":\n                entered.set()\n                release.wait(self.TIMEOUT)\n            return key\n\n        f, cache = factory(body, info, cond)\n        if hot:\n            self.assertEqual(f(\"other\"), \"other\")\n            calls.clear()\n\n        def call(key, done):\n            try:\n                results[key] = f(key)\n            except BaseException as exc:  # pragma: no cover - failure path\n                errors.append(repr(exc))\n            finally:\n                done.set()\n\n        first_done = threading.Event()\n        second_done = threading.Event()\n        first = threading.Thread(target=call, args=(\"held\", first_done), daemon=True)\n        second = threading.Thread(target=call, args=(\"other\", second_done), daemon=True)\n        try:\n            first.start()\n            self.assertTrue(entered.wait(self.TIMEOUT), \"held call did not run\")\n            second.start()\n            # An unrelated key must make progress while \"held\" is still pending.\n            self.assertTrue(\n                second_done.wait(self.TIMEOUT),\n                \"caller of a different key stalled behind a held computation\",\n            )\n            self.assertTrue(\n                first.is_alive(),\n                \"held computation finished, test did not exercise concurrency\",\n            )\n            if hot:\n                self.assertEqual(\n                    calls, [\"held\"], \"cached value was recomputed instead of returned\"\n                )\n        finally:\n            release.set()\n            first.join(self.TIMEOUT)\n            second.join(self.TIMEOUT)\n\n        self.assertFalse(first.is_alive() or second.is_alive())\n        self.assertFalse(errors, errors)\n        self.assertEqual(results, {\"held\": \"held\", \"other\": \"other\"})\n        self.assertEqual(calls.count(\"held\"), 1)\n        if hot:\n            self.assertEqual(calls.count(\"other\"), 0)\n        self.assertEqual(len(cache), 2 if not hot else 2)\n        if info:\n            stats = f.cache_info()\n            self.assertEqual(stats.misses, 1 if hot else 2)\n            self.assertEqual(stats.hits, 1 if hot else 0)\n\n    def test_independent_key_progress(self):\n        for factory in self.DECORATORS:\n            for info in (False, True):\n                for hot in (False, True):\n                    with self.subTest(\n                        decorator=factory.__name__, info=info, hot=hot\n                    ):\n                        self.exercise(factory, info, hot)\n\n    def test_distinct_keys_compute_concurrently(self):\n        # If unrelated keys were serialized, the two bodies could never\n        # reach the barrier at the same time.\n        for factory in self.DECORATORS:\n            for info in (False, True):\n                with self.subTest(decorator=factory.__name__, info=info):\n                    barrier = threading.Barrier(2, timeout=self.TIMEOUT)\n                    errors = []\n\n                    def body(key):\n                        if key in (\"left\", \"right\"):\n                            barrier.wait()\n                        return key\n\n                    f, _ = factory(body, info, threading.Condition())\n\n                    def call(key):\n                        try:\n                            f(key)\n                        except BaseException as exc:\n                            errors.append(repr(exc))\n\n                    threads = [\n                        threading.Thread(target=call, args=(key,), daemon=True)\n                        for key in (\"left\", \"right\")\n                    ]\n                    for thread in threads:\n                        thread.start()\n                    for thread in threads:\n                        thread.join(self.TIMEOUT)\n                    self.assertFalse(\n                        any(thread.is_alive() for thread in threads),\n                        \"distinct keys were serialized\",\n                    )\n                    self.assertFalse(errors, errors)\n\n    def test_same_key_stampede_suppressed(self):\n        for factory in self.DECORATORS:\n            for info in (False, True):\n                with self.subTest(decorator=factory.__name__, info=info):\n                    entered = threading.Event()\n                    release = threading.Event()\n                    calls = []\n                    errors = []\n\n                    def body(key):\n                        calls.append(key)\n                        entered.set()\n                        release.wait(self.TIMEOUT)\n                        return key\n\n                    f, _ = factory(body, info, threading.Condition())\n\n                    def call():\n                        try:\n                            f(7)\n                        except BaseException as exc:  # pragma: no cover\n                            errors.append(repr(exc))\n\n                    holder = threading.Thread(target=call, daemon=True)\n                    waiters = [\n                        threading.Thread(target=call, daemon=True) for _ in range(3)\n                    ]\n                    try:\n                        holder.start()\n                        self.assertTrue(entered.wait(self.TIMEOUT))\n                        for waiter in waiters:\n                            waiter.start()\n                        time.sleep(0.3)\n                        self.assertEqual(\n                            calls, [7], \"concurrent identical calls were not suppressed\"\n                        )\n                    finally:\n                        release.set()\n                        for thread in [holder, *waiters]:\n                            thread.join(self.TIMEOUT)\n\n                    self.assertFalse(errors, errors)\n                    self.assertEqual(calls, [7])\n                    self.assertTrue(\n                        all(not thread.is_alive() for thread in [holder, *waiters])\n                    )\n                    if info:\n                        stats = f.cache_info()\n                        self.assertEqual(stats.misses, 1)\n                        self.assertEqual(stats.hits, 3)\n\n    def test_same_key_waiter_recovers_from_failure(self):\n        # A failed computation must release waiters and clean up pending\n        # state so an identical call can retry instead of deadlocking.\n        for factory in self.DECORATORS:\n            for info in (False, True):\n                with self.subTest(decorator=factory.__name__, info=info):\n                    entered = threading.Event()\n                    release = threading.Event()\n                    attempts = []\n                    errors = []\n                    results = []\n\n                    def body(key):\n                        attempts.append(key)\n                        if len(attempts) == 1:\n                            entered.set()\n                            release.wait(self.TIMEOUT)\n                            raise ValueError(\"original failure\")\n                        return key\n\n                    f, _ = factory(body, info, threading.Condition())\n\n                    def call():\n                        try:\n                            results.append(f(3))\n                        except BaseException as exc:\n                            errors.append(repr(exc))\n\n                    holder = threading.Thread(target=call, daemon=True)\n                    waiter = threading.Thread(target=call, daemon=True)\n                    try:\n                        holder.start()\n                        self.assertTrue(entered.wait(self.TIMEOUT))\n                        waiter.start()\n                        time.sleep(0.3)\n                        self.assertEqual(\n                            attempts, [3], \"waiter ran the body while pending\"\n                        )\n                    finally:\n                        release.set()\n                        holder.join(self.TIMEOUT)\n                        waiter.join(self.TIMEOUT)\n\n                    self.assertFalse(holder.is_alive() or waiter.is_alive())\n                    self.assertEqual(len(errors), 1, errors)\n                    self.assertIn(\"ValueError\", errors[0])\n                    self.assertEqual(results, [3])\n                    self.assertEqual(attempts, [3, 3])\n                    # pending state was cleaned up: the retried value is cached\n                    self.assertEqual(f(3), 3)\n                    self.assertEqual(attempts, [3, 3])\n\n\nif __name__ == \"__main__\":\n    unittest.main()\n"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:14110"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_wjdyvLcsnwAIhFNt0mN35731",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/agent_tests/test_independent_key_progress.py",
+        "old_string": "        self.assertEqual(len(cache), 2 if not hot else 2)\n        if info:\n            stats = f.cache_info()\n            self.assertEqual(stats.misses, 1 if hot else 2)\n            self.assertEqual(stats.hits, 1 if hot else 0)",
+        "new_string": "        self.assertEqual(len(cache), 2)\n        if info:\n            stats = f.cache_info()\n            self.assertEqual(stats.misses, 2)\n            self.assertEqual(stats.hits, 1 if hot else 0)"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:14759"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_xhTmbj9gtsT3C3OVfeyJ6756",
+      "name": "Bash",
+      "input": {
+        "command": "python3 -m pytest -q agent_tests 2>&1 | tail -15",
+        "description": "Run new agent regression tests (post-fix)",
+        "timeout": 300000
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:14869"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_JnXqHRWZsCCvKUPd4unn2853",
+      "name": "Bash",
+      "input": {
+        "command": "git diff src/cachetools > \"$TMPDIR/dn2-evidence/fix.patch\" && wc -l \"$TMPDIR/dn2-evidence/fix.patch\" && git checkout -- src/cachetools && echo \"--- reverted; running agent tests against pre-fix source ---\" && python3 -m pytest -q agent_tests 2>&1 | tail -12",
+        "description": "Revert fix temporarily and run agent tests",
+        "timeout": 300000
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:14901"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_wAdxzsFbwMxixgkZUSUl1042",
+      "name": "Bash",
+      "input": {
+        "command": "git apply \"$TMPDIR/dn2-evidence/fix.patch\" && git diff --stat && echo \"--- verify fix lines ---\" && grep -n \"wait_for\" src/cachetools/_cached.py src/cachetools/_cachedmethod.py",
+        "description": "Re-apply fix patch and show diffstat"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:14969"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_3DY1KkjWxkeIIv5fadbb5279",
+      "name": "Bash",
+      "input": {
+        "command": "python3 \"/private/tmp/dn2-live-6h5xy_8e/workspace/.claude/skills/deep-native/scripts/deep_native.py\" --project \"/private/tmp/dn2-live-6h5xy_8e/workspace\" configure --name checks -- python3 run_checks.py 2>&1 | tail -20",
+        "description": "Configure project check with deep-native"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:15247"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_ET_1v08nm0ZcdvR6AEQ5vMA2723",
+      "name": "Bash",
+      "input": {
+        "command": "python3 \"/private/tmp/dn2-live-6h5xy_8e/workspace/.claude/skills/deep-native/scripts/deep_native.py\" --project \"/private/tmp/dn2-live-6h5xy_8e/workspace\" begin --session \"27c6b2c6-f7b9-4646-91b6-62847b61bca4\" --goal \"Restore independent-key progress for cachetools cached/cachedmethod with condition set (info on and off) while preserving same-key stampede suppression, hit/miss accounting, exception cleanup and public behavior; python3 run_checks.py must pass (task tests + upstream + agent_tests).\" 2>&1 | tail -20",
+        "description": "Begin deep-native task session"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:15250"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_MmCrmg1rM8vq5aDA2bHo4235",
+      "name": "Bash",
+      "input": {
+        "command": "python3 \"/private/tmp/dn2-live-6h5xy_8e/workspace/.claude/skills/deep-native/scripts/deep_native.py\" --project \"/private/tmp/dn2-live-6h5xy_8e/workspace\" checkpoint --note \"Reproduced D1: all 8 subtests of benchmark_tests.test_independent_keys_and_cached_hits fail; upstream 338 pass. Discriminating evidence (TMPDIR scratch): lock is acquirable while held call runs and cache has no eviction pressure (0-1/128), yet the unrelated caller is parked in Condition.wait_for on the global predicate 'not pending' at src/cachetools/_cached.py:24,153 and _cachedmethod.py:165,279. Fixed predicate to wait only for the caller's own key. Added agent_tests/test_independent_key_progress.py (4 tests) which fails on pre-fix source (independent-key + concurrency tests) and passes after.\" --next \"Run deep-native verify (python3 run_checks.py) on the frozen worktree, then review diff and finish.\" 2>&1 | tail -20",
+        "description": "Checkpoint milestone in deep-native"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:15372"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_ET_drURiOEnB8Dy5ha5mm075347",
+      "name": "Bash",
+      "input": {
+        "command": "python3 \"/private/tmp/dn2-live-6h5xy_8e/workspace/.claude/skills/deep-native/scripts/deep_native.py\" --project \"/private/tmp/dn2-live-6h5xy_8e/workspace\" verify --timeout 300 2>&1 | tail -30",
+        "description": "Run deep-native verification",
+        "timeout": 400000
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:15375"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_Cr6cDz9Xa98VS3PlmbTP9977",
+      "name": "Bash",
+      "input": {
+        "command": "python3 run_checks.py 2>&1 | tail -6",
+        "description": "Re-run project checks to capture receipt including agent tests",
+        "timeout": 320000
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:15697"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_3VDEa4J6D6M0HxHDLcrY4426",
+      "name": "Bash",
+      "input": {
+        "command": "git diff; echo \"=== untracked ===\"; git status --short; echo \"=== deep-native attempts ===\"; find .deep-native -type f | head -20",
+        "description": "Review full diff and evidence artifacts"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:16936"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_0eos7Dddxqss75PlF4xF4176",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/agent_tests/test_independent_key_progress.py",
+        "old_string": "def make_cached(body, info, cond, cache=None):\n    if cache is None:\n        cache = LRUCache(128)\n    return cached(cache, condition=cond, info=info)(body), cache\n\n\ndef make_cachedmethod(body, info, cond, cache=None):\n    if cache is None:\n        cache = LRUCache(128)\n\n    class Owner:\n        def __init__(self):\n            self.cache = cache\n            self.cond = cond\n\n        @cachedmethod(\n            lambda self: self.cache,\n            condition=lambda self: self.cond,\n            info=info,\n        )\n        def run(self, key):\n            return body(key)\n\n    return Owner().run, cache",
+        "new_string": "def make_cached(body, info, cond, lock=None, cache=None):\n    if cache is None:\n        cache = LRUCache(128)\n    return (\n        cached(cache, lock=lock, condition=cond, info=info)(body),\n        cache,\n    )\n\n\ndef make_cachedmethod(body, info, cond, lock=None, cache=None):\n    if cache is None:\n        cache = LRUCache(128)\n\n    class Owner:\n        def __init__(self):\n            self.cache = cache\n            self.cond = cond\n            self.lock = lock\n\n        @cachedmethod(\n            lambda self: self.cache,\n            lock=None if lock is None else (lambda self: self.lock),\n            condition=lambda self: self.cond,\n            info=info,\n        )\n        def run(self, key):\n            return body(key)\n\n    return Owner().run, cache"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:18033"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_ET_lsYSndgqsXyB70qiaQnV4215",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/agent_tests/test_independent_key_progress.py",
+        "old_string": "    def exercise(self, factory, info, hot):\n        entered = threading.Event()\n        release = threading.Event()\n        cond = threading.Condition()\n        calls = []\n        errors = []\n        results = {}\n\n        def body(key):\n            calls.append(key)\n            if key == \"held\":\n                entered.set()\n                release.wait(self.TIMEOUT)\n            return key\n\n        f, cache = factory(body, info, cond)",
+        "new_string": "    def exercise(self, factory, info, hot, use_lock):\n        entered = threading.Event()\n        release = threading.Event()\n        cond = threading.Condition()\n        lock = threading.Lock() if use_lock else None\n        calls = []\n        errors = []\n        results = {}\n\n        def body(key):\n            calls.append(key)\n            if key == \"held\":\n                entered.set()\n                release.wait(self.TIMEOUT)\n            return key\n\n        f, cache = factory(body, info, cond, lock=lock)"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:18036"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_ET_kMWsBphWatODV0K9o0mM8638",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/agent_tests/test_independent_key_progress.py",
+        "old_string": "    def test_independent_key_progress(self):\n        for factory in self.DECORATORS:\n            for info in (False, True):\n                for hot in (False, True):\n                    with self.subTest(\n                        decorator=factory.__name__, info=info, hot=hot\n                    ):\n                        self.exercise(factory, info, hot)",
+        "new_string": "    def test_independent_key_progress(self):\n        for factory in self.DECORATORS:\n            for info in (False, True):\n                for hot in (False, True):\n                    for use_lock in (False, True):\n                        with self.subTest(\n                            decorator=factory.__name__,\n                            info=info,\n                            hot=hot,\n                            lock=use_lock,\n                        ):\n                            self.exercise(factory, info, hot, use_lock)"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:18039"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_uHGnI17KGFgdfo1MdUcx8140",
+      "name": "Bash",
+      "input": {
+        "command": "python3 -m pytest -q agent_tests 2>&1 | tail -8",
+        "description": "Run extended agent regression tests",
+        "timeout": 300000
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:18222"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_1xYslgbI2BBMSlpoA8pw6186",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/agent_tests/test_independent_key_progress.py",
+        "old_string": "def make_cached(body, info, cond, lock=None, cache=None):\n    if cache is None:\n        cache = LRUCache(128)\n    return (\n        cached(cache, lock=lock, condition=cond, info=info)(body),\n        cache,\n    )\n\n\ndef make_cachedmethod(body, info, cond, lock=None, cache=None):\n    if cache is None:\n        cache = LRUCache(128)\n\n    class Owner:\n        def __init__(self):\n            self.cache = cache\n            self.cond = cond\n            self.lock = lock\n\n        @cachedmethod(\n            lambda self: self.cache,\n            lock=None if lock is None else (lambda self: self.lock),\n            condition=lambda self: self.cond,\n            info=info,\n        )\n        def run(self, key):\n            return body(key)\n\n    return Owner().run, cache",
+        "new_string": "def make_cached(body, info, cond, cache=None):\n    if cache is None:\n        cache = LRUCache(128)\n    return cached(cache, condition=cond, info=info)(body), cache\n\n\ndef make_cachedmethod(body, info, cond, cache=None):\n    if cache is None:\n        cache = LRUCache(128)\n\n    class Owner:\n        def __init__(self):\n            self.cache = cache\n            self.cond = cond\n\n        @cachedmethod(\n            lambda self: self.cache,\n            condition=lambda self: self.cond,\n            info=info,\n        )\n        def run(self, key):\n            return body(key)\n\n    return Owner().run, cache"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:20100"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_ET_1ca1ZM2fIDDEFVlZ2lgW3101",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/agent_tests/test_independent_key_progress.py",
+        "old_string": "    def exercise(self, factory, info, hot, use_lock):\n        entered = threading.Event()\n        release = threading.Event()\n        cond = threading.Condition()\n        lock = threading.Lock() if use_lock else None\n        calls = []\n        errors = []\n        results = {}\n\n        def body(key):\n            calls.append(key)\n            if key == \"held\":\n                entered.set()\n                release.wait(self.TIMEOUT)\n            return key\n\n        f, cache = factory(body, info, cond, lock=lock)",
+        "new_string": "    def exercise(self, factory, info, hot):\n        entered = threading.Event()\n        release = threading.Event()\n        cond = threading.Condition()\n        calls = []\n        errors = []\n        results = {}\n\n        def body(key):\n            calls.append(key)\n            if key == \"held\":\n                entered.set()\n                release.wait(self.TIMEOUT)\n            return key\n\n        f, cache = factory(body, info, cond)"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:20103"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_ET_8I4qkpzOPLEbFHQIZkY55338",
+      "name": "Edit",
+      "input": {
+        "replace_all": false,
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/agent_tests/test_independent_key_progress.py",
+        "old_string": "    def test_independent_key_progress(self):\n        for factory in self.DECORATORS:\n            for info in (False, True):\n                for hot in (False, True):\n                    for use_lock in (False, True):\n                        with self.subTest(\n                            decorator=factory.__name__,\n                            info=info,\n                            hot=hot,\n                            lock=use_lock,\n                        ):\n                            self.exercise(factory, info, hot, use_lock)",
+        "new_string": "    def test_independent_key_progress(self):\n        for factory in self.DECORATORS:\n            for info in (False, True):\n                for hot in (False, True):\n                    with self.subTest(\n                        decorator=factory.__name__, info=info, hot=hot\n                    ):\n                        self.exercise(factory, info, hot)"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:20106"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_ET_Sh8rAx9KeDjNhu9vudP71410",
+      "name": "Bash",
+      "input": {
+        "command": "python3 -m pytest -q agent_tests 2>&1 | tail -6",
+        "description": "Re-run agent tests after reverting lock experiment",
+        "timeout": 300000
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:20109"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_s3N5ifDziy99FJJxgdRU3684",
+      "name": "Read",
+      "input": {
+        "file_path": "/private/tmp/dn2-live-6h5xy_8e/workspace/agent_tests/test_independent_key_progress.py"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:20170"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_cnYtKZj1mo1mAQnFgoJF9085",
+      "name": "Bash",
+      "input": {
+        "command": "python3 -m ruff --version 2>&1 | head -2; grep -n -A15 \"ruff\" pyproject.toml | head -40",
+        "description": "Check ruff availability and config"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:20924"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_QSnkyFM6HX6SQuOWO0Q76424",
+      "name": "Bash",
+      "input": {
+        "command": "python3 - <<'PY'\nfrom pathlib import Path\nfor p in [Path(\"agent_tests/test_independent_key_progress.py\"), Path(\"src/cachetools/_cached.py\"), Path(\"src/cachetools/_cachedmethod.py\")]:\n    for i, line in enumerate(p.read_text().splitlines(), 1):\n        if len(line) > 88:\n            print(f\"{p}:{i}: {len(line)} chars: {line[:100]}\")\nPY",
+        "description": "Check line lengths against ruff default"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:20980"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_o7zQUpTOFHiR8kH71Q7D5799",
+      "name": "Bash",
+      "input": {
+        "command": "for i in 1 2 3 4 5; do python3 -m pytest -q agent_tests 2>&1 | tail -1; done",
+        "description": "Repeat agent tests five times for flakiness",
+        "timeout": 300000
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:21672"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_JIHJNF3U6R3OdjoUGBh63197",
+      "name": "Bash",
+      "input": {
+        "command": "python3 run_checks.py 2>&1 | tail -8",
+        "description": "Final manual run of project checks",
+        "timeout": 320000
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:22110"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_ET_Z1uIZDFUsxbjcufFzPul3729",
+      "name": "Bash",
+      "input": {
+        "command": "python3 \"/private/tmp/dn2-live-6h5xy_8e/workspace/.claude/skills/deep-native/scripts/deep_native.py\" --project \"/private/tmp/dn2-live-6h5xy_8e/workspace\" verify --timeout 300 2>&1 | tail -20",
+        "description": "Final deep-native verification",
+        "timeout": 400000
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:22115"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_gr5tvjivY2SBZjNVbNLi6776",
+      "name": "Bash",
+      "input": {
+        "command": "git status --short; echo \"--- .gitignore ---\"; cat .gitignore; echo \"--- agent_tests contents ---\"; find agent_tests -type f; echo \"--- .experiment ---\"; ls -a .experiment 2>/dev/null",
+        "description": "Inspect repo working tree state and artifacts"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:22511"
+    },
+    {
+      "type": "tool_use",
+      "id": "call_00_1cvyAd3AvoXW807ttRt74709",
+      "name": "Bash",
+      "input": {
+        "command": "python3 \"/private/tmp/dn2-live-6h5xy_8e/workspace/.claude/skills/deep-native/scripts/deep_native.py\" --project \"/private/tmp/dn2-live-6h5xy_8e/workspace\" finish --summary \"Restored independent-key progress for condition-based caching: the wait predicate in src/cachetools/_cached.py (_condition_info/_condition) and src/cachetools/_cachedmethod.py (_condition_info/_condition) now waits only for the caller's own cache key (k not in pending) instead of any pending computation. Added agent_tests/test_independent_key_progress.py (4 tests, 16 subTest cases) covering decorator x info x hot-key progress, distinct-key concurrency, same-key stampede suppression with hit/miss accounting, and same-key recovery after a failed computation.\" --risk \"Pre-existing, out-of-scope limitation confirmed but not changed: with a real threading.Condition plus a distinct lock= object, notify_all() is called without holding the condition's lock (upstream tests only use mock lock/condition). Regression tests use short (0.3s) observation windows for suppression, which is directional: they cannot false-fail on a correct implementation, but an extremely slow machine could miss a broken one.\" 2>&1 | tail -20",
+        "description": "Finish deep-native task with summary and risk"
+      },
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:22776"
+    }
+  ],
+  "failed_tools": [],
+  "results": [
+    {
+      "tool": "call_00_ET_girAeKrBx7lOfVq7WSxc9394",
+      "error": false,
+      "content": "Launching skill: deep-native",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:7"
+    },
+    {
+      "tool": "call_00_VGUEwS3SNn73awkp517I7241",
+      "error": false,
+      "content": "total 128\ndrwxr-xr-x@ 21 yimingyang  wheel    672 Oct  6 15:16 .\ndrwx------@  7 yimingyang  wheel    224 Oct  6 15:16 ..\ndrwxr-xr-x@  4 yimingyang  wheel    128 Oct  6 15:16 .claude\ndrwxr-xr-x@  3 yimingyang  wheel     96 Oct  6 15:16 .deep-native\ndrwxr-xr-x@ 12 yimingyang  wheel    384 Oct  6 15:16 .git\ndrwxr-xr-x@ 10 yimingyang  wheel    320 Oct  6 02:29 .github\n-rw-r--r--@  1 yimingyang  wheel     98 Oct  6 02:29 .gitignore\n-rw-r--r--@  1 yimingyang  wheel    187 Oct  6 02:29 .readthedocs.yaml\n-rw-r--r--@  1 yimingyang  wheel     27 Oct  6 15:16 benchmark_phase.json\n-rw-r--r--@  1 yimingyang  wheel   3914 Oct  6 15:16 benchmark_tests.py\n-rw-r--r--@  1 yimingyang  wheel  15780 Oct  6 02:29 CHANGELOG.rst\n-rw-r--r--@  1 yimingyang  wheel   1640 Oct  6 15:16 check_receipt.py\ndrwxr-xr-x@  4 yimingyang  wheel    128 Oct  6 02:29 docs\n-rw-r--r--@  1 yimingyang  wheel   1085 Oct  6 02:29 LICENSE\n-rw-r--r--@  1 yimingyang  wheel     60 Oct  6 02:29 MANIFEST.in\n-rw-r--r--@  1 yimingyang  wheel   1665 Oct  6 02:29 pyproject.toml\n-rw-r--r--@  1 yimingyang  wheel   4144 Oct  6 02:29 README.rst\n-rw-r--r--@  1 yimingyang  wheel     62 Oct  6 15:16 run_checks.py\ndrwxr-xr-x@  3 yimingyang  wheel     96 Oct  6 02:29 src\ndrwxr-xr-x@ 16 yimingyang  wheel    512 Oct  6 02:29 tests\n-rw-r--r--@  1 yimingyang  wheel    676 Oct  6 02:29 tox.ini",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:113"
+    },
+    {
+      "tool": "call_01_FuRePRFx7gepZw53rpY30852",
+      "error": false,
+      "content": "93a5738 Frozen fixture D1\nOn branch main\nnothing to commit, working tree clean",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:115"
+    },
+    {
+      "tool": "call_00_zYIkUH2PoIchAHnwjFPj8247",
+      "error": false,
+      "content": "/private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/_cachedmethod.py\n/private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/__init__.pyi\n/private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/__init__.py\n/private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/func.pyi\n/private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/keys.py\n/private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/_cached.py\n/private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/keys.pyi\n/private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/py.typed\n/private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/func.py\n/private/tmp/dn2-live-6h5xy_8e/workspace/tests/test_classmethod.py\n/private/tmp/dn2-live-6h5xy_8e/workspace/tests/test_fifo.py\n/private/tmp/dn2-live-6h5xy_8e/workspace/tests/test_threading.py\n/private/tmp/dn2-live-6h5xy_8e/workspace/tests/test_cachedmethod.py\n/private/tmp/dn2-live-6h5xy_8e/workspace/tests/test_keys.py\n/private/tmp/dn2-live-6h5xy_8e/workspace/tests/__init__.py\n/private/tmp/dn2-live-6h5xy_8e/workspace/tests/test_rr.py\n/private/tmp/dn2-live-6h5xy_8e/workspace/tests/test_func.py\n/private/tmp/dn2-live-6h5xy_8e/workspace/tests/test_tlru.py\n/private/tmp/dn2-live-6h5xy_8e/workspace/tests/test_ttl.py\n/private/tmp/dn2-live-6h5xy_8e/workspace/tests/test_lru.py\n/private/tmp/dn2-live-6h5xy_8e/workspace/tests/test_cache.py\n/private/tmp/dn2-live-6h5xy_8e/workspace/tests/test_lfu.py\n/private/tmp/dn2-live-6h5xy_8e/workspace/tests/test_cached.py",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:151"
+    },
+    {
+      "tool": "call_01_cm4mbn8f2hhXFUiaJdUx2485",
+      "error": false,
+      "content": "1\tfrom check_receipt import execute\n2\traise SystemExit(execute())\n3\t",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:153"
+    },
+    {
+      "tool": "call_02_7ZTiCvSvHCoL0k5bVCA19710",
+      "error": false,
+      "content": "1\timport threading, time, unittest\n2\tfrom cachetools import Cache, LRUCache, cached, cachedmethod\n3\t\n4\tclass DebugTests(unittest.TestCase):\n5\t\n6\t    def exercise(self, info, method, hot=False):\n7\t        entered = threading.Event()\n8\t        release = threading.Event()\n9\t        other = threading.Event()\n10\t        calls = []\n11\t        cache = LRUCache(128)\n12\t        cond = threading.Condition()\n13\t        errors = []\n14\t\n15\t        def body(key):\n16\t            calls.append(key)\n17\t            if key == 'held':\n18\t                entered.set()\n19\t                release.wait(4)\n20\t            if key == 'other':\n21\t                other.set()\n22\t            return key\n23\t        if method:\n24\t\n25\t            class Owner:\n26\t\n27\t                def __init__(self):\n28\t                    self.cache = cache\n29\t                    self.cond = cond\n30\t\n31\t                @cachedmethod(lambda self: self.cache, condition=lambda self: self.cond, info=info)\n32\t                def run(self, key):\n33\t                    return body(key)\n34\t            f = Owner().run\n35\t        else:\n36\t            f = cached(cache, condition=cond, info=info)(body)\n37\t        if hot:\n38\t            f('other')\n39\t            other.clear()\n40\t\n41\t        def call(key):\n42\t            try:\n43\t                f(key)\n44\t            except Exception as e:\n45\t                errors.append(repr(e))\n46\t        first = threading.Thread(target=call, args=('held',))\n47\t        second = threading.Thread(target=call, args=('other',))\n48\t        try:\n49\t            first.start()\n50\t            self.assertTrue(entered.wait(2))\n51\t            second.start()\n52\t            if hot:\n53\t                second.join(1)\n54\t                self.assertFalse(second.is_alive(), 'cached unrelated key blocked although no evi",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:155"
+    },
+    {
+      "tool": "call_03_Rs7JThaqKOA8ajeHUAa27051",
+      "error": false,
+      "content": "1\t{\"task\": \"D1\", \"phase\": 1}\n2\t",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:157"
+    },
+    {
+      "tool": "call_04_rEpQY2RinHyHxU81OtlR1351",
+      "error": false,
+      "content": "1\timport hashlib,json,os,subprocess,sys,time\n2\tfrom pathlib import Path\n3\tROOT=Path(__file__).resolve().parent\n4\tdef fingerprint():\n5\t files=sorted(list((ROOT/'src/cachetools').rglob('*.py'))+list((ROOT/'agent_tests').rglob('*.py'))+[ROOT/'benchmark_tests.py',ROOT/'benchmark_phase.json',ROOT/'run_checks.py',ROOT/'check_receipt.py'])\n6\t return hashlib.sha256(b''.join(str(p.relative_to(ROOT)).encode()+b'\\0'+p.read_bytes()+b'\\0' for p in files)).hexdigest()\n7\tdef execute():\n8\t sys.path.insert(0,str(ROOT/'src'));sys.path.insert(0,str(ROOT))\n9\t import benchmark_tests\n10\t os.environ['PYTHONPATH']=str(ROOT/'src');os.environ['PYTEST_DISABLE_PLUGIN_AUTOLOAD']='1'\n11\t phase=json.loads((ROOT/'benchmark_phase.json').read_text());before=fingerprint();started=time.time()\n12\t ok,n=benchmark_tests.run(phase['task'],phase['phase'])\n13\t upstream=subprocess.run([sys.executable,'-m','pytest','-q','tests'],cwd=ROOT)\n14\t extra=subprocess.run([sys.executable,'-m','pytest','-q','agent_tests'],cwd=ROOT) if (ROOT/'agent_tests').exists() else None\n15\t passed=ok and upstream.returncode==0 and (extra is None or extra.returncode==0)\n16\t after=fingerprint();record={'task':phase['task'],'phase':phase['phase'],'task_tests':n,'passed':passed and before==after,'source_before':before,'source_after':after,'started_epoch':started,'ended_epoch':time.time(),'pid':os.getpid(),'upstream_exit':upstream.returncode,'extra_exit':extra.returncode if extra else None}\n17\t receipts=ROOT/'.experiment';receipts.mkdir(exist_ok=True)\n18\t with (receipts/'checks.jsonl').open('a') as f:f.write(json.dumps(record)+'\\n')\n19\t print('TASK_CHECK_RESULT '+json.dumps(record),flush=True)\n20\t return 0 if record['passed'] else 1\n21\t",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:159"
+    },
+    {
+      "tool": "call_00_gtZowqDkjvKfpOYgfcLh6432",
+      "error": false,
+      "content": "1\t\"\"\"Function decorator helpers.\"\"\"\n2\t\n3\t# pyright: reportFunctionMemberAccess=false\n4\t\n5\t__all__ = ()\n6\t\n7\timport functools\n8\timport warnings\n9\t\n10\t# At least for now, the implementation prefers clarity and performance\n11\t# over ease of maintenance, thus providing separate wrappers for\n12\t# all valid combinations of decorator parameters lock, condition and\n13\t# info.\n14\t\n15\t\n16\tdef _condition_info(func, cache, key, lock, cond, info):\n17\t    hits = misses = 0\n18\t    pending = set()\n19\t\n20\t    def wrapper(*args, **kwargs):\n21\t        nonlocal hits, misses\n22\t        k = key(*args, **kwargs)\n23\t        with lock:\n24\t            cond.wait_for(lambda: not pending)\n25\t            try:\n26\t                result = cache[k]\n27\t                hits += 1\n28\t                return result\n29\t            except KeyError:\n30\t                pending.add(k)\n31\t                misses += 1\n32\t        try:\n33\t            v = func(*args, **kwargs)\n34\t            with lock:\n35\t                try:\n36\t                    cache[k] = v\n37\t                except ValueError:\n38\t                    pass  # value too large\n39\t                return v\n40\t        finally:\n41\t            with lock:\n42\t                pending.remove(k)\n43\t                cond.notify_all()\n44\t\n45\t    def cache_clear():\n46\t        nonlocal hits, misses\n47\t        with lock:\n48\t            cache.clear()\n49\t            hits = misses = 0\n50\t\n51\t    def cache_info():\n52\t        with lock:\n53\t            return info(hits, misses)\n54\t\n55\t    wrapper.cache_clear = cache_clear\n56\t    wrapper.cache_info = cache_info\n57\t    return wrapper\n58\t\n59\t\n60\tdef _locked_info(func, cache, key, lock, info):\n61\t    hits = misses = 0\n62\t\n63\t    def wrapper(*args, **kwargs):\n64\t        nonlocal hits, misses\n65\t        k = key(*args, **kwargs)\n",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:193"
+    },
+    {
+      "tool": "call_01_4iR7Ii3IIREh7sTHjNhM8783",
+      "error": false,
+      "content": "1\t\"\"\"Method decorator helpers.\"\"\"\n2\t\n3\t# pyright: reportOptionalContextManager=false, reportOptionalMemberAccess=false\n4\t\n5\t__all__ = ()\n6\t\n7\timport functools\n8\timport warnings\n9\timport weakref\n10\t\n11\t\n12\tdef _warn_classmethod(stacklevel):\n13\t    warnings.warn(\n14\t        \"decorating class methods with @cachedmethod is deprecated\",\n15\t        DeprecationWarning,\n16\t        stacklevel=stacklevel,\n17\t    )\n18\t\n19\t\n20\tdef _warn_instance_dict(msg, stacklevel):\n21\t    warnings.warn(\n22\t        msg,\n23\t        DeprecationWarning,\n24\t        stacklevel=stacklevel,\n25\t    )\n26\t\n27\t\n28\tdef _none(_):\n29\t    return None\n30\t\n31\t\n32\tclass _WrapperBase:\n33\t    \"\"\"Wrapper base class providing default implementations for properties.\"\"\"\n34\t\n35\t    def __init__(self, obj, method, cache, key, lock=None, cond=None):\n36\t        if isinstance(obj, type):\n37\t            _warn_classmethod(stacklevel=5)\n38\t        functools.update_wrapper(self, method)\n39\t        self._obj = obj  # protected\n40\t        self.__cache = cache\n41\t        self.__key = functools.partial(key, obj)\n42\t        self.__lock = lock if lock is not None else _none\n43\t        self.__cond = cond if cond is not None else _none\n44\t\n45\t    def __call__(self, *args, **kwargs):\n46\t        raise NotImplementedError()  # pragma: no cover\n47\t\n48\t    def cache_clear(self):\n49\t        raise NotImplementedError()  # pragma: no cover\n50\t\n51\t    @property\n52\t    def cache(self):\n53\t        return self.__cache(self._obj)\n54\t\n55\t    @property\n56\t    def cache_key(self):\n57\t        return self.__key  # self._obj passed via functools.partial\n58\t\n59\t    @property\n60\t    def cache_lock(self):\n61\t        return self.__lock(self._obj)\n62\t\n63\t    @property\n64\t    def cache_condition(self):\n65\t        return self.__cond(self._obj)\n66\t\n67\t\n68\tclass _",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:195"
+    },
+    {
+      "tool": "call_00_vGrrJaoel7UQMNFN0dAk9408",
+      "error": false,
+      "content": "1\timport unittest\n2\timport warnings\n3\t\n4\timport cachetools\n5\timport cachetools.keys\n6\t\n7\tfrom . import CountedCondition, CountedLock, _TestCaseProtocol\n8\t\n9\t\n10\tclass DecoratorTestMixin(_TestCaseProtocol):\n11\t    def cache(self, minsize):\n12\t        raise NotImplementedError\n13\t\n14\t    def func(self, *args, **kwargs):\n15\t        if hasattr(self, \"count\"):\n16\t            self.count += 1\n17\t        else:\n18\t            self.count = 0\n19\t        return self.count\n20\t\n21\t    def error_func(self, *args, **kwargs):\n22\t        raise ValueError(\"test error\")\n23\t\n24\t    def test_decorator(self):\n25\t        cache = self.cache(2)\n26\t        wrapper = cachetools.cached(cache)(self.func)\n27\t\n28\t        self.assertEqual(len(cache), 0)\n29\t        self.assertEqual(wrapper(0), 0)\n30\t        self.assertEqual(len(cache), 1)\n31\t        self.assertIn(cachetools.keys.hashkey(0), cache)\n32\t        self.assertNotIn(cachetools.keys.hashkey(1), cache)\n33\t        self.assertNotIn(cachetools.keys.hashkey(1.0), cache)\n34\t\n35\t        self.assertEqual(wrapper(1), 1)\n36\t        self.assertEqual(len(cache), 2)\n37\t        self.assertIn(cachetools.keys.hashkey(0), cache)\n38\t        self.assertIn(cachetools.keys.hashkey(1), cache)\n39\t        self.assertIn(cachetools.keys.hashkey(1.0), cache)\n40\t\n41\t        self.assertEqual(wrapper(1), 1)\n42\t        self.assertEqual(len(cache), 2)\n43\t\n44\t        self.assertEqual(wrapper(1.0), 1)\n45\t        self.assertEqual(len(cache), 2)\n46\t\n47\t        self.assertEqual(wrapper(1.0), 1)\n48\t        self.assertEqual(len(cache), 2)\n49\t\n50\t    def test_decorator_typed(self):\n51\t        cache = self.cache(3)\n52\t        key = cachetools.keys.typedkey\n53\t        wrapper = cachetools.cached(cache, key=key)(self.func)\n54\t\n55\t        self.assertEqual(len(cache), 0)\n56\t        self.as",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:2919"
+    },
+    {
+      "tool": "call_01_8MehPjl8FzjNYfFhqyMV2848",
+      "error": false,
+      "content": "1\timport unittest\n2\timport unittest.mock\n3\timport warnings\n4\t\n5\tfrom cachetools import Cache, cachedmethod, keys\n6\t\n7\tfrom . import CountedCondition, CountedLock, _TestCaseProtocol\n8\t\n9\t\n10\tclass Cached:\n11\t    def __init__(self, cache, count=0):\n12\t        self.cache = cache\n13\t        self.count = count\n14\t        self.lock = CountedLock()\n15\t        self.cond = CountedCondition()\n16\t\n17\t    def __get(self, _value):\n18\t        result = self.count\n19\t        self.count += 1\n20\t        return result\n21\t\n22\t    @cachedmethod(lambda self: self.cache)\n23\t    def get(self, value):\n24\t        \"\"\"docstring\"\"\"\n25\t\n26\t        return self.__get(value)\n27\t\n28\t    @cachedmethod(lambda self: self.cache, key=keys.typedmethodkey)\n29\t    def get_typed(self, value):\n30\t        return self.__get(value)\n31\t\n32\t    @cachedmethod(lambda self: self.cache, info=True)\n33\t    def get_info(self, value):\n34\t        return self.__get(value)\n35\t\n36\t    @cachedmethod(lambda self: self.cache, lock=lambda self: self.lock)\n37\t    def get_lock(self, value):\n38\t        return self.__get(value)\n39\t\n40\t    @cachedmethod(lambda self: self.cache, lock=lambda self: self.lock, info=True)\n41\t    def get_lock_info(self, value):\n42\t        return self.__get(value)\n43\t\n44\t    @cachedmethod(lambda self: self.cache, condition=lambda self: self.cond)\n45\t    def get_cond(self, value):\n46\t        return self.__get(value)\n47\t\n48\t    @cachedmethod(lambda self: self.cache, condition=lambda self: self.cond)\n49\t    def get_cond_error(self, _value):\n50\t        raise ValueError(\"test error\")\n51\t\n52\t    @cachedmethod(lambda self: self.cache, condition=lambda self: self.cond, info=True)\n53\t    def get_cond_info(self, value):\n54\t        return self.__get(value)\n55\t\n56\t    @cachedmethod(\n57\t        lambda self: self.cache,\n58\t  ",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:2920"
+    },
+    {
+      "tool": "call_00_41224R8rG9An7bDzhpXU6329",
+      "error": false,
+      "content": "1\timport math\n2\tfrom collections.abc import Container, Iterable\n3\tfrom typing import Any, Protocol\n4\t\n5\timport cachetools\n6\t\n7\t\n8\tclass _TestCaseProtocol(Protocol):\n9\t    def assertEqual(self, first: Any, second: Any, msg: Any = None) -> None: ...\n10\t    def assertNotEqual(self, first: Any, second: Any, msg: Any = None) -> None: ...\n11\t    def assertTrue(self, expr: Any, msg: Any = None) -> None: ...\n12\t    def assertFalse(self, expr: Any, msg: Any = None) -> None: ...\n13\t    def assertIs(self, expr1: object, expr2: object, msg: Any = None) -> None: ...\n14\t    def assertIsNot(self, expr1: object, expr2: object, msg: Any = None) -> None: ...\n15\t    def assertIsNone(self, obj: object, msg: Any = None) -> None: ...\n16\t\n17\t    def assertIn(\n18\t        self, member: Any, container: Iterable[Any] | Container[Any], msg: Any = None\n19\t    ) -> None: ...\n20\t\n21\t    def assertNotIn(\n22\t        self, member: Any, container: Iterable[Any] | Container[Any], msg: Any = None\n23\t    ) -> None: ...\n24\t\n25\t    def assertRaises(self, expected_exception: type[BaseException]) -> Any: ...\n26\t\n27\t    def assertRaisesRegex(\n28\t        self, expected_exception: type[BaseException], expected_regex: str\n29\t    ) -> Any: ...\n30\t\n31\t\n32\tclass CacheTestMixin(_TestCaseProtocol):\n33\t    Cache: type[cachetools.Cache]\n34\t\n35\t    def test_defaults(self):\n36\t        cache = self.Cache(maxsize=1)\n37\t        self.assertEqual(0, len(cache))\n38\t        self.assertEqual(1, cache.maxsize)\n39\t        self.assertEqual(0, cache.currsize)\n40\t        self.assertEqual(1, cache.getsizeof(None))\n41\t        self.assertEqual(1, cache.getsizeof(\"\"))\n42\t        self.assertEqual(1, cache.getsizeof(0))\n43\t        self.assertTrue(repr(cache).startswith(cache.__class__.__name__))\n44\t\n45\t    def test_maxsize_negative(self):\n46\t",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:2957"
+    },
+    {
+      "tool": "call_01_hrspt6BbcxRs1ApxvSKE0794",
+      "error": false,
+      "content": "1\timport threading\n2\timport time\n3\timport unittest\n4\tfrom typing import Any\n5\t\n6\tfrom cachetools import LRUCache, cached, cachedmethod\n7\t\n8\tcount = 0\n9\t\n10\t\n11\t@cached(cache=LRUCache(1), condition=threading.Condition(), info=True)\n12\tdef func():\n13\t    global count\n14\t    time.sleep(1.0)\n15\t    count += 1\n16\t    return count\n17\t\n18\t\n19\t@cached(cache=LRUCache(1), lock=threading.Lock(), info=True)\n20\tdef locked_func():\n21\t    global count\n22\t    time.sleep(1.0)\n23\t    count += 1\n24\t    return 42\n25\t\n26\t\n27\tclass ThreadingTest(unittest.TestCase):\n28\t    NTHREADS = 10\n29\t\n30\t    TIMEOUT = 10\n31\t\n32\t    cache: LRUCache[Any, int] = LRUCache(1)\n33\t\n34\t    cond = threading.Condition()\n35\t\n36\t    lock = threading.Lock()\n37\t\n38\t    count = 0\n39\t\n40\t    @cachedmethod(\n41\t        cache=lambda self: self.cache, condition=lambda self: self.cond, info=True\n42\t    )\n43\t    def method(self):\n44\t        time.sleep(1.0)\n45\t        self.count += 1\n46\t        return 42\n47\t\n48\t    @cachedmethod(cache=lambda self: self.cache, lock=lambda self: self.lock, info=True)\n49\t    def locked_method(self):\n50\t        time.sleep(1.0)\n51\t        self.count += 1\n52\t        return 42\n53\t\n54\t    def test_cached_stampede(self):\n55\t        global count\n56\t        count = 0\n57\t        threads = [threading.Thread(target=func) for i in range(self.NTHREADS)]\n58\t        for t in threads:\n59\t            t.start()\n60\t        for t in threads:\n61\t            t.join(timeout=self.TIMEOUT)\n62\t            self.assertFalse(t.is_alive())\n63\t\n64\t        self.assertEqual(count, 1)\n65\t\n66\t        info = func.cache_info()\n67\t        self.assertEqual(info.hits, self.NTHREADS - 1)\n68\t        self.assertEqual(info.misses, 1)\n69\t\n70\t    def test_cachedmethod_stampede(self):\n71\t        self.cache = LRUCache(1)\n72\t        self.count",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:2959"
+    },
+    {
+      "tool": "call_00_EK8FW1roRhxl168hwTC99683",
+      "error": false,
+      "content": "188:- Add test cases for cache stampede scenarios.\n203:- Improve documentation regarding ``@cachedmethod`` with ``condition``\n259:- Add an optional ``condition`` parameter to the ``@cached`` and\n261:  ``threading.Condition`` instance, should improve `cache stampede\n262:  <https://en.wikipedia.org/wiki/Cache_stampede>`_ issues in massively\n267:  ``threading.Condition`` instance to deal with `cache stampede\n268:  <https://en.wikipedia.org/wiki/Cache_stampede>`_ issues.  Note that\n269:  this *may* result in a noticable performance degradation, depending\n472:- Improve behavior of decorators in case of race conditions.\n606:- Document pending removal of deprecated features.",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:3535"
+    },
+    {
+      "tool": "call_01_3xErrHc210f7zZlg70Sp8828",
+      "error": false,
+      "content": "docs/index.rst-295-\ndocs/index.rst-296-   >>> fib(42)\ndocs/index.rst-297-   267914296\ndocs/index.rst-298-\ndocs/index.rst:299:.. decorator:: cached(cache, key=cachetools.keys.hashkey, lock=None, condition=None, info=False)\ndocs/index.rst-300-\ndocs/index.rst-301-   Decorator to wrap a function with a memoizing callable that saves\ndocs/index.rst-302-   results in a cache.\ndocs/index.rst-303-\n--\ndocs/index.rst-327-      cache object.  The underlying wrapped function will be called\ndocs/index.rst-328-      outside the `with` statement to allow concurrent execution, and\ndocs/index.rst-329-      therefore must be `thread-safe`_ by itself.\ndocs/index.rst-330-\ndocs/index.rst:331:   If `condition` is not :const:`None`, it must specify a `condition\ndocs/index.rst-332-   variable`_, i.e. an object providing :func:`wait()`,\ndocs/index.rst-333-   :func:`wait_for()`, :func:`notify()` and :func:`notify_all()`\ndocs/index.rst-334-   methods as defined by :class:`threading.Condition`.  Using a\ndocs/index.rst:335:   `condition` variable will prevent concurrent execution of the\ndocs/index.rst-336-   wrapped function with *identical* parameters, or cache keys.\ndocs/index.rst-337-   Instead, a calling thread will check if an identical function call\ndocs/index.rst-338-   is already executing, and will then :func:`wait()` for the pending\ndocs/index.rst-339-   call to finish.  The executing thread will :func:`notify()` any\n--\ndocs/index.rst-344-\ndocs/index.rst-345-      Although providing a `lock` alone is generally sufficient to\ndocs/index.rst-346-      make :func:`cached` `thread-safe`_, it may still be subject to\ndocs/index.rst-347-      `cache stampede`_ issues under high load, depending on your\ndocs/index.rst:348:      actual use case.  Providing a `condition` variable will mitigate\ndocs/in",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:3537"
+    },
+    {
+      "tool": "call_00_NKmtTnNgUf3y7OKSb0Gt4295",
+      "error": false,
+      "content": "{\n  \"claude_on_path\": true,\n  \"credential_present\": true,\n  \"endpoint\": \"custom-or-unset\",\n  \"live_api_test\": \"NOT_RUN\",\n  \"model\": \"deepseek-flash[1m]\",\n  \"note\": \"Presence check only; not proof of authentication or model capability.\",\n  \"platform\": \"darwin\",\n  \"python\": \"3.12.14\",\n  \"skill_installed\": true,\n  \"version\": \"0.1.0\"\n}\n---STATUS---\n{\n  \"checks_current\": false,\n  \"reason\": \"No verification attempt.\",\n  \"task\": null\n}",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:4058"
+    },
+    {
+      "tool": "call_01_6KEV3vDOraINxCNqMnd18047",
+      "error": false,
+      "content": "299\t.. decorator:: cached(cache, key=cachetools.keys.hashkey, lock=None, condition=None, info=False)\n300\t\n301\t   Decorator to wrap a function with a memoizing callable that saves\n302\t   results in a cache.\n303\t\n304\t   The `cache` argument specifies a cache object to store previous\n305\t   function arguments and return values.  Note that `cache` need not\n306\t   be an instance of the cache implementations provided by the\n307\t   :mod:`cachetools` module.  :func:`cached` will work with any\n308\t   mutable mapping type, including plain :class:`dict` and\n309\t   :class:`weakref.WeakValueDictionary`.\n310\t\n311\t   `key` specifies a function that will be called with the same\n312\t   positional and keyword arguments as the wrapped function itself,\n313\t   and which has to return a suitable cache key.  Since caches are\n314\t   mappings, the object returned by `key` must be hashable.  The\n315\t   default is to call :func:`cachetools.keys.hashkey`.\n316\t\n317\t   If `lock` is not :const:`None`, it must specify an object\n318\t   implementing the `context manager`_ protocol.  Any access to the\n319\t   cache will then be nested in a ``with lock:`` statement.  This can\n320\t   be used for synchronizing thread access to the cache by providing a\n321\t   :class:`threading.Lock` or :class:`threading.RLock` instance, for\n322\t   example.\n323\t\n324\t   .. note::\n325\t\n326\t      The `lock` context manager is used only to guard access to the\n327\t      cache object.  The underlying wrapped function will be called\n328\t      outside the `with` statement to allow concurrent execution, and\n329\t      therefore must be `thread-safe`_ by itself.\n330\t\n331\t   If `condition` is not :const:`None`, it must specify a `condition\n332\t   variable`_, i.e. an object providing :func:`wait()`,\n333\t   :func:`wait_for()`, :func:`notify",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:4060"
+    },
+    {
+      "tool": "call_00_4UOxL2D9Fl9aTCMzMHWo5356",
+      "error": false,
+      "content": "93a5738 Frozen fixture D1\n--- branches ---\n* main\n--- PYTHONPATH ---\n/private/tmp/dn2-live-6h5xy_8e/workspace/src\n3.12.14 (main, Sep  1 2026, 14:09:38) [Clang 22.1.3 ]\n['', '/private/tmp/dn2-live-6h5xy_8e/workspace/src', '/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none/lib/python312.zip', '/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12', '/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12-macos-aarch64-none/lib/python3.12/lib-dynload', '/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/ablation-env/lib/python3.12/site-packages']\n--- pip show ---\nWARNING: Package(s) not found: cachetools",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:4502"
+    },
+    {
+      "tool": "call_01_jCVNwutiQIxGWXKTnQca6221",
+      "error": false,
+      "content": "total 0\ndrwxr-xr-x@  3 yimingyang  wheel   96 Oct  6 15:16 .\ndrwxr-xr-x@ 21 yimingyang  wheel  672 Oct  6 15:16 ..\n-rw-------@  1 yimingyang  wheel    0 Oct  6 15:16 lock\n/private/tmp/dn2-live-6h5xy_8e/workspace/.deep-native/lock\n--- tmpdir ---\nTMPDIR=/private/tmp/dn2-live-6h5xy_8e/tmp/",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:4504"
+    },
+    {
+      "tool": "call_00_MZxLehmaGqRL9qqKIYqX9125",
+      "error": false,
+      "content": "v7.2.1 (2026-10-05)\n===================\n\n- Improve error handling for ``RRCache.popitem()`` when the cache is\n  empty.\n\n- Minor style and documentation improvements.\n\n- Update CI environment.\n\n\nv7.2.0 (2026-09-16)\n===================\n\n- Deprecate use of ``cache=None`` to suppress caching with the\n  ``@cached`` decorator.\n\n- Add support for Python 3.15.\n\n- Minor test improvements.\n\n- Minor documentation updates.\n\n\nv7.1.8 (2026-08-31)\n===================\n\n- Reject negative ``maxsize`` in ``Cache.__init__``.\n\n\nv7.1.7 (2026-08-01)\n===================\n\n- Improve ``Cache.__setitem__`` behavior when replacing an existing\n  cache item with a larger value.\n\n- Update CI environment.\n\n\nv7.1.6 (2026-07-24)\n===================\n\n- Minor style improvements to keep ``ruff`` happy.\n\n\nv7.1.5 (2026-07-23)\n===================\n\n- Fix ``TLRUCache`` silently keeping stale values on expired\n  overwrites.\n\n- Reject negative cache item ``getsizeof`` values.\n\n- Update build environment.\n\n\nv7.1.4 (2026-05-22)\n===================\n\n- Minor unit test improvements.",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:5685"
+    },
+    {
+      "tool": "call_01_5VWoOwAnEZdibZBUjPuu9323",
+      "error": false,
+      "content": "src/cachetools/_cached.py:18:    pending = set()\nsrc/cachetools/_cached.py:24:            cond.wait_for(lambda: not pending)\nsrc/cachetools/_cached.py:30:                pending.add(k)\nsrc/cachetools/_cached.py:42:                pending.remove(k)\nsrc/cachetools/_cached.py:148:    pending = set()\nsrc/cachetools/_cached.py:153:            cond.wait_for(lambda: not pending)\nsrc/cachetools/_cached.py:158:                pending.add(k)\nsrc/cachetools/_cached.py:169:                pending.remove(k)\nsrc/cachetools/_cachedmethod.py:156:                self.__pending = set()\nsrc/cachetools/_cachedmethod.py:165:                    cond.wait_for(lambda: not self.__pending)\nsrc/cachetools/_cachedmethod.py:171:                        self.__pending.add(key)\nsrc/cachetools/_cachedmethod.py:183:                        self.__pending.remove(key)\nsrc/cachetools/_cachedmethod.py:273:    pending = weakref.WeakKeyDictionary()\nsrc/cachetools/_cachedmethod.py:275:    def wrapper(self, pending, *args, **kwargs):\nsrc/cachetools/_cachedmethod.py:279:            cond(self).wait_for(lambda: not pending)\nsrc/cachetools/_cachedmethod.py:283:                pending.add(k)\nsrc/cachetools/_cachedmethod.py:294:                pending.remove(k)\nsrc/cachetools/_cachedmethod.py:303:        p = pending.setdefault(self, set())\nsrc/cachetools/_cachedmethod.py:310:                self.__pending = set()\nsrc/cachetools/_cachedmethod.py:313:                return wrapper(self._obj, self.__pending, *args, **kwargs)\nsrc/cachetools/__init__.pyi:146:    def wait_for(",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:5687"
+    },
+    {
+      "tool": "call_00_vGjXYXFMF9sRjHvuC56d5807",
+      "error": false,
+      "content": "(eval):1: command not found: timeout",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:5857"
+    },
+    {
+      "tool": "call_00_ET_aE3K1s6QlbpFm8pkpQad3943",
+      "error": false,
+      "content": "FAIL: test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) (info=True, method=True, hot=False)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/tmp/dn2-live-6h5xy_8e/workspace/benchmark_tests.py\", line 70, in test_independent_keys_and_cached_hits\n    self.exercise(info, method, hot)\n  File \"/private/tmp/dn2-live-6h5xy_8e/workspace/benchmark_tests.py\", line 56, in exercise\n    self.assertTrue(other.wait(1), 'unrelated cache miss blocked although no eviction occurs')\nAssertionError: False is not true : unrelated cache miss blocked although no eviction occurs\n\n======================================================================\nFAIL: test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) (info=True, method=True, hot=True)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/tmp/dn2-live-6h5xy_8e/workspace/benchmark_tests.py\", line 70, in test_independent_keys_and_cached_hits\n    self.exercise(info, method, hot)\n  File \"/private/tmp/dn2-live-6h5xy_8e/workspace/benchmark_tests.py\", line 54, in exercise\n    self.assertFalse(second.is_alive(), 'cached unrelated key blocked although no eviction occurs')\nAssertionError: True is not false : cached unrelated key blocked although no eviction occurs\n\n----------------------------------------------------------------------\nRan 2 tests in 8.110s\n\nFAILED (failures=8)\n........................................................................ [ 21%]\n........................................................................ [ 42%]\n.......................................................................",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:5862"
+    },
+    {
+      "tool": "call_00_EWZOQzs2NMlIqXexiAL46755",
+      "error": false,
+      "content": "/private/tmp/dn2-live-6h5xy_8e/tmp//dn2-evidence",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:7626"
+    },
+    {
+      "tool": "call_00_ET_HlxCMkzYtzFEQtrU1kNK6929",
+      "error": false,
+      "content": "File created successfully at: /private/tmp/dn2-live-6h5xy_8e/tmp/dn2-evidence/reproduce_regression.py (file state is current in your context — no need to Read it back)",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:7629"
+    },
+    {
+      "tool": "call_00_ET_NckTEqZz1rf2ZpeiOl8v9768",
+      "error": false,
+      "content": "--- cached/miss ---\n  lock acquired while computation held: True\n  unrelated call returned while held: False\n  cache len/maxsize: 0/128\n  stalled caller stack (top frame = where it blocks):\n    File \"/private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/_cached.py\", line 153, in wrapper\n    cond.wait_for(lambda: not pending)\n    File \"/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/threading.py\", line 390, in wait_for\n    self.wait(waittime)\n    File \"/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/threading.py\", line 355, in wait\n    waiter.acquire()\n--- cached/hit ---\n  lock acquired while computation held: True\n  unrelated call returned while held: False\n  cache len/maxsize: 1/128\n  stalled caller stack (top frame = where it blocks):\n    File \"/private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/_cached.py\", line 153, in wrapper\n    cond.wait_for(lambda: not pending)\n    File \"/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/threading.py\", line 390, in wait_for\n    self.wait(waittime)\n    File \"/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/threading.py\", line 355, in wait\n    waiter.acquire()\n--- cachedmethod/miss ---\n  lock acquired while computation held: True\n  unrelated call returned while held: False\n  cache len/maxsize: 0/128\n  stalled caller stack (top frame = where it blocks):\n    File \"/private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/_cachedmethod.py\", ",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:7632"
+    },
+    {
+      "tool": "call_00_nIeS0BByMst0Zm2MDgDg3854",
+      "error": false,
+      "content": "The file /private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/_cached.py has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:8207"
+    },
+    {
+      "tool": "call_01_0s9fbK5ZwJrh7PbHmaGm4329",
+      "error": false,
+      "content": "The file /private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/_cached.py has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:8209"
+    },
+    {
+      "tool": "call_00_ET_bHxzD8L41ymtWSRmxyHJ9580",
+      "error": false,
+      "content": "The file /private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/_cachedmethod.py has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:8212"
+    },
+    {
+      "tool": "call_01_ET_RnFpA47Dcn0xUDnE9Sfs8780",
+      "error": false,
+      "content": "The file /private/tmp/dn2-live-6h5xy_8e/workspace/src/cachetools/_cachedmethod.py has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:8214"
+    },
+    {
+      "tool": "call_00_dLBuVkRSnST1G3JMrd4m5950",
+      "error": false,
+      "content": "--- cachedmethod/miss ---\n  lock acquired while computation held: True\n  unrelated call returned while held: True\n  cache len/maxsize: 1/128\n  stalled caller stack (top frame = where it blocks):\n--- cachedmethod/hit ---\n  lock acquired while computation held: True\n  unrelated call returned while held: True\n  cache len/maxsize: 1/128\n  stalled caller stack (top frame = where it blocks):\n\nINDEPENDENT PROGRESS OK for all cases\nShell cwd was reset to /private/tmp/dn2-live-6h5xy_8e/workspace",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:8241"
+    },
+    {
+      "tool": "call_00_kUMgpUbC3htl5zB7kwGN5908",
+      "error": false,
+      "content": "----------------------------------------------------------------------\nRan 2 tests in 0.074s\n\nOK\n........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.15s\nTASK_CHECK_RESULT {\"task\": \"D1\", \"phase\": 1, \"task_tests\": 2, \"passed\": true, \"source_before\": \"3a46c32863acd4c537a8909d9f54202e95e2abcdf087a712b318ad78dfa72622\", \"source_after\": \"3a46c32863acd4c537a8909d9f54202e95e2abcdf087a712b318ad78dfa72622\", \"started_epoch\": 1791271082.381423, \"ended_epoch\": 1791271086.705695, \"pid\": 39305, \"upstream_exit\": 0, \"extra_exit\": null}",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:8280"
+    },
+    {
+      "tool": "call_00_ie1uDwcGUwVi12kuWMKx3372",
+      "error": false,
+      "content": "File created successfully at: /private/tmp/dn2-live-6h5xy_8e/workspace/agent_tests/test_independent_key_progress.py (file state is current in your context — no need to Read it back)",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:14111"
+    },
+    {
+      "tool": "call_00_wjdyvLcsnwAIhFNt0mN35731",
+      "error": false,
+      "content": "The file /private/tmp/dn2-live-6h5xy_8e/workspace/agent_tests/test_independent_key_progress.py has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:14760"
+    },
+    {
+      "tool": "call_00_xhTmbj9gtsT3C3OVfeyJ6756",
+      "error": false,
+      "content": "....                                                                     [100%]\n4 passed in 2.45s",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:14870"
+    },
+    {
+      "tool": "call_00_JnXqHRWZsCCvKUPd4unn2853",
+      "error": false,
+      "content": "      44 /private/tmp/dn2-live-6h5xy_8e/tmp//dn2-evidence/fix.patch\n--- reverted; running agent tests against pre-fix source ---\n                    ):\n>                       self.exercise(factory, info, hot)\n\nagent_tests/test_independent_key_progress.py:128: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nagent_tests/test_independent_key_progress.py:92: in exercise\n    self.assertTrue(\nE   AssertionError: False is not true : caller of a different key stalled behind a held computation\n=========================== short test summary info ============================\nFAILED agent_tests/test_independent_key_progress.py::IndependentKeyProgressTest::test_distinct_keys_compute_concurrently\nFAILED agent_tests/test_independent_key_progress.py::IndependentKeyProgressTest::test_independent_key_progress\n2 failed, 2 passed in 12.50s",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:14904"
+    },
+    {
+      "tool": "call_00_wAdxzsFbwMxixgkZUSUl1042",
+      "error": false,
+      "content": " src/cachetools/_cached.py       | 4 ++--\n src/cachetools/_cachedmethod.py | 4 ++--\n 2 files changed, 4 insertions(+), 4 deletions(-)\n--- verify fix lines ---\nsrc/cachetools/_cached.py:24:            cond.wait_for(lambda: k not in pending)\nsrc/cachetools/_cached.py:153:            cond.wait_for(lambda: k not in pending)\nsrc/cachetools/_cachedmethod.py:165:                    cond.wait_for(lambda: key not in self.__pending)\nsrc/cachetools/_cachedmethod.py:279:            cond(self).wait_for(lambda: k not in pending)",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:14970"
+    },
+    {
+      "tool": "call_00_3DY1KkjWxkeIIv5fadbb5279",
+      "error": false,
+      "content": "{\n  \"configured\": \"checks\",\n  \"required_checks\": 1\n}",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:15248"
+    },
+    {
+      "tool": "call_00_ET_1v08nm0ZcdvR6AEQ5vMA2723",
+      "error": false,
+      "content": "{\n  \"attempt\": \"\",\n  \"config_hash\": \"5487792df5a0803e4aaba0ea5f3f2412e769e4bec4f5ee03b9a105d76dad2f95\",\n  \"goal\": \"Restore independent-key progress for cachetools cached/cachedmethod with condition set (info on and off) while preserving same-key stampede suppression, hit/miss accounting, exception cleanup and public behavior; python3 run_checks.py must pass (task tests + upstream + agent_tests).\",\n  \"next\": \"Inspect and reproduce before editing.\",\n  \"note\": \"\",\n  \"schema\": 1,\n  \"session\": \"27c6b2c6-f7b9-4646-91b6-62847b61bca4\",\n  \"status\": \"active\",\n  \"task_id\": \"a526eb831bcc4382a4dc1ca5133e3a52\",\n  \"updated_at\": \"2026-10-06T07:19:15Z\"\n}",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:15251"
+    },
+    {
+      "tool": "call_00_MmCrmg1rM8vq5aDA2bHo4235",
+      "error": false,
+      "content": "{\n  \"attempt\": \"\",\n  \"config_hash\": \"5487792df5a0803e4aaba0ea5f3f2412e769e4bec4f5ee03b9a105d76dad2f95\",\n  \"goal\": \"Restore independent-key progress for cachetools cached/cachedmethod with condition set (info on and off) while preserving same-key stampede suppression, hit/miss accounting, exception cleanup and public behavior; python3 run_checks.py must pass (task tests + upstream + agent_tests).\",\n  \"next\": \"Run deep-native verify (python3 run_checks.py) on the frozen worktree, then review diff and finish.\",\n  \"note\": \"Reproduced D1: all 8 subtests of benchmark_tests.test_independent_keys_and_cached_hits fail; upstream 338 pass. Discriminating evidence (TMPDIR scratch): lock is acquirable while held call runs and cache has no eviction pressure (0-1/128), yet the unrelated caller is parked in Condition.wait_for on the global predicate 'not pending' at src/cachetools/_cached.py:24,153 and _cachedmethod.py:165,279. Fixed predicate to wait only for the caller's own key. Added agent_tests/test_independent_key_progress.py (4 tests) which fails on pre-fix source (independent-key + concurrency tests) and passes after.\",\n  \"schema\": 1,\n  \"session\": \"27c6b2c6-f7b9-4646-91b6-62847b61bca4\",\n  \"status\": \"active\",\n  \"task_id\": \"a526eb831bcc4382a4dc1ca5133e3a52\",\n  \"updated_at\": \"2026-10-06T07:19:24Z\"\n}",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:15373"
+    },
+    {
+      "tool": "call_00_ET_drURiOEnB8Dy5ha5mm075347",
+      "error": false,
+      "content": "{\n  \"after\": \"f7106aeb5867f63d1fe413ea77e818e2b2c478fe3d66298107c62f25c50f507a\",\n  \"attempt_id\": \"cca2b16a8740478881d06abf6179276b\",\n  \"before\": \"f7106aeb5867f63d1fe413ea77e818e2b2c478fe3d66298107c62f25c50f507a\",\n  \"checks\": [\n    {\n      \"argv\": [\n        \"python3\",\n        \"run_checks.py\"\n      ],\n      \"elapsed_seconds\": 6.937,\n      \"exit_code\": 0,\n      \"name\": \"checks\",\n      \"timeout\": false\n    }\n  ],\n  \"config_hash\": \"5487792df5a0803e4aaba0ea5f3f2412e769e4bec4f5ee03b9a105d76dad2f95\",\n  \"runtime_version\": \"0.1.0\",\n  \"schema\": 1,\n  \"started_at\": \"2026-10-06T07:19:27Z\",\n  \"status\": \"passed\",\n  \"task_id\": \"a526eb831bcc4382a4dc1ca5133e3a52\"\n}",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:15378"
+    },
+    {
+      "tool": "call_00_Cr6cDz9Xa98VS3PlmbTP9977",
+      "error": false,
+      "content": "........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.16s\n....                                                                     [100%]\n4 passed in 2.45s\nTASK_CHECK_RESULT {\"task\": \"D1\", \"phase\": 1, \"task_tests\": 2, \"passed\": true, \"source_before\": \"237bae707c99d50e9cdcc56aadebc66cd09794bbcdb9fa382265c960c4d9ba76\", \"source_after\": \"237bae707c99d50e9cdcc56aadebc66cd09794bbcdb9fa382265c960c4d9ba76\", \"started_epoch\": 1791271177.733911, \"ended_epoch\": 1791271184.576732, \"pid\": 42636, \"upstream_exit\": 0, \"extra_exit\": 0}",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:15700"
+    },
+    {
+      "tool": "call_00_3VDEa4J6D6M0HxHDLcrY4426",
+      "error": false,
+      "content": "diff --git a/src/cachetools/_cached.py b/src/cachetools/_cached.py\nindex 8c873e5..cfe26a7 100644\n--- a/src/cachetools/_cached.py\n+++ b/src/cachetools/_cached.py\n@@ -21,7 +21,7 @@ def _condition_info(func, cache, key, lock, cond, info):\n         nonlocal hits, misses\n         k = key(*args, **kwargs)\n         with lock:\n-            cond.wait_for(lambda: not pending)\n+            cond.wait_for(lambda: k not in pending)\n             try:\n                 result = cache[k]\n                 hits += 1\n@@ -150,7 +150,7 @@ def _condition(func, cache, key, lock, cond):\n     def wrapper(*args, **kwargs):\n         k = key(*args, **kwargs)\n         with lock:\n-            cond.wait_for(lambda: not pending)\n+            cond.wait_for(lambda: k not in pending)\n             try:\n                 result = cache[k]\n                 return result\ndiff --git a/src/cachetools/_cachedmethod.py b/src/cachetools/_cachedmethod.py\nindex c02de34..2a626ab 100644\n--- a/src/cachetools/_cachedmethod.py\n+++ b/src/cachetools/_cachedmethod.py\n@@ -162,7 +162,7 @@ def _condition_info(method, cache, key, lock, cond, info):\n                 key = self.cache_key(*args, **kwargs)\n \n                 with lock:\n-                    cond.wait_for(lambda: not self.__pending)\n+                    cond.wait_for(lambda: key not in self.__pending)\n                     try:\n                         result = cache[key]\n                         self.__hits += 1\n@@ -276,7 +276,7 @@ def _condition(method, cache, key, lock, cond):\n         c = cache(self)\n         k = key(self, *args, **kwargs)\n         with lock(self):\n-            cond(self).wait_for(lambda: not pending)\n+            cond(self).wait_for(lambda: k not in pending)\n             try:\n                 return c[k]\n             except KeyError:\n=== untracked ",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:16937"
+    },
+    {
+      "tool": "call_00_0eos7Dddxqss75PlF4xF4176",
+      "error": false,
+      "content": "The file /private/tmp/dn2-live-6h5xy_8e/workspace/agent_tests/test_independent_key_progress.py has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:18034"
+    },
+    {
+      "tool": "call_00_ET_lsYSndgqsXyB70qiaQnV4215",
+      "error": false,
+      "content": "The file /private/tmp/dn2-live-6h5xy_8e/workspace/agent_tests/test_independent_key_progress.py has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:18037"
+    },
+    {
+      "tool": "call_00_ET_kMWsBphWatODV0K9o0mM8638",
+      "error": false,
+      "content": "The file /private/tmp/dn2-live-6h5xy_8e/workspace/agent_tests/test_independent_key_progress.py has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:18040"
+    },
+    {
+      "tool": "call_00_uHGnI17KGFgdfo1MdUcx8140",
+      "error": false,
+      "content": "agent_tests/test_independent_key_progress.py:138: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nagent_tests/test_independent_key_progress.py:116: in exercise\n    self.assertFalse(errors, errors)\nE   AssertionError: [\"RuntimeError('cannot notify on un-acquired lock')\", \"RuntimeError('cannot notify on un-acquired lock')\"] is not false : [\"RuntimeError('cannot notify on un-acquired lock')\", \"RuntimeError('cannot notify on un-acquired lock')\"]\n=========================== short test summary info ============================\nFAILED agent_tests/test_independent_key_progress.py::IndependentKeyProgressTest::test_independent_key_progress\n1 failed, 3 passed in 2.46s",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:18223"
+    },
+    {
+      "tool": "call_00_1xYslgbI2BBMSlpoA8pw6186",
+      "error": false,
+      "content": "The file /private/tmp/dn2-live-6h5xy_8e/workspace/agent_tests/test_independent_key_progress.py has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:20101"
+    },
+    {
+      "tool": "call_00_ET_1ca1ZM2fIDDEFVlZ2lgW3101",
+      "error": false,
+      "content": "The file /private/tmp/dn2-live-6h5xy_8e/workspace/agent_tests/test_independent_key_progress.py has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:20104"
+    },
+    {
+      "tool": "call_00_ET_8I4qkpzOPLEbFHQIZkY55338",
+      "error": false,
+      "content": "The file /private/tmp/dn2-live-6h5xy_8e/workspace/agent_tests/test_independent_key_progress.py has been updated successfully. (file state is current in your context — no need to Read it back)",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:20107"
+    },
+    {
+      "tool": "call_00_ET_Sh8rAx9KeDjNhu9vudP71410",
+      "error": false,
+      "content": "....                                                                     [100%]\n4 passed in 2.45s",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:20110"
+    },
+    {
+      "tool": "call_00_s3N5ifDziy99FJJxgdRU3684",
+      "error": false,
+      "content": "1\t\"\"\"Regression tests for independent-key progress with condition-based caching.\n2\t\n3\tThe ``condition`` argument of ``@cached``/``@cachedmethod`` suppresses\n4\tconcurrent execution of the wrapped function or method with *identical*\n5\tparameters, i.e. cache keys (see docs/index.rst).  A regression made the\n6\twrappers wait for *any* pending computation (``wait_for(lambda: not pending)``),\n7\twhich serialized unrelated keys and even stalled callers of already cached\n8\tvalues.\n9\t\n10\tThese tests pin the documented behavior for both decorators, with ``info``\n11\tenabled and disabled, without weakening the same-key stampede suppression,\n12\thit/miss accounting, or exception cleanup.\n13\t\"\"\"\n14\t\n15\timport threading\n16\timport time\n17\timport unittest\n18\t\n19\tfrom cachetools import LRUCache, cached, cachedmethod\n20\t\n21\t\n22\tdef make_cached(body, info, cond, cache=None):\n23\t    if cache is None:\n24\t        cache = LRUCache(128)\n25\t    return cached(cache, condition=cond, info=info)(body), cache\n26\t\n27\t\n28\tdef make_cachedmethod(body, info, cond, cache=None):\n29\t    if cache is None:\n30\t        cache = LRUCache(128)\n31\t\n32\t    class Owner:\n33\t        def __init__(self):\n34\t            self.cache = cache\n35\t            self.cond = cond\n36\t\n37\t        @cachedmethod(\n38\t            lambda self: self.cache,\n39\t            condition=lambda self: self.cond,\n40\t            info=info,\n41\t        )\n42\t        def run(self, key):\n43\t            return body(key)\n44\t\n45\t    return Owner().run, cache\n46\t\n47\t\n48\tclass IndependentKeyProgressTest(unittest.TestCase):\n49\t    \"\"\"A held computation must not stall callers for a different key.\"\"\"\n50\t\n51\t    DECORATORS = (make_cached, make_cachedmethod)\n52\t\n53\t    TIMEOUT = 5\n54\t\n55\t    def exercise(self, factory, info, hot):\n56\t        entered = threading.Event(",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:20171"
+    },
+    {
+      "tool": "call_00_cnYtKZj1mo1mAQnFgoJF9085",
+      "error": false,
+      "content": "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/ablation-env/bin/python3: No module named ruff\n54:[tool.ruff.lint]\n55-ignore = [\"DTZ005\", \"UP031\"]",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:20925"
+    },
+    {
+      "tool": "call_00_QSnkyFM6HX6SQuOWO0Q76424",
+      "error": false,
+      "content": "(Bash completed with no output)",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:20981"
+    },
+    {
+      "tool": "call_00_o7zQUpTOFHiR8kH71Q7D5799",
+      "error": false,
+      "content": "4 passed in 2.45s\n4 passed in 2.45s\n4 passed in 2.45s\n4 passed in 2.45s\n4 passed in 2.45s",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:21675"
+    },
+    {
+      "tool": "call_00_JIHJNF3U6R3OdjoUGBh63197",
+      "error": false,
+      "content": "........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.15s\n....                                                                     [100%]\n4 passed in 2.45s\nTASK_CHECK_RESULT {\"task\": \"D1\", \"phase\": 1, \"task_tests\": 2, \"passed\": true, \"source_before\": \"237bae707c99d50e9cdcc56aadebc66cd09794bbcdb9fa382265c960c4d9ba76\", \"source_after\": \"237bae707c99d50e9cdcc56aadebc66cd09794bbcdb9fa382265c960c4d9ba76\", \"started_epoch\": 1791271275.024457, \"ended_epoch\": 1791271281.849696, \"pid\": 45308, \"upstream_exit\": 0, \"extra_exit\": 0}",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:22113"
+    },
+    {
+      "tool": "call_00_ET_Z1uIZDFUsxbjcufFzPul3729",
+      "error": false,
+      "content": "  \"before\": \"f7106aeb5867f63d1fe413ea77e818e2b2c478fe3d66298107c62f25c50f507a\",\n  \"checks\": [\n    {\n      \"argv\": [\n        \"python3\",\n        \"run_checks.py\"\n      ],\n      \"elapsed_seconds\": 6.9061,\n      \"exit_code\": 0,\n      \"name\": \"checks\",\n      \"timeout\": false\n    }\n  ],\n  \"config_hash\": \"5487792df5a0803e4aaba0ea5f3f2412e769e4bec4f5ee03b9a105d76dad2f95\",\n  \"runtime_version\": \"0.1.0\",\n  \"schema\": 1,\n  \"started_at\": \"2026-10-06T07:21:24Z\",\n  \"status\": \"passed\",\n  \"task_id\": \"a526eb831bcc4382a4dc1ca5133e3a52\"\n}",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:22118"
+    },
+    {
+      "tool": "call_00_gr5tvjivY2SBZjNVbNLi6776",
+      "error": false,
+      "content": " M src/cachetools/_cached.py\n M src/cachetools/_cachedmethod.py\n?? agent_tests/\n--- .gitignore ---\n*.egg-info\n*.pyc\n*.swp\n.cache/\n.coverage\n.pytest_cache/\n.tox/\nMANIFEST\nbuild/\ndist/\ndocs/_build/\n\n--- agent_tests contents ---\nagent_tests/test_independent_key_progress.py\n--- .experiment ---\n.\n..\nchecks.jsonl",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:22512"
+    },
+    {
+      "tool": "call_00_1cvyAd3AvoXW807ttRt74709",
+      "error": false,
+      "content": "{\n  \"attempt\": \"f63ec0379f484792ab8aa72703139a64\",\n  \"config_hash\": \"5487792df5a0803e4aaba0ea5f3f2412e769e4bec4f5ee03b9a105d76dad2f95\",\n  \"goal\": \"Restore independent-key progress for cachetools cached/cachedmethod with condition set (info on and off) while preserving same-key stampede suppression, hit/miss accounting, exception cleanup and public behavior; python3 run_checks.py must pass (task tests + upstream + agent_tests).\",\n  \"next\": \"Run deep-native verify (python3 run_checks.py) on the frozen worktree, then review diff and finish.\",\n  \"note\": \"Reproduced D1: all 8 subtests of benchmark_tests.test_independent_keys_and_cached_hits fail; upstream 338 pass. Discriminating evidence (TMPDIR scratch): lock is acquirable while held call runs and cache has no eviction pressure (0-1/128), yet the unrelated caller is parked in Condition.wait_for on the global predicate 'not pending' at src/cachetools/_cached.py:24,153 and _cachedmethod.py:165,279. Fixed predicate to wait only for the caller's own key. Added agent_tests/test_independent_key_progress.py (4 tests) which fails on pre-fix source (independent-key + concurrency tests) and passes after.\",\n  \"risk\": \"Pre-existing, out-of-scope limitation confirmed but not changed: with a real threading.Condition plus a distinct lock= object, notify_all() is called without holding the condition's lock (upstream tests only use mock lock/condition). Regression tests use short (0.3s) observation windows for suppression, which is directional: they cannot false-fail on a correct implementation, but an extremely slow machine could miss a broken one.\",\n  \"schema\": 1,\n  \"session\": \"27c6b2c6-f7b9-4646-91b6-62847b61bca4\",\n  \"status\": \"complete\",\n  \"summary\": \"Restored independent-key progress for condition-based caching: the wait predicate in ",
+      "evidence": "runs/02-D1-B/phase1/transcript.jsonl:22777"
+    }
+  ]
+}

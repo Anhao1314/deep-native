@@ -1,0 +1,36 @@
+## Root cause (confirmed, not the operator's hypothesis)
+
+The stall is in the `condition`-based wrappers' wait predicate, not eviction or the user function holding the lock.
+
+Discriminating evidence (scratch script in `$TMPDIR/dn2-evidence/reproduce_regression.py`):
+- **Eviction refuted** — cache held 0–1 of 128 entries while the unrelated caller stalled; nothing to evict.
+- **"User function holds the cache lock" refuted** — the cache lock was acquirable within 1 ms while the held computation was running (the body is invoked outside the `with lock` block).
+- **Actual cause** — the blocked caller's stack was parked in `Condition.wait_for` on a *decorator-global* predicate: `lambda: not pending` (`src/cachetools/_cached.py:24,153`, `_cachedmethod.py:165,279`). One key being computed gated every other key, including already-cached ones, contradicting `docs/index.rst:335` ("prevent concurrent execution … with *identical* parameters, or cache keys").
+
+## Change
+
+Four one-line edits: the predicate now waits only for the caller's own key (`k not in pending` / `key not in self.__pending`), still under the lock, with `pending` cleanup and `notify_all()` unchanged:
+
+- `src/cachetools/_cached.py` — `_condition_info`, `_condition`
+- `src/cachetools/_cachedmethod.py` — `_condition_info` (descriptor path), `_condition` (incl. deprecated classmethod path)
+
+Added `agent_tests/test_independent_key_progress.py` (4 tests / 16 subTest cases): independent-key progress for `cached`/`cachedmethod` × `info∈{False,True}` × cold/hot key, true concurrency of distinct keys (barrier), same-key stampede suppression with hit/miss accounting, and recovery of a same-key waiter after the holder raises. Pre-fix, this file fails on both progress tests while the suppression/exception tests pass; post-fix all pass. Frozen `benchmark_tests.py`, `benchmark_phase.json`, `run_checks.py`, `check_receipt.py` and upstream tests were not touched.
+
+## Checks actually executed
+
+| Command | Result |
+|---|---|
+| `python3 run_checks.py` (baseline, pre-fix) | task tests FAIL (8/8 subtests), upstream 338 pass |
+| `python3 run_checks.py` (final) | task tests OK, upstream 338 pass, agent_tests 4 pass, `upstream_exit=0`, `extra_exit=0`, source fingerprint stable |
+| `python3 -m pytest -q agent_tests` pre-fix (fix patch reverted, then re-applied) | 2 failed / 2 passed → tests discriminate |
+| `python3 -m pytest -q agent_tests` ×5 | 4 passed each run, stable |
+| deep-native `verify` (check `python3 run_checks.py`, timeout 300) | `status: passed`, exit 0, worktree hash before == after |
+
+Evidence: `.deep-native/attempts/f63ec0379f484792ab8aa72703139a64.json`; scratch reproduction under `$TMPDIR/dn2-evidence/` (not committed).
+
+## Remaining risk
+
+- Pre-existing, out-of-scope, unchanged: with a real `threading.Condition` **plus a distinct `lock=`**, `notify_all()` is called without holding the condition's lock (upstream tests only use mock lock/condition). Fixing it would alter lock-count behavior encoded in the frozen upstream tests, so I left it and noted it.
+- The suppression assertions use 0.3 s observation windows; they cannot false-fail a correct implementation, but an extremely slow machine could mask a broken one.
+
+STATUS: DONE

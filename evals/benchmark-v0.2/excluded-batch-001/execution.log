@@ -1,0 +1,32 @@
+{"run_id": "01-D1-C", "strict_pass": true, "tool_calls": 45, "duration_seconds": 249.98109750000003}
+{"run_id": "02-D1-B", "strict_pass": true, "tool_calls": 60, "duration_seconds": 329.0960242500005}
+Traceback (most recent call last):
+  File "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/runtime.py", line 148, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/runtime.py", line 147, in main
+    run_one(entry)
+  File "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/runtime.py", line 107, in run_one
+    session,trace=live(root,task,arm,home,tmp,relay,model,artifact/'phase1',BUDGET['phase1_max_seconds'] if staged else BUDGET['wall_seconds'],BUDGET['phase1_max_attempts'] if staged else BUDGET['assistant_attempts'],commit,expected)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/runtime.py", line 37, in live
+    owner.update()
+  File "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/isolation.py", line 87, in update
+    snapshot = _process_snapshot()
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/isolation.py", line 63, in _process_snapshot
+    listing = subprocess.run(
+              ^^^^^^^^^^^^^^^
+  File "/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/subprocess.py", line 550, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/subprocess.py", line 1209, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/subprocess.py", line 2115, in _communicate
+    ready = selector.select(timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/selectors.py", line 415, in select
+    fd_event_list = self._selector.poll(timeout)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

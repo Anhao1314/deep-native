@@ -1,12 +1,22 @@
 """Real Claude Code execution. All interruptions require completed functional evidence."""
 from harness import *
+import calendar
 
-def receipt(root,n,expected):
+def receipt(root,n,expected,epochs=None):
  p=root/'.experiment/checks.jsonl'
  if not p.exists() or protected(root)!=expected:return None
  try:rows=[json.loads(x) for x in p.read_text().splitlines()]
  except (ValueError,OSError):return None
- return next((r for r in reversed(rows) if r.get('passed') and r.get('phase')==n and r.get('source_before')==r.get('source_after')==fingerprint(root)),None)
+ return next((r for r in reversed(rows) if r.get('passed') and r.get('phase')==n and r.get('source_before')==r.get('source_after')==fingerprint(root) and (epochs is None or r.get('ended_epoch') in epochs)),None)
+def native_evidence_proof(root,tool,content,r):
+ if not (r and tool.get('name')=='Bash' and 'verify' in tool.get('input',{}).get('command','') and r['started_epoch']>=tool.get('_observed_epoch',float('inf'))):return False
+ for attempt in (root/'.deep-native/attempts').glob('*.json'):
+  evidence=json.loads(attempt.read_text())
+  output_identifies_attempt=evidence.get('attempt_id','IMPOSSIBLE') in content or (evidence.get('task_id','IMPOSSIBLE') in content and 'passed' in content)
+  started=calendar.timegm(time.strptime(evidence['started_at'],'%Y-%m-%dT%H:%M:%SZ'))
+  if evidence.get('status')=='passed' and output_identifies_attempt and started>=int(tool['_observed_epoch']) and any(check.get('exit_code')==0 and 'run_checks.py' in check.get('argv',[]) for check in evidence.get('checks',[])):return True
+ return False
+
 def checkpoint(root,arm):
  if arm=='A':
   p=root/'PROGRESS.md';note=p.read_text() if p.is_file() else '';value={'note':note,'next':note}
@@ -53,12 +63,9 @@ def live(root,task,arm,home,tmp,relay,model,artifact,seconds,turns,commit,expect
         tool=tools.get(c.get('tool_use_id'),{});r=receipt(root,n,expected)
         content=json.dumps(c,ensure_ascii=False)
         # A receipt only qualifies when the completed tool output corroborates it.
-        native_proof=False
-        if r and tool.get('name')=='Bash' and 'verify' in tool.get('input',{}).get('command','') and r['started_epoch']>=tool.get('_observed_epoch',float('inf')):
-         for attempt in (root/'.deep-native/attempts').glob('*.json'):
-          evidence=json.loads(attempt.read_text())
-          if evidence.get('status')=='passed' and any(check.get('exit_code')==0 and 'run_checks.py' in check.get('argv',[]) for check in evidence.get('checks',[])) and evidence.get('attempt_id','IMPOSSIBLE') in content:native_proof=True
+        native_proof=native_evidence_proof(root,tool,content,r)
         if r and ('TASK_CHECK_RESULT' in content or native_proof) and not c.get('is_error'):seen_receipts.add(r['ended_epoch'])
+        r=receipt(root,n,expected,seen_receipts) or r
         observation={'elapsed_seconds':time.monotonic()-started,'tool_use_id':c.get('tool_use_id'),'tool':tool,'source_hash':fingerprint(root),'current_receipt':r,'corroborated':bool(r and r['ended_epoch'] in seen_receipts),'is_error':c.get('is_error',False)}
         observations.append(observation)
         if n==1 and task['id'] in ['F1','R1'] and r and r['ended_epoch'] in seen_receipts:
@@ -115,7 +122,7 @@ def run_one(entry):
   calls=relay.close();dump(artifact/'provider_calls.json',calls)
   independent=grade(root,task,2,commit);dump(artifact/'independent_grade.json',independent)
   paths,violations=changes(root,task,commit,n);integrity=protected(root)==expected
-  final_receipt=receipt(root,n,expected);corroborated=bool(final_receipt and final_receipt['ended_epoch'] in sessions[-1]['corroborated_receipt_epochs'])
+  final_receipt=receipt(root,n,expected,sessions[-1]['corroborated_receipt_epochs']);corroborated=bool(final_receipt)
   outcome=independent['pass'] and not violations and integrity and (not staged or n==2) and (task['id'] not in ['E1','F1'] or corroborated)
   toolcalls=[c for e in events for c in e.get('message',{}).get('content',[]) if isinstance(c,dict) and c.get('type')=='tool_use']
   (artifact/'final.patch').write_text(git(root,'diff','--binary',commit))
@@ -133,7 +140,8 @@ def run_one(entry):
   if denied:dump(OUT/'INFRASTRUCTURE_STOP.json',{'run':entry,'reason':'unexpected execution denial requires trace audit; no next run authorized by harness'});raise RuntimeError('Infrastructure stop')
   print(json.dumps({k:result[k] for k in ['run_id','strict_pass','tool_calls','duration_seconds']}),flush=True)
  finally:
-  relay.close()
+  final_calls=relay.close()
+  if not (artifact/'provider_calls.json').exists():dump(artifact/'provider_calls.json',final_calls)
   # Keep the actual workspace for forensic inspection; sibling sandbox blocks reuse.
   dump(artifact/'retained_workspace.json',{'path':str(root),'preserved':True})
 

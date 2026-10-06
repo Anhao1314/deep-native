@@ -1,0 +1,6 @@
+{
+  "exit_code": 0,
+  "stdout": "{\n  \"files\": 6,\n  \"hooks\": true,\n  \"installed\": true,\n  \"restart_claude_code\": true,\n  \"scope\": \"project\"\n}\n",
+  "stderr": "",
+  "duration_seconds": 0.03256099999998696
+}
