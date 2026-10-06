@@ -1,68 +1,140 @@
 # Deep Native
 
-**让接入 DeepSeek 的 Claude Code，以证据驱动编码交付。**
+**让接入 DeepSeek 的 Claude Code，默认少折腾，必要时才进入深度 Agent 工作流。**
 
-[English](README.md) · [详细教程](docs/tutorial.zh-CN.md) · [实际演示](docs/demo/demo.html) · [验证报告](docs/validation.md) · [三组评测方法](evals/README.md)
+[English](README.md) · [完整教程](docs/tutorial.zh-CN.md) · [架构](docs/architecture.md) · [v0.1 实验结论](docs/v0.1-pilot-findings.md) · [v0.2 消融实验](evals/v0.2-ablation.md)
 
-> No evidence, no done.
-> 这是一个 Skill + 本地验证工具，不是模型升级器，也没有“DeepSeek 已达到 Claude 水平”的结论。
+> **默认轻量，证据要求升级时再升级。**
+>
+> Deep Native 是一个 Skill + 本地确定性验证工具，不是模型权重升级器，也没有“DeepSeek 已达到 Claude”的结论。
 
-## 当前能做什么
+## 为什么要重做 v0.2 Candidate
 
-Skill 引导模型先读代码、复现问题，再小步修改、回归验证和交付。辅助工具负责实际执行预设检查、记录退出码和超时，将证据绑定到代码内容；修改后仍想沿用旧证据，会被 `finish` 拒绝。
+第一次真实 A/B Pilot 没有得到我们想要的结果。
 
-长任务可以保存进度并恢复。可选 Hooks 在匹配的会话恢复时补充检查点，在缺少验证时提醒一次；不会无限阻止结束，不会扩大工具权限，也不会修改全局模型配置。
+10 个完整配对中：
 
-## 先运行一次演示
+| 指标 | Raw DeepSeek | Deep Native v0.1 |
+| --- | ---: | ---: |
+| 严格任务成功率 | **8/10** | **7/10** |
+| 配对质量结果 | — | **0 胜 / 1 负 / 9 平** |
+| 工具调用中位数 | 29 | 36 |
+| 真实检查失败后继续处理 | 4/5 | 10/10 |
 
-要求 Python 3.10+、Git，macOS 或 Linux。无需 API Key。
+Deep Native 确实改变了行为，让模型更愿意在失败后继续工作；问题是，更多工作没有稳定变成更好的结果，配对耗时和上下文处理 token 还分别约增加到 **1.20x / 1.21x**。
+
+所以 v0.2 不再给所有任务套完整流程。
+
+## 三档自适应工作流
+
+```text
+                         任务
+                          |
+                     判断复杂度
+                /          |          \
+             FAST       STANDARD      DEEP
+              |             |           |
+       局部修改+检查   复现+假设+验证   检查点+证据Runtime
+                \          |          /
+                      新鲜验证证据
+                          |
+                        交付
+```
+
+- **FAST**：局部、目标清楚、低风险、没有失败尝试。直接读相关代码、修改、跑一个有意义的检查、交付。
+- **STANDARD**：跨文件、根因不确定，或第一次尝试失败。先复现并写出一个可验证假设，再修改和验证。
+- **DEEP**：两次无效尝试、repo-wide、多子系统、长任务、高风险、可能 compact/中断。只有这时才启用持久状态、checkpoint、verify/finish 和恢复 Hook。
+
+也就是说，小 bug 不再为了“专业感”举行项目启动仪式。
+
+## 失败不是一种东西
+
+v0.2 Candidate 将失败分成：
+
+`implementation · hypothesis · contract · environment · dependency · budget · unknown`
+
+比如 heredoc / temp path 被沙箱拒绝，这是 **environment failure**。正确动作是调整命令、可写路径或执行方式，而不是开始改业务代码。
+
+第二次无效尝试则是升级信号，不能原样再试第三次然后期待宇宙突然变友善。
+
+## 证据层保持稳定
+
+v0.1 已经测试过的本地验证 Runtime 暂时不大改。
+
+DEEP 任务仍然可以：
+
+- 冻结项目实际检查命令；
+- 保存小型 checkpoint；
+- 执行检查并记录退出码/超时；
+- 将通过结果绑定到当前 worktree；
+- 代码发生变化后拒绝沿用旧证据；
+- 可选地在匹配 Claude Code 会话恢复/停止时提供提醒。
+
+v0.2 主要重做的是**什么时候启用这些机制，以及失败后下一步怎么决策**。
+
+## 安装
 
 ```bash
 git clone https://github.com/Anhao1314/deep-native.git
 cd deep-native
-python3 -m unittest discover -s tests -v
-python3 examples/demo.py --output artifacts/demo
-open artifacts/demo/demo.html
-```
 
-最后一行适用于 macOS；Linux 直接用浏览器打开该文件。演示内容为：
-
-```text
-真实失败测试 -> 拒绝提前完成 -> 明确标注的脚本修复
--> 恢复进度 -> 实际验证通过 -> 代码再变更后拒绝旧证据
--> 重新验证 -> 带限制说明完成
-```
-
-**代码修复由演示脚本执行，不是 DeepSeek 自主完成。** 网页展示的是实际命令回放，不是实时 Agent，也不是模型性能评测。
-
-## 装进你正在使用的项目
-
-保留你现有的 Claude Code + DeepSeek API 配置，不要把 Key 发到聊天或仓库。
-
-```bash
-PROJECT="/你的项目的绝对路径"
+PROJECT="/你的 Git 项目绝对路径"
 python3 deep_native.py --project "$PROJECT" doctor
 python3 deep_native.py --project "$PROJECT" install
 ```
 
-重启该项目内的 Claude Code，输入：
+重启目标项目中的 Claude Code：
 
 ```text
-/deep-native 修复这个项目的问题。先调查和复现，再修改、添加回归测试，最后提供真实验证结果与未覆盖的风险。
+/deep-native 修复重试问题。使用能够安全完成任务的最小工作流，只有证据要求时再升级。
 ```
 
-需要可选会话恢复和停止提醒时：
+长任务需要恢复 Hook 时：
 
 ```bash
 python3 deep_native.py --project "$PROJECT" install --hooks
 ```
 
-只安装到指定项目。安装器不会覆盖内容不同的已有 Skill；不会替你购买模型、改 API Key 或开启绕过权限。完整参数、如何设置项目测试命令、卸载与故障处理，见[详细教程](docs/tutorial.zh-CN.md)。
+安装器仍然只作用于项目，不修改全局模型配置、不写 API Key、不扩大权限。
 
-## 已验证与未验证
+## 真实 Pilot 怎么处理
 
-本地工具测试、失败路径、12 步演示、三组同起点评测夹具已执行，结果见[验证报告](docs/validation.md)。
+完整 21-run 原始证据保留在
+[`benchmark-v1` 分支](https://github.com/Anhao1314/deep-native/tree/benchmark-v1)，
+没有把几十万行 artifact 直接塞进主线。
 
-**开发环境中没有 Claude Code 可执行程序或模型凭据，外部 DNS 也不可用。因此，真实宿主加载、真实 DeepSeek 调用以及与原生 Claude 的对照尚未执行。** 没有成功率提升百分比，没有 token 节省数据，没有模型等价承诺。
+该实验还发现：
 
-这版交付的是可安装、可复现、可继续评测的基础版本。它不是安全沙盒；本地记录也不是不可伪造的证明。请在可信项目运行，并由独立测试与人工评审判断最终正确性。
+- 17 次 shell/temp 写入拒绝，影响了 14 个 run；
+- T09 的“验证时效”没有形成有效观察；
+- T10 在真实代码进展前就被中断，没真正测到恢复收益。
+
+所以正式结论仍然是 **INCONCLUSIVE**，而不是“v0.1 已证明失败”或“只是运气不好”。
+
+详细见 [v0.1 实验结论](docs/v0.1-pilot-findings.md)。
+
+## 下一轮不是 60 次
+
+下一步是 **12-run 机制消融**：
+
+```text
+Raw DeepSeek
+vs
+Deep Native v0.1
+vs
+Deep Native v0.2 Candidate
+```
+
+只测四类真正有差距空间的任务：困难根因调试、环境失败分类、最终代码的新鲜验证、中断后真实恢复。
+
+如果 12 次里 v0.2 都没有机制级收益，就停下来继续研究，不机械烧到 60 次。
+
+完整协议见 [evals/v0.2-ablation.md](evals/v0.2-ablation.md)。
+
+## 边界
+
+Skill 可以改善流程，不能凭空生成模型智力。更多规划、更多工具调用、更多 token 都不是“更 Agentic”的证据。
+
+本地验证工具也不是安全沙盒或签名证明。最终仍应依赖真实测试、独立 CI 和代码审查。
+
+MIT License。独立开源项目，与 Anthropic、DeepSeek 无官方隶属或背书关系。

@@ -1,164 +1,202 @@
 # Deep Native
 
-**Evidence-first coding for DeepSeek in Claude Code.**
+**Adaptive coding behavior for DeepSeek in Claude Code.**
 
-[中文说明](README.zh-CN.md) · [中文完整教程](docs/tutorial.zh-CN.md) · [Executed demo](docs/demo/demo.html) · [Test report](docs/validation.md) · [Evaluation protocol](evals/README.md)
+[中文说明](README.zh-CN.md) · [中文教程](docs/tutorial.zh-CN.md) · [Architecture](docs/architecture.md) · [v0.1 pilot findings](docs/v0.1-pilot-findings.md) · [v0.2 ablation plan](evals/v0.2-ablation.md)
 
-> **No evidence, no done.**
-> A small Skill plus local verification tools. Not a model upgrade, not a Claude clone,
-> and not a claim that DeepSeek now matches Claude.
+> **Do less by default. Escalate when evidence demands it.**
+>
+> Deep Native is a Skill plus deterministic local verification tools. It is not a
+> model-weight upgrade, not a Claude clone, and not a claim that DeepSeek matches Claude.
+
+## Why v0.2 Candidate exists
+
+The first live A/B pilot did **not** show a quality improvement for v0.1. In the
+10 complete pairs, Raw DeepSeek passed **8/10** and Deep Native v0.1 passed **7/10**.
+The Skill made the agent more persistent after failures, but also increased tool use
+and paired processing overhead without converting that extra work into more task wins.
+
+That negative result changed the design.
 
 ```text
-Inspect -> Reproduce -> Edit -> Verify -> Review -> Deliver
-                              |
-                   current code + required checks
-                              |
-                   evidence receipt, not a promise
+                         task
+                          |
+                   choose lightest mode
+                 /          |           \
+              FAST       STANDARD       DEEP
+              local       uncertain      long/high-risk
+                |            |              |
+          edit + check   hypothesis +   checkpoint +
+                         verification     evidence runtime
+                 \          |           /
+                       fresh evidence
+                          |
+                        deliver
 ```
 
-## What ships in v0.1.0
+Raw pilot artifacts remain on the
+[`benchmark-v1` branch](https://github.com/Anhao1314/deep-native/tree/benchmark-v1).
+The product branch keeps only the measured conclusions, not 370k+ lines of experiment
+artifacts.
 
-| Component | What it actually does |
-| --- | --- |
-| `SKILL.md` | A bounded, adaptive coding workflow: investigate first, verify before done, report blockers honestly |
-| `doctor` | Read-only configuration presence checks; no API request or secret output |
-| `install` | Project-scoped Skill installation; no global settings or model changes |
-| Check contract | Named required commands, frozen when a task begins |
-| `verify` / `finish` | Actual subprocess checks, exit codes, timeouts, worktree fingerprints, stale-result rejection |
-| Checkpoint / recovery | Small persisted progress notes; optional matching-session recovery hook |
-| Optional Stop hook | One continuation reminder, then explicit unverified escape to avoid loops |
-| Demo / grader | A real offline scripted replay and equal fixtures for future model comparisons |
+## Three modes
 
-The helper uses Python's standard library. Runtime support: **Python 3.10+ on macOS/Linux**,
-Git, and a trusted repository. Windows runtime support is not claimed; use WSL.
-The Skill itself has no package dependency, but the evidence helper requires Python.
+| Mode | Use when | Persistent Deep Native runtime |
+| --- | --- | --- |
+| **FAST** | Localized, clear, low-risk, no failed attempt | No |
+| **STANDARD** | Cross-file, uncertain root cause, or first failed attempt | No by default |
+| **DEEP** | >=2 ineffective attempts, repo-wide, long-running/high-risk, interruption risk | Yes |
 
-## Try the offline demo first
+FAST is intentionally boring:
 
-No Claude installation, API key or model bill required:
+```text
+inspect -> edit -> focused check -> deliver
+```
+
+STANDARD adds explicit reproduction/hypothesis handling and a broader relevant check.
+DEEP activates the existing frozen check contract, checkpoints, worktree-bound
+verification, stale-evidence rejection, and optional recovery hooks.
+
+## Failure classification
+
+v0.2 Candidate distinguishes:
+
+`implementation · hypothesis · contract · environment · dependency · budget · unknown`
+
+The distinction is operational. An environment failure such as a denied temp path
+should change the invocation or writable path before product code is touched.
+A second ineffective attempt is an escalation signal, not permission to loop.
+
+The installable Skill contains
+[`scripts/policy.py`](skills/deep-native/scripts/policy.py), a deterministic mirror of
+the routing/failure rules used by tests and evals. Normal tasks do not need another tool
+call just to “prove” they chose a mode.
+
+## Stable evidence layer
+
+The v0.1 deterministic helper remains deliberately stable in this candidate. For DEEP
+tasks it can:
+
+- freeze named project checks when a task begins;
+- save small recovery checkpoints;
+- run required checks without a shell wrapper;
+- record exit code, timeout, contract identity, and worktree fingerprints;
+- reject completion when evidence is missing, failed, or stale;
+- optionally remind a matching Claude Code session before it stops unverified.
+
+This separation matters: v0.2 is changing the **behavior policy**, not rewriting the
+already-tested evidence gate merely to improve benchmark scores.
+
+## Install
+
+Requires Python 3.10+, Git, macOS/Linux (or WSL for the runtime helper).
 
 ```bash
 git clone https://github.com/Anhao1314/deep-native.git
 cd deep-native
-python3 -m unittest discover -s tests -v
-python3 examples/demo.py --output artifacts/demo
-```
 
-Open `artifacts/demo/demo.html` locally. On macOS:
-
-```bash
-open artifacts/demo/demo.html
-```
-
-The demo executes failing tests, rejects premature completion, applies an explicitly
-**scripted** repair, restores a checkpoint, verifies, rejects evidence after a later
-edit, and verifies again. Twelve recorded steps, not an animation pretending to be an
-agent. The checked-in [JSON transcript](docs/demo/demo.json) is inspectable.
-
-## Install into an existing Claude Code project
-
-Already running Claude Code through DeepSeek? **Keep your working provider setup.**
-This project does not need your API key and does not change model settings.
-
-```bash
-# From this cloned deep-native directory:
 PROJECT="/absolute/path/to/your/git-project"
 python3 deep_native.py --project "$PROJECT" doctor
 python3 deep_native.py --project "$PROJECT" install
 ```
 
-Restart Claude Code in that project and invoke:
+Restart Claude Code in the target project. Then:
 
 ```text
-/deep-native Fix the retry behavior. Inspect first, add a regression test,
-verify the actual change, and report any untested limitations.
+/deep-native Fix the retry bug with the smallest safe workflow. Escalate only if the evidence requires it.
 ```
 
-For optional session recovery and a bounded Stop reminder:
+For long-running DEEP work, optional recovery/Stop hooks can be installed with:
 
 ```bash
 python3 deep_native.py --project "$PROJECT" install --hooks
 ```
 
-This merges only our entries into `.claude/settings.local.json`, preserves unrelated
-settings, and grants no tools or permission bypass. Inspect the file before restarting.
-Different existing Skill files are never overwritten. See [installation and removal](docs/tutorial.zh-CN.md).
+The installer is project-scoped. It does not alter global model settings, buy access,
+set API keys, grant tools, or bypass permissions.
 
-## Manual evidence workflow
+## DEEP manual evidence workflow
 
-Configure the **real test command for your project**, not a command that simply exits zero.
-This example uses a Python unittest project:
+Only use the persistent lifecycle when the task actually needs it.
 
 ```bash
 DN="$PWD/deep_native.py"
+
 python3 "$DN" --project "$PROJECT" configure --name tests -- python3 -m unittest discover -s tests
 python3 "$DN" --project "$PROJECT" begin --goal "Fix retry semantics without regressions"
-# Make and inspect the actual change.
-python3 "$DN" --project "$PROJECT" checkpoint --note "Located and fixed boundary condition" --next "Run regression suite"
+python3 "$DN" --project "$PROJECT" checkpoint \
+  --note "Confirmed boundary bug; current hypothesis X; changed retry.py and test_retry.py" \
+  --next "Run focused regression and inspect failure if any"
 python3 "$DN" --project "$PROJECT" verify --timeout 60
-python3 "$DN" --project "$PROJECT" finish --summary "Retry semantics fixed" --risk "Provider integration not tested"
+python3 "$DN" --project "$PROJECT" finish \
+  --summary "Retry semantics fixed" --risk "Provider integration not tested"
 ```
 
-`--project` goes **before** the subcommand. `configure` accepts argv after `--`, not a
-shell string. Add multiple named checks before `begin`; every configured check is
-required. For hook activation the Skill supplies Claude Code's current session ID.
-The manual CLI session defaults to `manual` and does not attach to an arbitrary session.
+FAST and STANDARD tasks should not pay this lifecycle cost by default.
 
-Exit codes: **0** successful command, **1** verification failed, **2** invalid input,
-blocked completion or runtime error. Hook errors are reported as warnings with exit 0
-so a broken hook cannot trap the user; they never certify success.
+## Live preliminary evidence
 
-## What has and has not been measured
+The stopped v0.1 campaign retained 21 runs. Matched comparison:
 
-| Experiment | Status |
-| --- | --- |
-| Runtime, installer, failure-path and fixture-grader tests | See [actual validation report](docs/validation.md) |
-| Offline scripted repair and stale-evidence demo | Executed; [12-step transcript](docs/demo/demo.json) |
-| Three-arm fixture identity / external grader | Tested locally |
-| Actual Claude Code Skill loading and hook lifecycle | **NOT RUN in the authoring environment** |
-| DeepSeek raw vs DeepSeek + Skill vs native Claude | **NOT RUN** |
-| Model accuracy, token savings, cost savings, native parity | **No claim** |
+| Metric | Raw DeepSeek | Deep Native v0.1 |
+| --- | ---: | ---: |
+| Strict task success | **8/10** | **7/10** |
+| Pairwise quality wins | — | **0 win / 1 loss / 9 ties** |
+| Median tool calls | 29 | 36 |
+| Continued after actual failed check | 4/5 | 10/10 |
 
-The development environment had no Claude executable, model credentials or external
-DNS access. Unit tests and hook payload simulations are **not** live host validation.
-The [evaluation protocol](evals/README.md) explains how to run the missing comparisons
-without passing off fixture tests as model performance.
+Paired median B/A ratios were approximately **1.20x** for agent time and **1.21x**
+for context-processing tokens. The run also exposed 17 shell/temp denials and invalid
+measurement of the intended stale-verification/recovery mechanisms. Therefore the
+formal result remains **inconclusive**, and v0.2 is a hypothesis derived from traces,
+not a claimed improvement.
 
-## Limits that matter
+See [the full product-side findings](docs/v0.1-pilot-findings.md).
 
-Verification covers Git-tracked and nonignored untracked worktree bytes, the check
-contract, symlink targets and executable bits. It excludes local state and untracked
-ignored files. External services, dependencies and environment changes are not covered.
-Submodules and oversized worktrees fail explicitly. See [coverage details](skills/deep-native/references/verification.md).
+## Next experiment
 
-Checks run real programs. This is **not a sandbox**. Do not run untrusted repositories
-or model patches without OS/container isolation. The wrapper does not forward model
-credentials to checks and does not store test stdout/stderr, but programs can still
-read files or contact networks. Local receipts are not signed or tamper-proof; an agent
-with filesystem access can forge them. Use independent CI and code review for trust.
+Do **not** jump back to 60 runs. The next experiment is a 12-run mechanism ablation:
 
-A Skill cannot supply unsupported API capabilities, larger model intelligence or
-perfect instruction following. Extra planning/checks can increase latency and token
-usage. Tiny read-only tasks should not pay for a full task lifecycle.
+`Raw DeepSeek vs v0.1 vs v0.2 Candidate`
+
+on four held-out tasks targeting hard debugging, environment classification, fresh
+verification, and recovery after real progress.
+
+See [evals/v0.2-ablation.md](evals/v0.2-ablation.md).
+
+## Limits
+
+A Skill cannot create model intelligence that the base model does not have. More
+planning and more tool calls are not automatically better.
+
+The evidence helper is not a security sandbox or signed attestation. Checks can be
+insufficient even when they exit zero. External services, ignored untracked files,
+dependencies, and environment changes are outside the worktree fingerprint. Use
+independent tests, CI, and review for consequential changes.
 
 ## Project layout
 
 ```text
-skills/deep-native/      Installable Skill, references and standalone helper
-deep_native.py          Zero-install CLI entry point
-tests/                  Offline regression and negative tests
-examples/demo.py        Executed fixture -> HTML and JSON replay
-evals/                  Equal workspaces and external patch grader
-docs/                   Tutorial, validation, architecture, sources and replay
-.github/workflows/      CI definition; workflow status is separate from local results
+skills/deep-native/
+  SKILL.md                    adaptive agent behavior
+  references/
+    adaptive-runtime.md       routing/failure policy
+    recovery.md
+    verification.md
+  scripts/
+    policy.py                 deterministic policy mirror
+    deep_native.py            stable evidence runtime
+
+tests/                        offline regression tests
+docs/                         architecture, tutorial, pilot findings
+evals/                        benchmark protocol and ablations
+benchmark-v1 branch           retained live raw artifacts
 ```
 
-## Contributing
+## Development rule
 
-Start with a reproducible failure and a failing test. Keep the Skill small and preserve
-existing permissions. Do not submit credentials, conversation transcripts or fabricated
-benchmark results. See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
+Do not optimize the Skill against a frozen benchmark and then call the same tasks
+held-out evidence. Every candidate change gets a new commit and a new held-out set.
 
 Licensed under MIT. Independent project; not affiliated with or endorsed by Anthropic
-or DeepSeek. The aspiration is native-like workflow reliability; any improvement must
-be demonstrated on held-out tasks, not inferred from the project name.
+or DeepSeek.

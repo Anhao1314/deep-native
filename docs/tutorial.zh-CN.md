@@ -1,4 +1,4 @@
-# Deep Native v0.1 完整教程
+# Deep Native v0.2 Candidate 完整教程
 
 本文中的终端命令是可执行接口；出现 `/deep-native` 的内容要输入 **Claude Code 会话**，而不是系统终端。使用 Python 3.10+ 和 Git，支持 macOS/Linux；原生 Windows 暂不支持运行时锁，请使用 WSL。
 
@@ -6,7 +6,7 @@
 
 **Skill** 是模型按需读取的工作流规范。它不能改变模型权重，也不保证模型每次都遵守。
 
-**辅助 CLI** 是确定性程序：建立任务、保存进度、运行你指定的检查、记录证据、拒绝使用过期证据完成任务。它不调用模型，不改变你的 DeepSeek 连接，也不负责把不支持的协议字段变成可用能力。
+**辅助 CLI** 是确定性程序：建立深度任务、保存进度、运行你指定的检查、记录证据、拒绝使用过期证据完成任务。它不调用模型，不改变你的 DeepSeek 连接，也不负责把不支持的协议字段变成可用能力。\n\n**v0.2 Candidate 的变化**：不是每个任务都建立状态。局部清晰任务走 FAST；跨文件、根因不确定或第一次失败走 STANDARD；只有两次无效尝试、repo-wide、多子系统、长任务、高风险或可能中断时才进入 DEEP 并启用辅助 CLI 的完整生命周期。
 
 推荐先在一个可丢弃的测试项目使用，再安装到正式项目。检查仓库脚本后再执行；本工具不是沙盒。
 
@@ -82,7 +82,7 @@ python3 "$DN" --project "$PROJECT" install
 从你的目标项目启动或重启 Claude Code。输入：
 
 ```text
-/deep-native 修复重试次数的边界问题。先检查实现和测试，复现错误，添加回归测试，以最小修改修复。交付时说明真正运行了什么、哪些没有验证。
+/deep-native 修复重试次数的边界问题。使用能够安全完成任务的最小工作流；如果第一次假设失败，先分类失败再继续，只有复杂度或风险上升时才进入 DEEP。交付时说明真正运行了什么、哪些没有验证。
 ```
 
 首次使用时，模型应读取仓库规则、Git 状态和相关文件，确认实际检查命令，再创建任务。它不应该一上来修改许多无关文件，也不应该把 Skill 当成跳过权限的理由。
@@ -132,7 +132,7 @@ python3 "$DN" --project "$PROJECT" block --reason "所需数据库不可用，�
 
 `blocked` 不等于 `complete`。进度保存在 `.deep-native/state.json`，检查记录在 `.deep-native/attempts/`。一个工作区同时只允许一个活跃任务，并发项目使用不同 Git worktree。
 
-## 9. 可选 Hooks 与恢复
+## 9. 可选 Hooks 与恢复（主要用于 DEEP）
 
 ```bash
 python3 "$DN" --project "$PROJECT" install --hooks
@@ -170,3 +170,21 @@ SessionStart 在匹配会话中返回简短进度。Stop 在没有当前证据�
 ## 12. 真正比较模型效果
 
 见 [evals/README.md](../evals/README.md)。需要比较 DeepSeek 原始、同一 DeepSeek + Skill、明确版本的原生 Claude，在相同起点、权限、预算、任务和独立评分下重复运行。测试工具自身通过，不等于 DeepSeek 变强，也不等于省 token。
+
+
+## 13. v0.2 的失败分类
+
+遇到失败时，先判断是哪一类，而不是立即再跑一遍：
+
+| 类型 | 下一步 |
+| --- | --- |
+| implementation | 检查失败行为和 diff，做最小代码修正 |
+| hypothesis | 停止编辑，收集能区分根因的新证据，换假设 |
+| contract | 重新读验收条件/现有测试，不能弱化要求 |
+| environment | 先调整命令、可写路径、shell/sandbox 假设，不要先改业务代码 |
+| dependency | 检查依赖版本/运行状态；无权限修复则阻塞 |
+| budget | 保存确认事实、当前假设、改动文件和下一步，然后干净停止 |
+| unknown | 先获得一个新观察，不重复完全相同的失败命令 |
+
+可执行的确定性镜像位于 `.claude/skills/deep-native/scripts/policy.py`。
+它主要用于测试和实验；普通任务不需要额外调用它来增加仪式感。
