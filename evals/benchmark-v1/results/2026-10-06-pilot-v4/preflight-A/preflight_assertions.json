@@ -1,0 +1,8 @@
+{
+  "independent_test_pass": true,
+  "native_cwd_write_denials": 0,
+  "observed_successful_verification": true,
+  "actual_successful_bash_results": 3,
+  "per_run_claude_tmpdir": "/private/tmp/dn-v4-toy-yvj6mj4u/tmp",
+  "excluded_from_formal_results": true
+}

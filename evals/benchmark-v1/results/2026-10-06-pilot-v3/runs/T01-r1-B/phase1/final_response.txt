@@ -1,0 +1,19 @@
+## Summary
+
+**Root cause:** `boltons/strutils.py:172` checked `numstr[-2] == '2'` for the "teens" branch — that's the tens digit of 20–29, not the teens. The pre-existing comment and `_ORDINAL_MAP` make the intent unambiguous.
+
+**Change** (`boltons/strutils.py`):
+- `numstr[-2] == '2'` → `numstr[-2] == '1'`, so 10–19 (and 110–119, …) take `th`, and numbers whose tens digit is 2 fall through to the last-digit rule.
+- Added documented examples `ordinalize(11) → 11th` and `ordinalize(22) → 22nd` to the docstring (docs render via `automodule`).
+
+**Regression tests** (`agent_tests/test_ordinalize.py`, new): 114 parametrized cases covering teens, twenties (20–29, 120–129), other tens, hundreds/thousands, `ext_only=True` suffix parity, numeric-string inputs, and preserved non-digit string passthrough (`'hi'`, `''`, etc.).
+
+**Verification actually run:**
+- `python3 benchmark_check.py` → "Visible acceptance checks passed"; `tests/test_strutils.py` + `tests/test_iterutils.py` 77 passed; `agent_tests` 114 passed.
+- deep-native `verify` → status `passed`, exit code 0, worktree hash unchanged during the run (evidence: `.deep-native/attempts/6412ce39f0614962a4c7e1d0948aeb33.json`).
+- Independent property check against a from-scratch ordinal rule for 0–4999: 0 mismatches, including `ext_only` and string passthrough.
+- Docstring doctests for `ordinalize` pass.
+
+**Scope/risk:** Only `boltons/strutils.py` and `agent_tests/` changed; no existing tests, config, or benchmark files were touched. Negative-number ordinals were out of scope and unchanged. This is self-review, not independent review.
+
+STATUS: DONE

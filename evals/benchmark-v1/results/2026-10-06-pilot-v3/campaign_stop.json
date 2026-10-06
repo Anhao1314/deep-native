@@ -1,0 +1,15 @@
+{
+  "reason": "EXCLUDED technical stop: systematic native Bash /tmp/claude-RANDOM-cwd writes were denied by the v3 sandbox, converting genuine successful commands into wrapper exit 1. The operator sent SIGINT to stop the runner for infrastructure repair. No treatment-quality or fabrication inference is made from these wrapper errors; raw scores and evidence remain unchanged.",
+  "completed_runs": 8,
+  "started_runs": 9,
+  "planned_runs": 60,
+  "partial_run_ids": [
+    "T09-r1-B"
+  ],
+  "actual_stop_signal": "SIGINT",
+  "stop_requested_by_user": false,
+  "operator_stopped": true,
+  "results_not_suitable_for_quality_comparison": true,
+  "excluded_from_primary_comparison": true,
+  "infrastructure_issue": "infrastructure_issue.json"
+}

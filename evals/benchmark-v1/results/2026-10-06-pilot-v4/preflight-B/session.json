@@ -1,0 +1,99 @@
+{
+  "session_id": "19e65bd8-7e87-4709-9653-99b44bf512ae",
+  "exit_code": 0,
+  "duration_seconds": 28.0831,
+  "interrupted": false,
+  "stop_reason": "completed",
+  "observed_assistant_messages": 13,
+  "final_response": "**Change** — `hello.py:2`: `greet(name)` returned the hardcoded `\"hello\"`; now returns `f\"Hello, {name}!\"`.\n\n**Evidence**\n- Reproduced first: `python3 -m unittest` failed with `AssertionError: 'hello' != 'Hello, Ada!'`.\n- After the edit: `python3 -m unittest -v` → 1 test, OK; direct exercise gave `'Hello, Ada!'` and `'Hello, Bo!'`.\n- `deep_native.py verify` → status `passed`, check `tests` (`python3 -m unittest`) exit 0, bound to worktree hash `d2dcaeff…`; attempt recorded at `.deep-native/attempts/d0942083884c4de4b6981dd434ceb49c.json`.\n\n**Notes** — No new test was added: the pre-existing `test_hello.T.test_name` was exactly the failing repro and now serves as the regression test. Working tree has only the one-line change; `.claude/` and `.deep-native/` remain untracked. Remaining risk: only the single `\"Ada\"` assertion is covered; non-string input is unhandled but wasn't requested. Self-review, not an independent review.\n\nSTATUS: DONE",
+  "cli_result": {
+    "duration_api_ms": 27137,
+    "stop_reason": "end_turn",
+    "session_id": "19e65bd8-7e87-4709-9653-99b44bf512ae",
+    "total_cost_usd": 0.17174799999999998,
+    "usage": {
+      "input_tokens": 10640,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 112896,
+      "output_tokens": 2484,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "deepseek-flash[1m]": {
+        "inputTokens": 10640,
+        "outputTokens": 2484,
+        "cacheReadInputTokens": 112896,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.17174799999999998,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 32000,
+        "thinkingTokens": 0,
+        "canonicalModel": "deepseek-flash[1m]",
+        "provider": "firstParty",
+        "costBasis": "unknown"
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "fast_mode_disabled_reason": "sdk_opt_in_required",
+    "subagent_stats": {
+      "spawned": 0,
+      "requested": {
+        "background": 0,
+        "foreground": 0,
+        "unset": 0
+      },
+      "started_in_background": 0,
+      "max_depth": 0,
+      "spawned_by_subagents": 0,
+      "completed": 0,
+      "failed": 0,
+      "killed": {
+        "parent": 0,
+        "user": 0,
+        "system": 0
+      },
+      "refused": {
+        "depth_limit": 0,
+        "concurrency_limit": 0,
+        "budget": 0
+      },
+      "by_type": {}
+    },
+    "is_error": false,
+    "num_turns": 17,
+    "subtype": "success",
+    "api_error_status": null,
+    "result": "**Change** — `hello.py:2`: `greet(name)` returned the hardcoded `\"hello\"`; now returns `f\"Hello, {name}!\"`.\n\n**Evidence**\n- Reproduced first: `python3 -m unittest` failed with `AssertionError: 'hello' != 'Hello, Ada!'`.\n- After the edit: `python3 -m unittest -v` → 1 test, OK; direct exercise gave `'Hello, Ada!'` and `'Hello, Bo!'`.\n- `deep_native.py verify` → status `passed`, check `tests` (`python3 -m unittest`) exit 0, bound to worktree hash `d2dcaeff…`; attempt recorded at `.deep-native/attempts/d0942083884c4de4b6981dd434ceb49c.json`.\n\n**Notes** — No new test was added: the pre-existing `test_hello.T.test_name` was exactly the failing repro and now serves as the regression test. Working tree has only the one-line change; `.claude/` and `.deep-native/` remain untracked. Remaining risk: only the single `\"Ada\"` assertion is covered; non-string input is unhandled but wasn't requested. Self-review, not an independent review.\n\nSTATUS: DONE",
+    "ttft_ms": 2082,
+    "type": "result",
+    "duration_ms": 27834,
+    "uuid": "4f9ab122-27ca-42cc-8985-19ca192ea4fc",
+    "ttft_stream_ms": 1518,
+    "time_to_request_ms": 16,
+    "first_content_frame_ms": 1519,
+    "queued_turn_count": 0,
+    "result_index": 0
+  },
+  "last_observed_verified_source_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "final_source_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stale_observed_verification": false,
+  "operator_interrupted": false
+}

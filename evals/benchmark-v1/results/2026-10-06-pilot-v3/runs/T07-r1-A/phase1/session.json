@@ -1,0 +1,99 @@
+{
+  "session_id": "5e7e51ba-d7d2-4535-8483-d43ae7f6f339",
+  "exit_code": 0,
+  "duration_seconds": 113.9609,
+  "interrupted": false,
+  "stop_reason": "completed",
+  "observed_assistant_messages": 18,
+  "final_response": "All changes are confined to the allowed files, and the benchmark check passes. Summary of the work:\n\n**Implementation** — `more_itertools/more.py`\n- Added `take_until_inclusive(iterable, pred)`: a generator that yields through the first item for which `pred` is truthy (inclusive), then stops. Predicate is evaluated exactly once per encountered item (before each item is yielded); empty input yields nothing, and no item after the match is pulled from the underlying iterator.\n- Added `'take_until_inclusive'` to `__all__` (alphabetically before `takewhile_inclusive`), which `more_itertools/__init__.py` re-exports via `from .more import *`.\n\n**Types** — `more_itertools/more.pyi`\n- Added the name to `__all__` and the stub `def take_until_inclusive(iterable: Iterable[_T], pred: Callable[[_T], bool]) -> Iterator[_T]`.\n\n**Documentation**\n- Full docstring with doctested examples (inclusive match, no match, empty input).\n- `docs/api.rst`: `.. autofunction:: take_until_inclusive`.\n- `README.rst`: table row (grid-table width preserved exactly).\n\n**Tests** — `agent_tests/test_take_until_inclusive.py` (15 tests, pytest-style)\n- Inclusive stop, match on first item, predicate never true, empty input (predicate never called), no consumption of later items (verified via remaining iterator), laziness with pull tracking, once-per-item predicate evaluation, evaluation before yield, infinite iterables, truthy non-bool predicates, general iterables (str/dict), iterator protocol, signature order `(iterable, pred)`, and package export/identity.\n\n**Verification**\n- `python3 benchmark_check.py` → \"Visible acceptance checks passed\", 933 tests OK, 15 agent tests passed.\n- `tests/test_more.py` → 619 passed; docstring doctest and `py_compile` clean.\n\nSTATUS: DONE",
+  "cli_result": {
+    "duration_api_ms": 104329,
+    "stop_reason": "end_turn",
+    "session_id": "5e7e51ba-d7d2-4535-8483-d43ae7f6f339",
+    "total_cost_usd": 0.730169,
+    "usage": {
+      "input_tokens": 14575,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 338688,
+      "output_tokens": 19518,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "deepseek-flash[1m]": {
+        "inputTokens": 14575,
+        "outputTokens": 19518,
+        "cacheReadInputTokens": 338688,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.730169,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 32000,
+        "thinkingTokens": 0,
+        "canonicalModel": "deepseek-flash[1m]",
+        "provider": "firstParty",
+        "costBasis": "unknown"
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "fast_mode_disabled_reason": "sdk_opt_in_required",
+    "subagent_stats": {
+      "spawned": 0,
+      "requested": {
+        "background": 0,
+        "foreground": 0,
+        "unset": 0
+      },
+      "started_in_background": 0,
+      "max_depth": 0,
+      "spawned_by_subagents": 0,
+      "completed": 0,
+      "failed": 0,
+      "killed": {
+        "parent": 0,
+        "user": 0,
+        "system": 0
+      },
+      "refused": {
+        "depth_limit": 0,
+        "concurrency_limit": 0,
+        "budget": 0
+      },
+      "by_type": {}
+    },
+    "is_error": false,
+    "num_turns": 32,
+    "subtype": "success",
+    "api_error_status": null,
+    "result": "All changes are confined to the allowed files, and the benchmark check passes. Summary of the work:\n\n**Implementation** — `more_itertools/more.py`\n- Added `take_until_inclusive(iterable, pred)`: a generator that yields through the first item for which `pred` is truthy (inclusive), then stops. Predicate is evaluated exactly once per encountered item (before each item is yielded); empty input yields nothing, and no item after the match is pulled from the underlying iterator.\n- Added `'take_until_inclusive'` to `__all__` (alphabetically before `takewhile_inclusive`), which `more_itertools/__init__.py` re-exports via `from .more import *`.\n\n**Types** — `more_itertools/more.pyi`\n- Added the name to `__all__` and the stub `def take_until_inclusive(iterable: Iterable[_T], pred: Callable[[_T], bool]) -> Iterator[_T]`.\n\n**Documentation**\n- Full docstring with doctested examples (inclusive match, no match, empty input).\n- `docs/api.rst`: `.. autofunction:: take_until_inclusive`.\n- `README.rst`: table row (grid-table width preserved exactly).\n\n**Tests** — `agent_tests/test_take_until_inclusive.py` (15 tests, pytest-style)\n- Inclusive stop, match on first item, predicate never true, empty input (predicate never called), no consumption of later items (verified via remaining iterator), laziness with pull tracking, once-per-item predicate evaluation, evaluation before yield, infinite iterables, truthy non-bool predicates, general iterables (str/dict), iterator protocol, signature order `(iterable, pred)`, and package export/identity.\n\n**Verification**\n- `python3 benchmark_check.py` → \"Visible acceptance checks passed\", 933 tests OK, 15 agent tests passed.\n- `tests/test_more.py` → 619 passed; docstring doctest and `py_compile` clean.\n\nSTATUS: DONE",
+    "ttft_ms": 2119,
+    "type": "result",
+    "duration_ms": 113742,
+    "uuid": "ee4955cb-1c77-4462-8ea3-bfb7c2e1e214",
+    "ttft_stream_ms": 785,
+    "time_to_request_ms": 26,
+    "first_content_frame_ms": 785,
+    "queued_turn_count": 0,
+    "result_index": 0
+  },
+  "last_observed_verified_source_hash": null,
+  "final_source_hash": "710e9e4af795bab30d2fecab8147039b8e119519a351f79dade10d04c1054436",
+  "stale_observed_verification": false,
+  "operator_interrupted": false
+}

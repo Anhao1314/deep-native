@@ -1,0 +1,154 @@
+diff --git a/boltons/strutils.py b/boltons/strutils.py
+index 5ff4f38..425100a 100644
+--- a/boltons/strutils.py
++++ b/boltons/strutils.py
+@@ -158,6 +158,10 @@ def ordinalize(number, ext_only=False):
+ 
+     >>> print(ordinalize(1))
+     1st
++    >>> print(ordinalize(11))
++    11th
++    >>> print(ordinalize(22))
++    22nd
+     >>> print(ordinalize(3694839230))
+     3694839230th
+     >>> print(ordinalize('hi'))
+@@ -169,7 +173,7 @@ def ordinalize(number, ext_only=False):
+     if numstr and numstr[-1] in string.digits:
+         try:
+             # first check for teens
+-            if numstr[-2] == '2':
++            if numstr[-2] == '1':
+                 ext = 'th'
+             else:
+                 # all other cases
+diff --git a/agent_tests/test_ordinalize.py b/agent_tests/test_ordinalize.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/test_ordinalize.py
+@@ -0,0 +1,125 @@
++"""Regression tests for boltons.strutils.ordinalize.
++
++A regression made every number whose tens digit is 2 (20-29, 120-129, ...)
++return the teen suffix ``th`` and made actual teens (10-19, 110-119, ...)
++fall through to the last-digit rule, producing e.g. ``11st`` and ``22th``.
++
++The correct English rules are:
++  * 11, 12, 13 (and 111, 112, 113, ...) take ``th``;
++  * otherwise the last digit decides: 1 -> st, 2 -> nd, 3 -> rd, else th.
++"""
++
++import pytest
++
++from boltons.strutils import ordinalize
++
++
++ORDINAL_CASES = [
++    # single digits
++    (1, '1st'),
++    (2, '2nd'),
++    (3, '3rd'),
++    (4, '4th'),
++    (5, '5th'),
++    (9, '9th'),
++    (0, '0th'),
++    # teens: always 'th'
++    (10, '10th'),
++    (11, '11th'),
++    (12, '12th'),
++    (13, '13th'),
++    (14, '14th'),
++    (15, '15th'),
++    (19, '19th'),
++    # twenties: last-digit rule, not the teen rule
++    (20, '20th'),
++    (21, '21st'),
++    (22, '22nd'),
++    (23, '23rd'),
++    (24, '24th'),
++    (25, '25th'),
++    (29, '29th'),
++    # other tens
++    (30, '30th'),
++    (31, '31st'),
++    (32, '32nd'),
++    (33, '33rd'),
++    (40, '40th'),
++    # hundreds/thousands: same rules repeat
++    (100, '100th'),
++    (101, '101st'),
++    (102, '102nd'),
++    (103, '103rd'),
++    (110, '110th'),
++    (111, '111th'),
++    (112, '112th'),
++    (113, '113th'),
++    (114, '114th'),
++    (120, '120th'),
++    (121, '121st'),
++    (122, '122nd'),
++    (123, '123rd'),
++    (124, '124th'),
++    (1515, '1515th'),
++    (3694839230, '3694839230th'),
++]
++
++SUFFIX_CASES = [
++    (1, 'st'),
++    (2, 'nd'),
++    (3, 'rd'),
++    (4, 'th'),
++    (11, 'th'),
++    (12, 'th'),
++    (13, 'th'),
++    (21, 'st'),
++    (22, 'nd'),
++    (23, 'rd'),
++    (24, 'th'),
++    (111, 'th'),
++    (112, 'th'),
++    (113, 'th'),
++    (121, 'st'),
++    (122, 'nd'),
++    (123, 'rd'),
++]
++
++
++@pytest.mark.parametrize('number,expected', ORDINAL_CASES)
++def test_ordinalize_number(number, expected):
++    assert ordinalize(number) == expected
++
++
++@pytest.mark.parametrize('number,expected', SUFFIX_CASES)
++def test_ordinalize_ext_only(number, expected):
++    assert ordinalize(number, ext_only=True) == expected
++
++
++@pytest.mark.parametrize('number,expected', ORDINAL_CASES)
++def test_ordinalize_ext_matches_suffix(number, expected):
++    # ext_only=True must return exactly the suffix appended by ext_only=False.
++    full = ordinalize(number)
++    assert full == str(number) + ordinalize(number, ext_only=True)
++
++
++@pytest.mark.parametrize('text', ['hi', '', 'the 1st', 'hello world', '3rd'])
++def test_ordinalize_non_digit_string_unchanged(text):
++    # Strings not ending in a digit are returned unchanged, with no suffix.
++    assert ordinalize(text) == text
++    assert ordinalize(text, ext_only=True) == ''
++
++
++@pytest.mark.parametrize('number,expected', [
++    ('11', '11th'),
++    ('12', '12th'),
++    ('13', '13th'),
++    ('22', '22nd'),
++    ('21', '21st'),
++    ('23', '23rd'),
++    ('122', '122nd'),
++    ('1515', '1515th'),
++])
++def test_ordinalize_numeric_string_input(number, expected):
++    # Numeric strings take the same path as ints.
++    assert ordinalize(number) == expected
++    assert ordinalize(number, ext_only=True) == expected[len(number):]

@@ -6,10 +6,11 @@ This harness performs real Claude Code calls to the official DeepSeek Anthropic
 endpoint. It does not generate mock agent results. Offline reference repairs only
 validate the independent grader and are never provided to agents.
 
-The primary campaign is [2026-10-06-pilot-v3](results/2026-10-06-pilot-v3/).
-Earlier campaigns remain available as excluded evidence. Its generated report
-records actual completion and validity; a final quality judgment requires all
-60 scheduled runs and valid evidence.
+The primary replacement is [2026-10-06-pilot-v4](results/2026-10-06-pilot-v4/).
+Both arms passed real CLI checks after the native Bash infrastructure repair.
+Earlier campaigns, including v3, remain available as excluded evidence. Generated reports record
+actual completion and validity; a final quality judgment requires all 60 scheduled
+runs and valid evidence.
 
 ## Scope and frozen design
 
@@ -74,6 +75,8 @@ The independent grader anchors its canonical upstream tests and benchmark checks
 to that fixture commit, even if an agent changes Git HEAD or its index. It also
 runs supplied `agent_tests/` with pytest, supporting pytest functions and unittest
 test cases. Passing new regression tests are required for T05, T08 and T10.
+The [coverage limits](COVERAGE-LIMITS.md) specify what these finite checks and
+verification fingerprints do and do not establish.
 
 ## Actual interventions
 
@@ -128,6 +131,10 @@ Seatbelt denies reading personal Claude/Codex/SSH/DSH/config/keychain data and t
 experiment directory. It also denies sibling-run and other temporary-tree reads,
 and writes outside the current run. Narrow exceptions support read-only Python
 dependencies and the current Claude process's task files and IPC socket.
+Both `TMPDIR` and Claude's own `CLAUDE_CODE_TMPDIR` point inside the current run.
+Claude Code 2.1.289 uses the latter for Bash cwd receipts. Agent PATH selects the
+audited native Apple Git binary before `/usr/bin`, avoiding the launcher shim's
+denied xcrun cache writes; both binaries report the same Git version.
 The agent's outgoing network is limited to the loopback relay port. The relay
 alone calls the official DeepSeek endpoint. It keeps the upstream credential only
 in parent process memory. Agents get the non-secret string `benchmark-local-relay`,
@@ -246,7 +253,7 @@ improvement on this pilot, not proof of population equivalence. Recovery/stalene
 mechanism comparisons use only qualifying observations; all runs remain in the
 strict primary score.
 
-## Excluded campaigns and the v3 restart
+## Excluded campaigns and the fresh restart
 
 The first campaign stopped after **2 completed runs and 1 partial run** when
 process inspection showed that Claude's background Bash descendants can have a
@@ -265,7 +272,7 @@ omission. This grading-contract defect invalidates the quality comparison; its
 are preserved. The whole campaign is excluded rather than rescored after seeing
 agent outputs.
 
-The primary replacement, `results/2026-10-06-pilot-v3/`, starts a fresh full
+The third campaign, `results/2026-10-06-pilot-v3/`, started a fresh full
 60-run schedule. Task intent, repositories, seed, budgets, model configuration and
 Deep Native commit are unchanged. Shared prompts now spell out allowed sources;
 type declarations and relevant exports are permitted. The grader independently
@@ -274,7 +281,32 @@ The runner adds strict temporary/sibling isolation, process ownership across
 normal exits, full frozen-input attestation, per-run environment validation,
 shared-budget enforcement and cross-stage verification tracking. These are
 experiment reliability repairs; the treatment Skill was not tuned to results.
-No runs from earlier protocols are pooled into v3.
+
+V3 was then technically stopped by the operator with SIGINT after **8 completed
+runs and 1 partial run**. Its sandbox denied Claude Code's native Bash wrapper
+handoff files at `/tmp/claude-RANDOM-cwd`. Across nine started runs, 121 distinct
+tool-result events contained that denial; 114 were marked tool errors with outer
+exit 1. Twenty-four contained passing test output; two also recorded an explicit
+inner `EXIT 0`. These are infrastructure observations, not new quality scores.
+The wrapper error makes verification-success proxies and agent workflow unsuitable
+for treatment attribution. It is not evidence of fabricated tests or false
+completion by itself. V3's eight strict raw scores remain preserved; the entire
+campaign is excluded and its judgment is INCONCLUSIVE.
+
+See the [machine-counted infrastructure evidence](results/2026-10-06-pilot-v3/infrastructure_issue.json),
+[technical stop record](results/2026-10-06-pilot-v3/campaign_stop.json) and
+[frozen-protocol report](results/2026-10-06-pilot-v3/REPORT.md). Evidence integrity
+PASS means the retained artifacts are consistent; it does not certify the runtime
+as valid or the 60-run campaign as complete. The stop was an operator decision,
+not a user request.
+
+A fresh v4 freeze follows real A/B CLI checks of native Bash success/exit semantics
+and offline cleanup checks while preserving sibling isolation. It restarts all 60
+runs with the same task intent and fixed Deep Native commit. Before the first formal
+v4 call, native Git routing was also checked without calling a model; the preparation
+freeze is retained separately in the campaign's preparation revision record.
+No runs from earlier protocols are pooled into that comparison. [Correction record](CONTRACT-CORRECTIONS.md)
+documents the exclusions and restart requirements.
 
 ## Validate the harness without calling a model
 

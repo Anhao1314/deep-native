@@ -1,0 +1,12 @@
+{
+  "attempt": "2980efd56185454f9e9478a4c8de74de",
+  "config_hash": "9918af3dd1d5c3f74ba7b872936588255df42c28302210c39e4ba655ee967bf5",
+  "goal": "take_until_inclusive(iterable, pred) yields items through and including the first item satisfying pred, stops without consuming later items, empty stays empty, pred called once per encountered item; exported and documented; agent_tests pass and benchmark_check.py exits 0",
+  "next": "Run deep-native verify on frozen bytes, then review diff.",
+  "note": "Added take_until_inclusive to more.py (+__all__), more.pyi (__all__ + stub), docs/api.rst, README.rst; added agent_tests/test_take_until_inclusive.py (14 tests). benchmark_check.py: visible acceptance passed, 933 unittest OK, 14 pytest passed.",
+  "schema": 1,
+  "session": "9f3c2a41-58de-4c17-9b0e-2f6ad4c8e9a1",
+  "status": "active",
+  "task_id": "1a566e9f8c3045feb751a13715d84341",
+  "updated_at": "2026-10-06T04:19:19Z"
+}

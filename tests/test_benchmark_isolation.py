@@ -69,9 +69,97 @@ class ProcessOwnershipTests(unittest.TestCase):
         kill.assert_not_called()
 
 
+class AgentEnvironmentTests(unittest.TestCase):
+    def test_runtime_git_uses_linux_path_fallback(self):
+        from harness import runtime_git
+        with patch('harness.platform.system', return_value='Linux'), \
+             patch('harness.shutil.which', return_value='/fixture/git'):
+            self.assertEqual(runtime_git(), Path('/fixture/git'))
+
+    def test_native_scratch_is_scoped_to_each_run(self):
+        from harness import agent_env
+        relay = type('Relay', (), {'url': 'http://127.0.0.1:12345'})()
+        environments = []
+        with patch('harness.shutil.which', return_value='/tools/claude'):
+            for name in ['run-a', 'run-b']:
+                base = Path('/private/tmp') / name
+                environments.append(agent_env(base / 'home', base / 'tmp',
+                                              Path(sys.executable), relay, 'offline-model'))
+        self.assertNotEqual(environments[0]['CLAUDE_CODE_TMPDIR'],
+                            environments[1]['CLAUDE_CODE_TMPDIR'])
+        for env in environments:
+            self.assertEqual(env['CLAUDE_CODE_TMPDIR'], env['TMPDIR'])
+            self.assertEqual(Path(env['CLAUDE_CODE_TMPDIR']).parent,
+                             Path(env['HOME']).parent)
+
+
 @unittest.skipUnless(sys.platform == 'darwin' and shutil.which('sandbox-exec'),
                      'Seatbelt is only available on macOS')
 class SandboxTests(unittest.TestCase):
+    def test_native_git_status_has_no_shim_cache_warnings(self):
+        from harness import agent_env, runtime_git
+        git = runtime_git()
+        if git != Path('/Library/Developer/CommandLineTools/usr/bin/git'):
+            self.skipTest('Native macOS Command Line Tools Git is unavailable')
+        with tempfile.TemporaryDirectory(prefix='dn-live-', dir='/private/tmp') as current:
+            base = Path(current).resolve(); root = base / 'workspace'; home = base / 'home'
+            tmp = base / 'tmp'
+            root.mkdir(); home.mkdir(); tmp.mkdir()
+            subprocess.run([str(git), 'init', '-q', str(root)], check=True, capture_output=True)
+            relay = type('Relay', (), {'url': 'http://127.0.0.1:12345'})()
+            with patch('harness.shutil.which', return_value='/tools/claude'):
+                env = agent_env(home, tmp, Path(sys.executable), relay, 'offline-model')
+            profile = base / 'sandbox.sb'
+            profile.write_text(sandbox_profile(root, home, Path('/usr/bin'), None))
+            expected = subprocess.run([str(git), '--version'], check=True,
+                                      capture_output=True, text=True).stdout.strip()
+            script = ('import shutil,subprocess,sys; '
+                      'assert shutil.which("git")==sys.argv[1]; '
+                      'version=subprocess.run(["git","--version"],check=True,capture_output=True,text=True); '
+                      'assert version.stdout.strip()==sys.argv[2]; assert not version.stderr,version.stderr; '
+                      'status=subprocess.run(["git","status","--porcelain"],check=True,capture_output=True,text=True); '
+                      'assert not status.stderr,status.stderr; assert not status.stdout,status.stdout')
+            argv = ['sandbox-exec', '-D', 'CLI_PID=999999', '-f', str(profile),
+                    str(Path(sys.executable).resolve()), '-B', '-c', script, str(git), expected]
+            result = subprocess.run(argv, cwd=root, env=env, capture_output=True,
+                                    text=True, timeout=15)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertFalse(result.stderr, result.stderr)
+
+    def test_native_cwd_receipt_tasks_and_socket_stay_in_run(self):
+        from harness import agent_env
+        with tempfile.TemporaryDirectory(prefix='dn-live-', dir='/private/tmp') as current, \
+             tempfile.TemporaryDirectory(prefix='dn-live-', dir='/private/tmp') as sibling:
+            base = Path(current).resolve(); root = base / 'workspace'; home = base / 'home'
+            tmp = base / 'tmp'
+            root.mkdir(); home.mkdir(); tmp.mkdir()
+            previous = Path(sibling) / 'claude-offline-cwd'; previous.write_text('other run')
+            relay = type('Relay', (), {'url': 'http://127.0.0.1:12345'})()
+            with patch('harness.shutil.which', return_value='/tools/claude'):
+                env = agent_env(home, tmp, Path(sys.executable), relay, 'offline-model')
+            profile = base / 'sandbox.sb'
+            profile.write_text(sandbox_profile(root, home, Path('/usr/bin'), None))
+            script = ('import os,pathlib,socket,subprocess,sys; '
+                      'tmp=pathlib.Path(os.environ["CLAUDE_CODE_TMPDIR"]); '
+                      'subprocess.run(["/bin/zsh","-df","-c",'
+                      '\'pwd -P >| "$CLAUDE_CODE_TMPDIR/claude-offline-cwd"\'],check=True); '
+                      'assert (tmp/"claude-offline-cwd").read_text().strip()==str(pathlib.Path.cwd()); '
+                      'task=tmp/("claude-"+str(os.getuid()))/"offline-cwd"/"tasks"; '
+                      'task.mkdir(parents=True); (task/"output.txt").write_text("ok"); '
+                      'ipc=tmp/"cc-socks"; ipc.mkdir(); '
+                      '\nwith socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as server:\n'
+                      ' server.bind(str(ipc/"offline.sock"))\n'
+                      'try: pathlib.Path(sys.argv[1]).read_text()\n'
+                      'except PermissionError: pass\n'
+                      'else: raise AssertionError("other run scratch readable")\n')
+            argv = ['sandbox-exec', '-D', 'CLI_PID=999999', '-f', str(profile),
+                    str(Path(sys.executable).resolve()), '-B', '-c', script, str(previous)]
+            result = subprocess.run(argv, cwd=root, env=env, capture_output=True,
+                                    text=True, timeout=15)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertNotIn('operation not permitted', result.stderr.lower())
+            self.assertEqual((tmp / 'claude-offline-cwd').read_text().strip(), str(root))
+
     def test_literal_evaluator_exception_and_offline_subprocess(self):
         with tempfile.TemporaryDirectory(prefix='dn-grade-', dir='/private/tmp') as current, \
              tempfile.TemporaryDirectory(prefix='dn-evaluator-', dir='/private/tmp') as evaluator:

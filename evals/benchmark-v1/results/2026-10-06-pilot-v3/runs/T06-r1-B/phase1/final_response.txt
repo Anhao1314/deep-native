@@ -1,0 +1,13 @@
+## Summary
+
+**Root cause** — `boltons/iterutils.py:1364`: `get_path` looked up every path segment on the outer `root` (`cur = root[seg]`) instead of on the value reached by the preceding segments. So on nested mappings, segment 2+ was resolved against the top-level object: multi-segment paths either raised `PathAccessError` or, worse, silently returned an unrelated top-level value when the later segment happened to exist at the root.
+
+**Fix (one line)** — `boltons/iterutils.py:1364`: `cur = root[seg]` → `cur = cur[seg]`. The `TypeError` fallback already used `cur`, which still holds the previous value because the failed assignment never lands, so dotted list-index handling (`'a.b.0'`), tuple paths, defaults, and `PathAccessError` (`exc`/`seg`/`path`) semantics are untouched. The docstring's example (`get_path(root, ('a','b','c',2,0)) == 3`) now holds; `docs/iterutils.rst` autodocs the function, so no doc edits were needed.
+
+**Regression tests** — new `agent_tests/test_get_path_regression.py` (21 tests) plus `agent_tests/conftest.py` (repo root on `sys.path`). They cover: nested mapping lookup via tuple and dotted paths, the sharp outer-root traps (`{'a': {}, 'b': 1}`, `{'a': ['x'], 1: 'top-level'}`), nested string indices, tuple roots, dotted list indices, defaults (used on failure, ignored on success), and `PathAccessError` details (`exc`, `seg`, `path`, message, catchability as `KeyError`/`IndexError`/`TypeError`).
+
+**Verification** — `python3 benchmark_check.py` passed via deep-native `verify` (attempt `47cc5cca05b54521bbb96e075297df0b`, check exit code 0): `benchmark_tests.py` reported "Visible acceptance checks passed", 77 passed in `tests/`, 21 passed in `agent_tests/`. Diff is limited to the one-line source change and new `agent_tests/` files; no existing tests, config, or benchmark files were touched.
+
+**Remaining limitation** — only the local check suite was exercised; `PathAccessError.path` for a dotted-string input remains a list rather than a tuple (pre-existing behavior, pinned by a test).
+
+STATUS: DONE

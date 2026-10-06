@@ -1,0 +1,14 @@
+{
+  "session_id": "aebacb3e-7005-486c-bbe7-06b841e74bbd",
+  "exit_code": -9,
+  "duration_seconds": 19.6249,
+  "interrupted": false,
+  "stop_reason": "operator_interrupt",
+  "observed_assistant_messages": 8,
+  "final_response": "",
+  "cli_result": null,
+  "last_observed_verified_source_hash": null,
+  "final_source_hash": "5de74a31226823cf0e4f0fb8de92e326401224b7b5b59d28d1ebd40058f2bb6b",
+  "stale_observed_verification": false,
+  "operator_interrupted": true
+}

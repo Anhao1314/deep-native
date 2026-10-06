@@ -1,0 +1,57 @@
+{
+  "pass": true,
+  "contract": {
+    "argv": [
+      "sandbox-exec",
+      "-D",
+      "CLI_PID=0",
+      "-f",
+      "/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-7x0u6nk7/grader.sb",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/benchmark-env/bin/python",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native/evals/benchmark-v1/acceptance.py",
+      "T01",
+      "2"
+    ],
+    "exit_code": 0,
+    "stdout": "Independent contract checks passed: T01 phase 2\n",
+    "stderr": "",
+    "duration_seconds": 0.0323
+  },
+  "upstream_regression": {
+    "argv": [
+      "sandbox-exec",
+      "-D",
+      "CLI_PID=0",
+      "-f",
+      "/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-7x0u6nk7/grader.sb",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/benchmark-env/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "tests/test_strutils.py",
+      "tests/test_iterutils.py"
+    ],
+    "exit_code": 0,
+    "stdout": "........................................................................ [ 93%]\n.....                                                                    [100%]\n77 passed in 0.10s\n",
+    "stderr": "",
+    "duration_seconds": 0.2318
+  },
+  "new_regression_tests": {
+    "argv": [
+      "sandbox-exec",
+      "-D",
+      "CLI_PID=0",
+      "-f",
+      "/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T/dn-independent-grade-7x0u6nk7/grader.sb",
+      "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/benchmark-env/bin/python",
+      "-m",
+      "pytest",
+      "-q",
+      "agent_tests"
+    ],
+    "exit_code": 0,
+    "stdout": "........................................................................ [ 63%]\n..........................................                               [100%]\n114 passed in 0.03s\n",
+    "stderr": "",
+    "duration_seconds": 0.1698
+  }
+}

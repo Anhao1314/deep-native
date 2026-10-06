@@ -1,0 +1,24 @@
+{
+  "protocol_sha256": {
+    "fixtures.py": "79a5112b1b9fd5d958d4dfd3e7e6bdff01b302fb2058cd48a8959cf3fc0798da",
+    "tasks.json": "504f737aede7b5baf2b4c9b8547ce3c401f19926fe59831fb1032e3345bdf6f4",
+    "acceptance.py": "d0310f91014486e83b194b50af27d3e7e5790997087a2185ff4f15597d1394c3",
+    "harness.py": "f25c0a86ec53f0fd53cdff08273516e5a3c0be3054cf5ae1916958365618a9d3",
+    "transport.py": "4020991029867c057402f2dd39cc222a8a7833c81fc70f68afe4b8033541a18e",
+    "analysis.py": "0e2e9d02b29d0bbfa5256880448c19c0d417bcdcc1e2a174727153ea8493392a",
+    "isolation.py": "42e3c2fa1aeb2a9e8464e71fcfb2f048b1ca0e53b26347988393db26117cbc1e",
+    "audit_evidence.py": "ca1baad5db1eef8e101f09df26758ecac222037900373cd334092d9b60b0a53b"
+  },
+  "deep_native_commit": "fda3dd010e7de8f8c1ee1953e006e577464aa3d6",
+  "treatment_sha256": {
+    "skills/deep-native/SKILL.md": "697e9dc0c9731a2e1021a3826591fc569704ded6b12e3daf2d99e325be367123",
+    "skills/deep-native/references/recovery.md": "6b639da1afcfddaafbf7875c2beac7f756bd2ca7b24950cc829e88ce3db37d7b",
+    "skills/deep-native/references/verification.md": "079ba277e95402a3516d3edc86dad772ff1b9c1c37ab98c9fd0a457146c70f62",
+    "skills/deep-native/scripts/deep_native.py": "52c65a7f8a4b4c1c76c203ecd32a5b866f90cd0b454f78df628dd6ccf365670f"
+  },
+  "audit_sha256": "1a45b532cc756f562e06d6f863d8b85d44a1f8bd062032d22049e175ddf04f46",
+  "baselines_sha256": "f63b02ea98b64d7bf010f9d97e80510e21373425bc65c973c431f0230380e32c",
+  "schedule_sha256": "2910058e667bca92cb03f4b4e94be433ff88b203a7a19460f9b9c82949f69f56",
+  "tasks_sha256": "504f737aede7b5baf2b4c9b8547ce3c401f19926fe59831fb1032e3345bdf6f4",
+  "frozen_at_utc": "2026-10-06T04:38:37Z"
+}

@@ -1,0 +1,3 @@
+Fixed `greet` in hello.py:2 to return `"Hello, {}!".format(name)`. Ran `pwd` (`/private/tmp/dn-v4-toy-yvj6mj4u/workspace`) and `python3 -m unittest` — 1 test passed, OK.
+
+STATUS: DONE

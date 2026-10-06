@@ -1,0 +1,15 @@
+{
+  "tests_before.json": "5f74f1e8efb8abfc7c4c5af320555a0732b0a69230ece891e99eb198b44ee8c4",
+  "installation.json": "02014b53b4eddc0709c427b2e2a475a3b34436fd6d194d5842b84355f83852fc",
+  "metadata.json": "c8bf75b9432b2172de6790ac9a1a0e16d56558e744dd3d5366a7b37af7310e96",
+  "local_workspace.txt": "56a3e00450951b264ca4e7faaf1d9d0f0849b02431a3c797ea5d07bbea882cd6",
+  "api_calls.json": "97c882a6734dfc8374ddca28167e2e50795dac4124629aba7be09eae83715372",
+  "phase1/process_cleanup.json": "5acdd8a579d8e795b80d4490b1e9aef9ced2d61fdb91fc23d7a1c1d035b68c6c",
+  "phase1/session.json": "c751a8d2210b0553974c5bbebe864b1b5bd42e293a384d4d35c1f9b5dbfaebb7",
+  "phase1/transcript.jsonl": "ff6e6f29587482550616596b4687c591939fbf7b4af1dca1f8b1d9bedcca0875",
+  "phase1/prompt.txt": "2e4fac7c1d2211f91ed79ebe7688c50a976ac4d0eec601ad198dc213813f28cb",
+  "phase1/stderr.txt": "af2f4f95914df9c684b8c6d9f07bfa793cb3ed8a4c9f15c3022ee6363d84537e",
+  "phase1/command.json": "645d9e32c98670f7ea0d9184d272389388a2fbc9074ca511b0afe1f76e7502d7",
+  "phase1/source_observations.json": "d5ab38c7091c1c07d76ee2222607a975d7c02f475c109dc8e690ccf26bf2cd2e",
+  "phase1/final_response.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

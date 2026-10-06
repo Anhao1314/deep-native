@@ -1,0 +1,10 @@
+**Change** — `hello.py:2`: `greet(name)` returned the hardcoded `"hello"`; now returns `f"Hello, {name}!"`.
+
+**Evidence**
+- Reproduced first: `python3 -m unittest` failed with `AssertionError: 'hello' != 'Hello, Ada!'`.
+- After the edit: `python3 -m unittest -v` → 1 test, OK; direct exercise gave `'Hello, Ada!'` and `'Hello, Bo!'`.
+- `deep_native.py verify` → status `passed`, check `tests` (`python3 -m unittest`) exit 0, bound to worktree hash `d2dcaeff…`; attempt recorded at `.deep-native/attempts/d0942083884c4de4b6981dd434ceb49c.json`.
+
+**Notes** — No new test was added: the pre-existing `test_hello.T.test_name` was exactly the failing repro and now serves as the regression test. Working tree has only the one-line change; `.claude/` and `.deep-native/` remain untracked. Remaining risk: only the single `"Ada"` assertion is covered; non-string input is unhandled but wasn't requested. Self-review, not an independent review.
+
+STATUS: DONE

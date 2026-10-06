@@ -1,0 +1,22 @@
+All changes are confined to the allowed files, and the benchmark check passes. Summary of the work:
+
+**Implementation** — `more_itertools/more.py`
+- Added `take_until_inclusive(iterable, pred)`: a generator that yields through the first item for which `pred` is truthy (inclusive), then stops. Predicate is evaluated exactly once per encountered item (before each item is yielded); empty input yields nothing, and no item after the match is pulled from the underlying iterator.
+- Added `'take_until_inclusive'` to `__all__` (alphabetically before `takewhile_inclusive`), which `more_itertools/__init__.py` re-exports via `from .more import *`.
+
+**Types** — `more_itertools/more.pyi`
+- Added the name to `__all__` and the stub `def take_until_inclusive(iterable: Iterable[_T], pred: Callable[[_T], bool]) -> Iterator[_T]`.
+
+**Documentation**
+- Full docstring with doctested examples (inclusive match, no match, empty input).
+- `docs/api.rst`: `.. autofunction:: take_until_inclusive`.
+- `README.rst`: table row (grid-table width preserved exactly).
+
+**Tests** — `agent_tests/test_take_until_inclusive.py` (15 tests, pytest-style)
+- Inclusive stop, match on first item, predicate never true, empty input (predicate never called), no consumption of later items (verified via remaining iterator), laziness with pull tracking, once-per-item predicate evaluation, evaluation before yield, infinite iterables, truthy non-bool predicates, general iterables (str/dict), iterator protocol, signature order `(iterable, pred)`, and package export/identity.
+
+**Verification**
+- `python3 benchmark_check.py` → "Visible acceptance checks passed", 933 tests OK, 15 agent tests passed.
+- `tests/test_more.py` → 619 passed; docstring doctest and `py_compile` clean.
+
+STATUS: DONE

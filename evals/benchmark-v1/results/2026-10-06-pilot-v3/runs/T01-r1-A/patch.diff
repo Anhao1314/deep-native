@@ -1,0 +1,182 @@
+diff --git a/boltons/strutils.py b/boltons/strutils.py
+index 5ff4f38..a3b3a50 100644
+--- a/boltons/strutils.py
++++ b/boltons/strutils.py
+@@ -164,12 +164,16 @@ def ordinalize(number, ext_only=False):
+     hi
+     >>> print(ordinalize(1515))
+     1515th
++    >>> print(ordinalize(11))
++    11th
++    >>> print(ordinalize(22))
++    22nd
+     """
+     numstr, ext = str(number), ''
+     if numstr and numstr[-1] in string.digits:
+         try:
+             # first check for teens
+-            if numstr[-2] == '2':
++            if numstr[-2] == '1':
+                 ext = 'th'
+             else:
+                 # all other cases
+diff --git a/agent_tests/test_ordinalize.py b/agent_tests/test_ordinalize.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/test_ordinalize.py
+@@ -0,0 +1,155 @@
++"""Regression tests for ``boltons.strutils.ordinalize``.
++
++A regression made the function select the ordinal suffix based on the
++*tens* digit being 2 instead of 1. That gave teens (11-19, which always
++take ``th``) the ``st``/``nd``/``rd`` suffix of their final digit, and
++stripped ``st``/``nd``/``rd`` from numbers ending in the twenties
++(21, 22, 23). These tests pin the standard English rules:
++
++* the last two digits in 11-19 take ``th``;
++* otherwise the suffix follows the final digit (1 -> st, 2 -> nd,
++  3 -> rd, anything else -> th);
++* a trailing non-digit leaves the value unchanged (and yields an empty
++  suffix when ``ext_only=True``).
++"""
++
++import pytest
++
++from boltons.strutils import ordinalize
++
++
++LAST_DIGIT_CASES = [
++    (0, '0th'),
++    (1, '1st'),
++    (2, '2nd'),
++    (3, '3rd'),
++    (4, '4th'),
++    (5, '5th'),
++    (6, '6th'),
++    (7, '7th'),
++    (8, '8th'),
++    (9, '9th'),
++]
++
++TEEN_CASES = [(n, f'{n}th') for n in range(10, 20)]
++
++TWENTIES_CASES = [
++    (20, '20th'),
++    (21, '21st'),
++    (22, '22nd'),
++    (23, '23rd'),
++    (24, '24th'),
++    (25, '25th'),
++    (26, '26th'),
++    (27, '27th'),
++    (28, '28th'),
++    (29, '29th'),
++]
++
++OTHER_TENS_CASES = [
++    (30, '30th'),
++    (31, '31st'),
++    (32, '32nd'),
++    (33, '33rd'),
++    (34, '34th'),
++    (40, '40th'),
++    (51, '51st'),
++    (62, '62nd'),
++    (73, '73rd'),
++    (84, '84th'),
++    (95, '95th'),
++    (100, '100th'),
++    (101, '101st'),
++    (102, '102nd'),
++    (103, '103rd'),
++    (104, '104th'),
++]
++
++LARGER_NUMBER_CASES = [
++    # the teen rule keys off the last two digits at any magnitude
++    (111, '111th'),
++    (112, '112th'),
++    (113, '113th'),
++    (114, '114th'),
++    (211, '211th'),
++    (1011, '1011th'),
++    (2013, '2013th'),
++    (3694839230, '3694839230th'),
++    # ...and the twenties rule must not swallow numbers ending in 21-23
++    (121, '121st'),
++    (122, '122nd'),
++    (123, '123rd'),
++    (124, '124th'),
++    (221, '221st'),
++    (222, '222nd'),
++    (223, '223rd'),
++    (1001, '1001st'),
++    (1002, '1002nd'),
++    (1003, '1003rd'),
++]
++
++NON_DIGIT_CASES = ['hi', '', '123abc', 'no. 1!', ' 4 ']
++
++
++@pytest.mark.parametrize('number,expected', LAST_DIGIT_CASES)
++def test_single_digits(number, expected):
++    assert ordinalize(number) == expected
++
++
++@pytest.mark.parametrize('number,expected', TEEN_CASES)
++def test_teens_take_th(number, expected):
++    # Regression: 11, 12, 13 used to come out as 11st, 12nd, 13rd.
++    assert ordinalize(number) == expected
++
++
++@pytest.mark.parametrize('number,expected', TWENTIES_CASES)
++def test_twenties_follow_final_digit(number, expected):
++    # Regression: 21, 22, 23 used to come out as 21th, 22th, 23th.
++    assert ordinalize(number) == expected
++
++
++@pytest.mark.parametrize('number,expected', OTHER_TENS_CASES)
++def test_other_numbers(number, expected):
++    assert ordinalize(number) == expected
++
++
++@pytest.mark.parametrize('number,expected', LARGER_NUMBER_CASES)
++def test_teen_and_twenties_rules_apply_to_last_two_digits(number, expected):
++    assert ordinalize(number) == expected
++
++
++@pytest.mark.parametrize('number,expected', TEEN_CASES + TWENTIES_CASES)
++def test_ext_only_returns_suffix_for_digit_endings(number, expected):
++    assert ordinalize(number, ext_only=True) == expected[-2:]
++
++
++@pytest.mark.parametrize('number', TEEN_CASES + TWENTIES_CASES)
++def test_ext_only_suffix_equals_full_result_minus_number(number):
++    assert ordinalize(number, ext_only=True) == ordinalize(number)[len(str(number)):]
++
++
++@pytest.mark.parametrize('text', NON_DIGIT_CASES)
++def test_non_digit_endings_are_unchanged(text):
++    # Regression guard for the documented fallback: no digit at the end
++    # means the input is passed through as-is.
++    assert ordinalize(text) == text
++    assert ordinalize(text, ext_only=True) == ''
++
++
++def test_string_digit_input_is_supported():
++    assert ordinalize('11') == '11th'
++    assert ordinalize('22') == '22nd'
++    assert ordinalize('22', ext_only=True) == 'nd'
++
++
++def test_negative_numbers_follow_last_two_digits():
++    assert ordinalize(-1) == '-1st'
++    assert ordinalize(-2) == '-2nd'
++    assert ordinalize(-3) == '-3rd'
++    assert ordinalize(-4) == '-4th'
++    assert ordinalize(-11) == '-11th'
++    assert ordinalize(-12) == '-12th'
++    assert ordinalize(-13) == '-13th'
++    assert ordinalize(-21) == '-21st'
++    assert ordinalize(-22) == '-22nd'
++    assert ordinalize(-23) == '-23rd'

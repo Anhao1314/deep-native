@@ -1,0 +1,171 @@
+diff --git a/boltons/iterutils.py b/boltons/iterutils.py
+index e8ccd61..adefc31 100644
+--- a/boltons/iterutils.py
++++ b/boltons/iterutils.py
+@@ -1361,7 +1361,7 @@ def get_path(root, path, default=_UNSET):
+     try:
+         for seg in path:
+             try:
+-                cur = root[seg]
++                cur = cur[seg]
+             except (KeyError, IndexError) as exc:
+                 raise PathAccessError(exc, seg, path)
+             except TypeError as exc:
+diff --git a/agent_tests/conftest.py b/agent_tests/conftest.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/conftest.py
+@@ -0,0 +1,7 @@
++import os
++import sys
++
++# Make the repository root importable regardless of how pytest is invoked.
++_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
++if _REPO_ROOT not in sys.path:
++    sys.path.insert(0, _REPO_ROOT)
+diff --git a/agent_tests/test_get_path_regression.py b/agent_tests/test_get_path_regression.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/test_get_path_regression.py
+@@ -0,0 +1,141 @@
++"""Regression tests for ``boltons.iterutils.get_path``.
++
++The bug: every path segment was looked up on the outer *root* instead of
++on the value reached by the preceding segments. Multi-segment paths over
++nested mappings therefore raised ``PathAccessError`` -- or, when a later
++segment happened to exist at the top level, silently returned an
++unrelated top-level value.
++
++These tests pin the repaired traversal as well as the behaviors that
++must be preserved: dotted list-index paths, tuple paths, defaults, and
++the details carried by ``PathAccessError``.
++"""
++
++import pytest
++
++from boltons.iterutils import PathAccessError, get_path
++
++
++class TestNestedLookup:
++    def test_nested_mapping_tuple_path(self):
++        assert get_path({'a': {'b': 7}}, ('a', 'b')) == 7
++
++    def test_nested_mapping_dotted_path(self):
++        assert get_path({'a': {'b': 7}}, 'a.b') == 7
++
++    def test_deep_mapping_mixed_list_path(self):
++        root = {'a': {'b': {'c': [[1], [2], [3]]}}}
++        assert get_path(root, ('a', 'b', 'c', 2, 0)) == 3
++        assert get_path(root, 'a.b.c.2.0') == 3
++
++    def test_later_segment_is_not_resolved_at_outer_root(self):
++        # 'b' exists only at the top level; a lookup against *root*
++        # would wrongly succeed instead of failing inside 'a'.
++        root = {'a': {}, 'b': 1}
++        with pytest.raises(PathAccessError) as excinfo:
++            get_path(root, ('a', 'b'))
++        assert excinfo.value.seg == 'b'
++        assert excinfo.value.path == ('a', 'b')
++
++    def test_int_segment_is_not_resolved_at_outer_root(self):
++        # As above, but with an integer segment that only exists at the
++        # top level; the repaired lookup must index into the list under
++        # 'a' and fail rather than return the top-level value.
++        root = {'a': ['x'], 1: 'top-level'}
++        with pytest.raises(PathAccessError) as excinfo:
++            get_path(root, ('a', 1))
++        assert isinstance(excinfo.value.exc, IndexError)
++        assert excinfo.value.seg == 1
++        assert excinfo.value.path == ('a', 1)
++
++    def test_string_index_reaches_into_nested_list(self):
++        root = {'a': {'b': [10, 20]}}
++        assert get_path(root, ('a', 'b', 1)) == 20
++        assert get_path(root, 'a.b.1') == 20
++
++
++class TestPreservedPathForms:
++    def test_tuple_root_with_int_path(self):
++        assert get_path(('x', ('y', 'z')), (1, 1)) == 'z'
++
++    def test_tuple_root_with_dotted_path(self):
++        assert get_path(('x', ('y', 'z')), '1.1') == 'z'
++
++    def test_dotted_index_into_nested_list(self):
++        root = {'key': ['test']}
++        assert get_path(root, ('key', 0)) == 'test'
++        assert get_path(root, 'key.0') == 'test'
++
++    def test_string_index_into_list(self):
++        assert get_path(['test'], (0,)) == 'test'
++        assert get_path(['test'], '0') == 'test'
++        assert get_path(['a', 'b', 'c'], (2,)) == 'c'
++
++    def test_single_segment_lookups(self):
++        assert get_path({'key': 'value'}, 'key') == 'value'
++        assert get_path({'key': 'value'}, ('key',)) == 'value'
++        assert get_path('abc', (1,)) == 'b'
++
++
++class TestDefaults:
++    def test_default_on_missing_later_segment(self):
++        marker = object()
++        assert get_path({'a': {'b': 1}}, ('a', 'z'), default=marker) is marker
++
++    def test_default_on_missing_first_segment(self):
++        assert get_path({}, ('x',), default=None) is None
++
++    def test_default_on_non_indexable_parent(self):
++        assert get_path({'a': 42}, ('a', 'x'), default='fallback') == 'fallback'
++
++    def test_default_with_dotted_path(self):
++        assert get_path({'a': {'b': 1}}, 'a.z', default='fallback') == 'fallback'
++
++    def test_default_not_used_on_success(self):
++        assert get_path({'a': {'b': 1}}, ('a', 'b'), default='fallback') == 1
++        assert get_path({'a': {'b': 1}}, 'a.b', default='fallback') == 1
++
++
++class TestPathAccessErrorDetails:
++    def test_missing_key_details(self):
++        with pytest.raises(PathAccessError) as excinfo:
++            get_path({'a': {}}, ('a', 'x'))
++        err = excinfo.value
++        assert isinstance(err, KeyError)
++        assert isinstance(err.exc, KeyError)
++        assert err.seg == 'x'
++        assert err.path == ('a', 'x')
++        assert 'could not access' in str(err)
++        assert repr(err).startswith('PathAccessError(')
++
++    def test_out_of_range_details(self):
++        with pytest.raises(PathAccessError) as excinfo:
++            get_path({'a': {'b': [1]}}, ('a', 'b', 5))
++        err = excinfo.value
++        assert isinstance(err, IndexError)
++        assert isinstance(err.exc, IndexError)
++        assert err.seg == 5
++        assert err.path == ('a', 'b', 5)
++
++    def test_non_indexable_parent_details(self):
++        with pytest.raises(PathAccessError) as excinfo:
++            get_path({'a': 42}, ('a', 'x'))
++        err = excinfo.value
++        assert isinstance(err, TypeError)
++        assert isinstance(err.exc, TypeError)
++        assert 'not indexable' in str(err)
++        assert err.seg == 'x'
++        assert err.path == ('a', 'x')
++
++    def test_error_path_preserves_split_dotted_path(self):
++        with pytest.raises(PathAccessError) as excinfo:
++            get_path({'a': {}}, 'a.x')
++        assert excinfo.value.path == ['a', 'x']
++
++    def test_catchable_as_standard_exceptions(self):
++        with pytest.raises(KeyError):
++            get_path({'a': {}}, ('a', 'x'))
++        with pytest.raises(IndexError):
++            get_path({'a': [0]}, ('a', 5))
++        with pytest.raises(TypeError):
++            get_path({'a': 42}, ('a', 'x'))

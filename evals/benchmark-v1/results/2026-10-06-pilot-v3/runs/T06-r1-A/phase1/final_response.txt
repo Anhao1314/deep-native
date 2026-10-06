@@ -1,0 +1,15 @@
+The bug is fixed and verified.
+
+**Root cause:** In `get_path` (`boltons/iterutils.py:1364`), each loop iteration index looked up `root[seg]` instead of the running cursor `cur[seg]`. Every path segment was therefore resolved against the original root: nested mappings only worked one level deep, and later segments could even silently resolve against sibling keys of the outer mapping (e.g. `get_path({'a': {'x': 1}, 'b': 2}, ('a', 'b'))` returned `2` instead of failing).
+
+**Fix (one line):** `cur = root[seg]` → `cur = cur[seg]`. The existing dotted-string splitting, int coercion fallback for list indices, `default` swallowing of `PathAccessError`, and the error construction (`exc`, `seg`, `path`, `is_iterable` fallback) are untouched.
+
+**Regression tests:** `agent_tests/test_get_path_regression.py` (20 tests) covers:
+- deep nested mappings via tuple and dotted paths, mixed mapping/list nesting, tuple containers, empty path
+- the exact bug shape: a segment present in the outer root but not in the current container now raises instead of resolving against root
+- defaults on missing leaves/middle segments/index errors, and that defaults don't interfere with success
+- `PathAccessError` details: failing `seg`/`path`, underlying exception types (KeyError, IndexError, original TypeError for coerced dotted list indices, "not indexable" TypeError), `str`/`repr`, and KeyError/IndexError/TypeError subclassing
+
+**Verification:** `python3 benchmark_check.py` exits 0 — `benchmark_tests.py` passes, existing `tests/test_strutils.py` + `tests/test_iterutils.py` (77 tests) pass, and all 20 new tests pass.
+
+STATUS: DONE

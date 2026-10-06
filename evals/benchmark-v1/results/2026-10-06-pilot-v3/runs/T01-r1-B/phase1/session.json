@@ -1,0 +1,99 @@
+{
+  "session_id": "10b5fd04-3dcb-4bca-8567-1fddc896aeb7",
+  "exit_code": 0,
+  "duration_seconds": 77.9183,
+  "interrupted": false,
+  "stop_reason": "completed",
+  "observed_assistant_messages": 23,
+  "final_response": "## Summary\n\n**Root cause:** `boltons/strutils.py:172` checked `numstr[-2] == '2'` for the \"teens\" branch — that's the tens digit of 20–29, not the teens. The pre-existing comment and `_ORDINAL_MAP` make the intent unambiguous.\n\n**Change** (`boltons/strutils.py`):\n- `numstr[-2] == '2'` → `numstr[-2] == '1'`, so 10–19 (and 110–119, …) take `th`, and numbers whose tens digit is 2 fall through to the last-digit rule.\n- Added documented examples `ordinalize(11) → 11th` and `ordinalize(22) → 22nd` to the docstring (docs render via `automodule`).\n\n**Regression tests** (`agent_tests/test_ordinalize.py`, new): 114 parametrized cases covering teens, twenties (20–29, 120–129), other tens, hundreds/thousands, `ext_only=True` suffix parity, numeric-string inputs, and preserved non-digit string passthrough (`'hi'`, `''`, etc.).\n\n**Verification actually run:**\n- `python3 benchmark_check.py` → \"Visible acceptance checks passed\"; `tests/test_strutils.py` + `tests/test_iterutils.py` 77 passed; `agent_tests` 114 passed.\n- deep-native `verify` → status `passed`, exit code 0, worktree hash unchanged during the run (evidence: `.deep-native/attempts/6412ce39f0614962a4c7e1d0948aeb33.json`).\n- Independent property check against a from-scratch ordinal rule for 0–4999: 0 mismatches, including `ext_only` and string passthrough.\n- Docstring doctests for `ordinalize` pass.\n\n**Scope/risk:** Only `boltons/strutils.py` and `agent_tests/` changed; no existing tests, config, or benchmark files were touched. Negative-number ordinals were out of scope and unchanged. This is self-review, not independent review.\n\nSTATUS: DONE",
+  "cli_result": {
+    "duration_api_ms": 75674,
+    "stop_reason": "end_turn",
+    "session_id": "10b5fd04-3dcb-4bca-8567-1fddc896aeb7",
+    "total_cost_usd": 0.552314,
+    "usage": {
+      "input_tokens": 18225,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 387328,
+      "output_tokens": 10701,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "deepseek-flash[1m]": {
+        "inputTokens": 18225,
+        "outputTokens": 10701,
+        "cacheReadInputTokens": 387328,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.552314,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 32000,
+        "thinkingTokens": 0,
+        "canonicalModel": "deepseek-flash[1m]",
+        "provider": "firstParty",
+        "costBasis": "unknown"
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "fast_mode_disabled_reason": "sdk_opt_in_required",
+    "subagent_stats": {
+      "spawned": 0,
+      "requested": {
+        "background": 0,
+        "foreground": 0,
+        "unset": 0
+      },
+      "started_in_background": 0,
+      "max_depth": 0,
+      "spawned_by_subagents": 0,
+      "completed": 0,
+      "failed": 0,
+      "killed": {
+        "parent": 0,
+        "user": 0,
+        "system": 0
+      },
+      "refused": {
+        "depth_limit": 0,
+        "concurrency_limit": 0,
+        "budget": 0
+      },
+      "by_type": {}
+    },
+    "is_error": false,
+    "num_turns": 30,
+    "subtype": "success",
+    "api_error_status": null,
+    "result": "## Summary\n\n**Root cause:** `boltons/strutils.py:172` checked `numstr[-2] == '2'` for the \"teens\" branch — that's the tens digit of 20–29, not the teens. The pre-existing comment and `_ORDINAL_MAP` make the intent unambiguous.\n\n**Change** (`boltons/strutils.py`):\n- `numstr[-2] == '2'` → `numstr[-2] == '1'`, so 10–19 (and 110–119, …) take `th`, and numbers whose tens digit is 2 fall through to the last-digit rule.\n- Added documented examples `ordinalize(11) → 11th` and `ordinalize(22) → 22nd` to the docstring (docs render via `automodule`).\n\n**Regression tests** (`agent_tests/test_ordinalize.py`, new): 114 parametrized cases covering teens, twenties (20–29, 120–129), other tens, hundreds/thousands, `ext_only=True` suffix parity, numeric-string inputs, and preserved non-digit string passthrough (`'hi'`, `''`, etc.).\n\n**Verification actually run:**\n- `python3 benchmark_check.py` → \"Visible acceptance checks passed\"; `tests/test_strutils.py` + `tests/test_iterutils.py` 77 passed; `agent_tests` 114 passed.\n- deep-native `verify` → status `passed`, exit code 0, worktree hash unchanged during the run (evidence: `.deep-native/attempts/6412ce39f0614962a4c7e1d0948aeb33.json`).\n- Independent property check against a from-scratch ordinal rule for 0–4999: 0 mismatches, including `ext_only` and string passthrough.\n- Docstring doctests for `ordinalize` pass.\n\n**Scope/risk:** Only `boltons/strutils.py` and `agent_tests/` changed; no existing tests, config, or benchmark files were touched. Negative-number ordinals were out of scope and unchanged. This is self-review, not independent review.\n\nSTATUS: DONE",
+    "ttft_ms": 1356,
+    "type": "result",
+    "duration_ms": 77685,
+    "uuid": "1fa56483-ca32-4e5e-965c-719e566813fd",
+    "ttft_stream_ms": 773,
+    "time_to_request_ms": 16,
+    "first_content_frame_ms": 773,
+    "queued_turn_count": 0,
+    "result_index": 0
+  },
+  "last_observed_verified_source_hash": null,
+  "final_source_hash": "ce60c0450d2f6dc8a2120a35af4c0c6b97e7eef4072e31a8b2235018715c27d3",
+  "stale_observed_verification": false,
+  "operator_interrupted": false
+}

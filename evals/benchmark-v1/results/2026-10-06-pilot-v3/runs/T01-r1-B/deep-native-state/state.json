@@ -1,0 +1,14 @@
+{
+  "attempt": "6412ce39f0614962a4c7e1d0948aeb33",
+  "config_hash": "5b9581457bd2f5322490d5e6b244630331b50a13f7934dac636905c8d0c65f7b",
+  "goal": "ordinalize(n) returns correct English ordinal suffix for teens (10-19 -> th), twenties (2x last-digit rule: 21st/22nd/23rd/24th), and preserves string passthrough and ext_only behavior",
+  "next": "Run deep-native verify, then review diff and report.",
+  "note": "Fixed boltons/strutils.py ordinalize: tens-digit check was '2' (twenties) instead of '1' (teens); added docstring examples for 11th/22nd; added agent_tests/test_ordinalize.py (114 tests). Manual runs: benchmark_tests.py passed, tests/ 77 passed, agent_tests 114 passed.",
+  "risk": "No live API or external service involved; correctness checked against an independent rule for 0..4999 plus project checks. Negative-number ordinals were not in scope and left unchanged.",
+  "schema": 1,
+  "session": "d23b0abb-3c7d-46ec-a55c-2a38f4eaafd4",
+  "status": "complete",
+  "summary": "Fixed strutils.ordinalize teen/twenties regression: '1' teens check; docstring examples for 11th/22nd; added agent_tests/test_ordinalize.py (114 tests).",
+  "task_id": "37a3acce1d72484abe74c9eb02d2c794",
+  "updated_at": "2026-10-06T04:15:51Z"
+}

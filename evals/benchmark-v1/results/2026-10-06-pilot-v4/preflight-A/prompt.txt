@@ -1,0 +1,1 @@
+Fix greet(name) so it returns Hello, <name>! Tests are run with python3 -m unittest. Execute pwd in Bash and run the tests. End with STATUS: DONE or STATUS: BLOCKED.

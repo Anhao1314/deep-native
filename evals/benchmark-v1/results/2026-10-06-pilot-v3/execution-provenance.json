@@ -1,0 +1,14 @@
+{
+  "harness_commit": "7511fb85d751585d111411f7f436eaf6e93b1bd8",
+  "deep_native_commit": "fda3dd010e7de8f8c1ee1953e006e577464aa3d6",
+  "primary_campaign": false,
+  "prior_campaigns_excluded": [
+    "2026-10-06-pilot",
+    "2026-10-06-pilot-v2"
+  ],
+  "corrections": "Scoring scope, independent new regressions, measurement/receipt continuity, strict process/temp isolation and attestation. No Deep Native change.",
+  "validation": "98 tests run: 97 passed, one cached fixture test skipped; full 10-test fixture validation separately passed for all 10 tasks. Real isolated A/B toy preflight passed; not counted as benchmark performance.",
+  "initially_intended_primary": true,
+  "excluded_from_primary_comparison": true,
+  "exclusion_reason": "Native Bash cwd receipt sandbox failure; see infrastructure_issue.json."
+}

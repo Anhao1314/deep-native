@@ -1,0 +1,99 @@
+{
+  "session_id": "2f016ba6-fdf8-4f9b-aeff-1f8996626693",
+  "exit_code": 0,
+  "duration_seconds": 9.712,
+  "interrupted": false,
+  "stop_reason": "completed",
+  "observed_assistant_messages": 5,
+  "final_response": "Fixed `greet` in hello.py:2 to return `\"Hello, {}!\".format(name)`. Ran `pwd` (`/private/tmp/dn-v4-toy-yvj6mj4u/workspace`) and `python3 -m unittest` — 1 test passed, OK.\n\nSTATUS: DONE",
+  "cli_result": {
+    "duration_api_ms": 9178,
+    "stop_reason": "end_turn",
+    "session_id": "2f016ba6-fdf8-4f9b-aeff-1f8996626693",
+    "total_cost_usd": 0.059868,
+    "usage": {
+      "input_tokens": 6923,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 25856,
+      "output_tokens": 493,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "deepseek-flash[1m]": {
+        "inputTokens": 6923,
+        "outputTokens": 493,
+        "cacheReadInputTokens": 25856,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.059868,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 32000,
+        "thinkingTokens": 0,
+        "canonicalModel": "deepseek-flash[1m]",
+        "provider": "firstParty",
+        "costBasis": "unknown"
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "fast_mode_disabled_reason": "sdk_opt_in_required",
+    "subagent_stats": {
+      "spawned": 0,
+      "requested": {
+        "background": 0,
+        "foreground": 0,
+        "unset": 0
+      },
+      "started_in_background": 0,
+      "max_depth": 0,
+      "spawned_by_subagents": 0,
+      "completed": 0,
+      "failed": 0,
+      "killed": {
+        "parent": 0,
+        "user": 0,
+        "system": 0
+      },
+      "refused": {
+        "depth_limit": 0,
+        "concurrency_limit": 0,
+        "budget": 0
+      },
+      "by_type": {}
+    },
+    "is_error": false,
+    "num_turns": 7,
+    "subtype": "success",
+    "api_error_status": null,
+    "result": "Fixed `greet` in hello.py:2 to return `\"Hello, {}!\".format(name)`. Ran `pwd` (`/private/tmp/dn-v4-toy-yvj6mj4u/workspace`) and `python3 -m unittest` — 1 test passed, OK.\n\nSTATUS: DONE",
+    "ttft_ms": 1734,
+    "type": "result",
+    "duration_ms": 9299,
+    "uuid": "4b258862-9bec-492b-8f19-7b58c5bcb2c4",
+    "ttft_stream_ms": 1000,
+    "time_to_request_ms": 53,
+    "first_content_frame_ms": 1000,
+    "queued_turn_count": 0,
+    "result_index": 0
+  },
+  "last_observed_verified_source_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "final_source_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stale_observed_verification": false,
+  "operator_interrupted": false
+}
