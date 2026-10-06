@@ -1,0 +1,29 @@
+test_checkpoint_requires_substance (__main__.HarnessTests.test_checkpoint_requires_substance) ... ok
+test_frozen_inputs (__main__.HarnessTests.test_frozen_inputs) ... ok
+test_receipt_staleness_and_protection (__main__.HarnessTests.test_receipt_staleness_and_protection) ... ok
+test_treatment_install_and_real_check (__main__.HarnessTests.test_treatment_install_and_real_check) ... 
+  test_treatment_install_and_real_check (__main__.HarnessTests.test_treatment_install_and_real_check) (arm='B') ... FAIL
+  test_treatment_install_and_real_check (__main__.HarnessTests.test_treatment_install_and_real_check) (arm='C') ... FAIL
+
+======================================================================
+FAIL: test_treatment_install_and_real_check (__main__.HarnessTests.test_treatment_install_and_real_check) (arm='B')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/test_harness.py", line 27, in test_treatment_install_and_real_check
+    result=cmd(prefix+args,root,env);self.assertEqual(result['exit_code'],0,result)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : {'exit_code': 1, 'stdout': '{\n  "after": "b6898241d60a784b141451750684946e4bdf1a5a426694b35fee4cb89fc146fc",\n  "attempt_id": "7c7d1797241f487babf9eeab1575d5e5",\n  "before": "b6898241d60a784b141451750684946e4bdf1a5a426694b35fee4cb89fc146fc",\n  "checks": [\n    {\n      "argv": [\n        "python3",\n        "run_checks.py"\n      ],\n      "elapsed_seconds": 0.1867,\n      "exit_code": 1,\n      "name": "tests",\n      "timeout": false\n    }\n  ],\n  "config_hash": "9d7ee9d2731d57d920dce64081e6da8bf5fa2da5910f814cfe47a5ad1d9a83e3",\n  "runtime_version": "0.1.0",\n  "schema": 1,\n  "started_at": "2026-10-06T07:08:21Z",\n  "status": "failed",\n  "task_id": "6b9697055a954dd796b49d9cdc53fad6"\n}\n', 'stderr': '', 'duration_seconds': 0.24111583299963968}
+
+======================================================================
+FAIL: test_treatment_install_and_real_check (__main__.HarnessTests.test_treatment_install_and_real_check) (arm='C')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/test_harness.py", line 27, in test_treatment_install_and_real_check
+    result=cmd(prefix+args,root,env);self.assertEqual(result['exit_code'],0,result)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : {'exit_code': 1, 'stdout': '{\n  "after": "b6898241d60a784b141451750684946e4bdf1a5a426694b35fee4cb89fc146fc",\n  "attempt_id": "9cf056afafd144f29b86b9065d261693",\n  "before": "b6898241d60a784b141451750684946e4bdf1a5a426694b35fee4cb89fc146fc",\n  "checks": [\n    {\n      "argv": [\n        "python3",\n        "run_checks.py"\n      ],\n      "elapsed_seconds": 0.1849,\n      "exit_code": 1,\n      "name": "tests",\n      "timeout": false\n    }\n  ],\n  "config_hash": "9d7ee9d2731d57d920dce64081e6da8bf5fa2da5910f814cfe47a5ad1d9a83e3",\n  "runtime_version": "0.1.0",\n  "schema": 1,\n  "started_at": "2026-10-06T07:08:22Z",\n  "status": "failed",\n  "task_id": "b4b786a8ba3b4f57a1d25b537dc56ffc"\n}\n', 'stderr': '', 'duration_seconds': 0.2395268340005714}
+
+----------------------------------------------------------------------
+Ran 4 tests in 5.359s
+
+FAILED (failures=2)

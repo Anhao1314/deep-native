@@ -1,0 +1,349 @@
+{
+  "D1": {
+    "fixture_commit": "4c1df5cc43f619b91fb936ca550ad832f986d61a",
+    "before": {
+      "pass": false,
+      "contract": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) ... \n  test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) (info=False, method=False, hot=False) ... FAIL\n  test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) (info=False, method=False, hot=True) ... FAIL\n  test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) (info=False, method=True, hot=False) ... FAIL\n  test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) (info=False, method=True, hot=True) ... FAIL\n  test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) (info=True, method=False, hot=False) ... FAIL\n  test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) (info=True, method=False, hot=True) ... FAIL\n  test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) (info=True, method=True, hot=False) ... FAIL\n  test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) (info=True, method=True, hot=True) ... FAIL\ntest_same_key_suppression_and_exception_cleanup (__main__.DebugTests.test_same_key_suppression_and_exception_cleanup) ... ok\n\n======================================================================\nFAIL: test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) (info=False, method=False, hot=False)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 40, in test_independent_keys_and_cached_hits\n    with self.subTest(info=info,method=method,hot=hot):self.exercise(info,method,hot)\n                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 30, in exercise\n    else:self.assertTrue(other.wait(1),'unrelated cache miss blocked although no eviction occurs')\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: False is not true : unrelated cache miss blocked although no eviction occurs\n\n======================================================================\nFAIL: test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) (info=False, method=False, hot=True)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 40, in test_independent_keys_and_cached_hits\n    with self.subTest(info=info,method=method,hot=hot):self.exercise(info,method,hot)\n                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 29, in exercise\n    second.join(1);self.assertFalse(second.is_alive(),'cached unrelated key blocked although no eviction occurs')\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: True is not false : cached unrelated key blocked although no eviction occurs\n\n======================================================================\nFAIL: test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) (info=False, method=True, hot=False)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 40, in test_independent_keys_and_cached_hits\n    with self.subTest(info=info,method=method,hot=hot):self.exercise(info,method,hot)\n                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 30, in exercise\n    else:self.assertTrue(other.wait(1),'unrelated cache miss blocked although no eviction occurs')\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: False is not true : unrelated cache miss blocked although no eviction occurs\n\n======================================================================\nFAIL: test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) (info=False, method=True, hot=True)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 40, in test_independent_keys_and_cached_hits\n    with self.subTest(info=info,method=method,hot=hot):self.exercise(info,method,hot)\n                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 29, in exercise\n    second.join(1);self.assertFalse(second.is_alive(),'cached unrelated key blocked although no eviction occurs')\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: True is not false : cached unrelated key blocked although no eviction occurs\n\n======================================================================\nFAIL: test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) (info=True, method=False, hot=False)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 40, in test_independent_keys_and_cached_hits\n    with self.subTest(info=info,method=method,hot=hot):self.exercise(info,method,hot)\n                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 30, in exercise\n    else:self.assertTrue(other.wait(1),'unrelated cache miss blocked although no eviction occurs')\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: False is not true : unrelated cache miss blocked although no eviction occurs\n\n======================================================================\nFAIL: test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) (info=True, method=False, hot=True)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 40, in test_independent_keys_and_cached_hits\n    with self.subTest(info=info,method=method,hot=hot):self.exercise(info,method,hot)\n                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 29, in exercise\n    second.join(1);self.assertFalse(second.is_alive(),'cached unrelated key blocked although no eviction occurs')\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: True is not false : cached unrelated key blocked although no eviction occurs\n\n======================================================================\nFAIL: test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) (info=True, method=True, hot=False)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 40, in test_independent_keys_and_cached_hits\n    with self.subTest(info=info,method=method,hot=hot):self.exercise(info,method,hot)\n                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 30, in exercise\n    else:self.assertTrue(other.wait(1),'unrelated cache miss blocked although no eviction occurs')\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: False is not true : unrelated cache miss blocked although no eviction occurs\n\n======================================================================\nFAIL: test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) (info=True, method=True, hot=True)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 40, in test_independent_keys_and_cached_hits\n    with self.subTest(info=info,method=method,hot=hot):self.exercise(info,method,hot)\n                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 29, in exercise\n    second.join(1);self.assertFalse(second.is_alive(),'cached unrelated key blocked although no eviction occurs')\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: True is not false : cached unrelated key blocked although no eviction occurs\n\n----------------------------------------------------------------------\nRan 2 tests in 8.116s\n\nFAILED (failures=8)\n",
+        "duration_seconds": 8.149584917002358
+      },
+      "upstream": {
+        "exit_code": 0,
+        "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.17s\n",
+        "stderr": "",
+        "duration_seconds": 4.280789208001806
+      },
+      "agent_tests": {
+        "exit_code": 0,
+        "stdout": "No agent tests supplied",
+        "stderr": ""
+      }
+    },
+    "launcher_before": {
+      "exit_code": 1,
+      "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.17s\nTASK_CHECK_RESULT {\"task\": \"D1\", \"phase\": 1, \"task_tests\": 2, \"passed\": false, \"source_before\": \"952df2167357326c9256ddcbbe4e7483aad764c931e3db13d2d8132a0fda18b6\", \"source_after\": \"952df2167357326c9256ddcbbe4e7483aad764c931e3db13d2d8132a0fda18b6\", \"started_epoch\": 1791270359.325108, \"ended_epoch\": 1791270371.7294762, \"pid\": 29684, \"upstream_exit\": 0, \"extra_exit\": null}\n",
+      "stderr": "test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) ... \n  test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) (info=False, method=False, hot=False) ... FAIL\n  test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) (info=False, method=False, hot=True) ... FAIL\n  test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) (info=False, method=True, hot=False) ... FAIL\n  test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) (info=False, method=True, hot=True) ... FAIL\n  test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) (info=True, method=False, hot=False) ... FAIL\n  test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) (info=True, method=False, hot=True) ... FAIL\n  test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) (info=True, method=True, hot=False) ... FAIL\n  test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) (info=True, method=True, hot=True) ... FAIL\ntest_same_key_suppression_and_exception_cleanup (benchmark_tests.DebugTests.test_same_key_suppression_and_exception_cleanup) ... ok\n\n======================================================================\nFAIL: test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) (info=False, method=False, hot=False)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/tmp/dn2-cal-h5eknyuc/workspace/benchmark_tests.py\", line 70, in test_independent_keys_and_cached_hits\n    self.exercise(info, method, hot)\n  File \"/private/tmp/dn2-cal-h5eknyuc/workspace/benchmark_tests.py\", line 56, in exercise\n    self.assertTrue(other.wait(1), 'unrelated cache miss blocked although no eviction occurs')\nAssertionError: False is not true : unrelated cache miss blocked although no eviction occurs\n\n======================================================================\nFAIL: test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) (info=False, method=False, hot=True)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/tmp/dn2-cal-h5eknyuc/workspace/benchmark_tests.py\", line 70, in test_independent_keys_and_cached_hits\n    self.exercise(info, method, hot)\n  File \"/private/tmp/dn2-cal-h5eknyuc/workspace/benchmark_tests.py\", line 54, in exercise\n    self.assertFalse(second.is_alive(), 'cached unrelated key blocked although no eviction occurs')\nAssertionError: True is not false : cached unrelated key blocked although no eviction occurs\n\n======================================================================\nFAIL: test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) (info=False, method=True, hot=False)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/tmp/dn2-cal-h5eknyuc/workspace/benchmark_tests.py\", line 70, in test_independent_keys_and_cached_hits\n    self.exercise(info, method, hot)\n  File \"/private/tmp/dn2-cal-h5eknyuc/workspace/benchmark_tests.py\", line 56, in exercise\n    self.assertTrue(other.wait(1), 'unrelated cache miss blocked although no eviction occurs')\nAssertionError: False is not true : unrelated cache miss blocked although no eviction occurs\n\n======================================================================\nFAIL: test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) (info=False, method=True, hot=True)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/tmp/dn2-cal-h5eknyuc/workspace/benchmark_tests.py\", line 70, in test_independent_keys_and_cached_hits\n    self.exercise(info, method, hot)\n  File \"/private/tmp/dn2-cal-h5eknyuc/workspace/benchmark_tests.py\", line 54, in exercise\n    self.assertFalse(second.is_alive(), 'cached unrelated key blocked although no eviction occurs')\nAssertionError: True is not false : cached unrelated key blocked although no eviction occurs\n\n======================================================================\nFAIL: test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) (info=True, method=False, hot=False)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/tmp/dn2-cal-h5eknyuc/workspace/benchmark_tests.py\", line 70, in test_independent_keys_and_cached_hits\n    self.exercise(info, method, hot)\n  File \"/private/tmp/dn2-cal-h5eknyuc/workspace/benchmark_tests.py\", line 56, in exercise\n    self.assertTrue(other.wait(1), 'unrelated cache miss blocked although no eviction occurs')\nAssertionError: False is not true : unrelated cache miss blocked although no eviction occurs\n\n======================================================================\nFAIL: test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) (info=True, method=False, hot=True)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/tmp/dn2-cal-h5eknyuc/workspace/benchmark_tests.py\", line 70, in test_independent_keys_and_cached_hits\n    self.exercise(info, method, hot)\n  File \"/private/tmp/dn2-cal-h5eknyuc/workspace/benchmark_tests.py\", line 54, in exercise\n    self.assertFalse(second.is_alive(), 'cached unrelated key blocked although no eviction occurs')\nAssertionError: True is not false : cached unrelated key blocked although no eviction occurs\n\n======================================================================\nFAIL: test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) (info=True, method=True, hot=False)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/tmp/dn2-cal-h5eknyuc/workspace/benchmark_tests.py\", line 70, in test_independent_keys_and_cached_hits\n    self.exercise(info, method, hot)\n  File \"/private/tmp/dn2-cal-h5eknyuc/workspace/benchmark_tests.py\", line 56, in exercise\n    self.assertTrue(other.wait(1), 'unrelated cache miss blocked although no eviction occurs')\nAssertionError: False is not true : unrelated cache miss blocked although no eviction occurs\n\n======================================================================\nFAIL: test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) (info=True, method=True, hot=True)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/tmp/dn2-cal-h5eknyuc/workspace/benchmark_tests.py\", line 70, in test_independent_keys_and_cached_hits\n    self.exercise(info, method, hot)\n  File \"/private/tmp/dn2-cal-h5eknyuc/workspace/benchmark_tests.py\", line 54, in exercise\n    self.assertFalse(second.is_alive(), 'cached unrelated key blocked although no eviction occurs')\nAssertionError: True is not false : cached unrelated key blocked although no eviction occurs\n\n----------------------------------------------------------------------\nRan 2 tests in 8.113s\n\nFAILED (failures=8)\n",
+      "duration_seconds": 12.444787708001968
+    },
+    "reference_phase1": {
+      "pass": true,
+      "contract": {
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) ... ok\ntest_same_key_suppression_and_exception_cleanup (__main__.DebugTests.test_same_key_suppression_and_exception_cleanup) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.074s\n\nOK\n",
+        "duration_seconds": 0.10477566699773888
+      },
+      "upstream": {
+        "exit_code": 0,
+        "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.16s\n",
+        "stderr": "",
+        "duration_seconds": 4.241281792001246
+      },
+      "agent_tests": {
+        "exit_code": 0,
+        "stdout": "No agent tests supplied",
+        "stderr": ""
+      }
+    },
+    "reference_launcher_phase1": {
+      "exit_code": 0,
+      "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.16s\nTASK_CHECK_RESULT {\"task\": \"D1\", \"phase\": 1, \"task_tests\": 2, \"passed\": true, \"source_before\": \"a82f3b6a92df5b9912804a7e74d7faf7089aedec2c2294775e9dd2294c81c9db\", \"source_after\": \"a82f3b6a92df5b9912804a7e74d7faf7089aedec2c2294775e9dd2294c81c9db\", \"started_epoch\": 1791270376.149015, \"ended_epoch\": 1791270380.458302, \"pid\": 29699, \"upstream_exit\": 0, \"extra_exit\": null}\n",
+      "stderr": "test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) ... ok\ntest_same_key_suppression_and_exception_cleanup (benchmark_tests.DebugTests.test_same_key_suppression_and_exception_cleanup) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.072s\n\nOK\n",
+      "duration_seconds": 4.349524875000498
+    },
+    "halfway_full_grade": null,
+    "reference_final": {
+      "pass": true,
+      "contract": {
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_independent_keys_and_cached_hits (__main__.DebugTests.test_independent_keys_and_cached_hits) ... ok\ntest_same_key_suppression_and_exception_cleanup (__main__.DebugTests.test_same_key_suppression_and_exception_cleanup) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.073s\n\nOK\n",
+        "duration_seconds": 0.10852229200099828
+      },
+      "upstream": {
+        "exit_code": 0,
+        "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.16s\n",
+        "stderr": "",
+        "duration_seconds": 4.241076124999381
+      },
+      "agent_tests": {
+        "exit_code": 0,
+        "stdout": "No agent tests supplied",
+        "stderr": ""
+      }
+    },
+    "reference_launcher_final": {
+      "exit_code": 0,
+      "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.16s\nTASK_CHECK_RESULT {\"task\": \"D1\", \"phase\": 2, \"task_tests\": 2, \"passed\": true, \"source_before\": \"1103ff52c04d0987f030ed344274e037c85a967eb43164e8c8c12c1a07fca587\", \"source_after\": \"1103ff52c04d0987f030ed344274e037c85a967eb43164e8c8c12c1a07fca587\", \"started_epoch\": 1791270384.873576, \"ended_epoch\": 1791270389.2552938, \"pid\": 29709, \"upstream_exit\": 0, \"extra_exit\": null}\n",
+      "stderr": "test_independent_keys_and_cached_hits (benchmark_tests.DebugTests.test_independent_keys_and_cached_hits) ... ok\ntest_same_key_suppression_and_exception_cleanup (benchmark_tests.DebugTests.test_same_key_suppression_and_exception_cleanup) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.074s\n\nOK\n",
+      "duration_seconds": 4.422034667000844
+    }
+  },
+  "E1": {
+    "fixture_commit": "c3f564fa2dd34db7bbc756dc1c76e4e1507f628d",
+    "before": {
+      "pass": true,
+      "contract": {
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_existing_product_contract (__main__.EnvironmentTests.test_existing_product_contract) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n",
+        "duration_seconds": 0.03110887499860837
+      },
+      "upstream": {
+        "exit_code": 0,
+        "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.16s\n",
+        "stderr": "",
+        "duration_seconds": 4.241355291000218
+      },
+      "agent_tests": {
+        "exit_code": 0,
+        "stdout": "No agent tests supplied",
+        "stderr": ""
+      }
+    },
+    "launcher_before": {
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": "Traceback (most recent call last):\n  File \"/private/tmp/dn2-cal-847ik91f/workspace/run_checks.py\", line 5, in <module>\n    with tempfile.TemporaryDirectory(dir=os.environ.get('CHECK_TMPDIR',str(root/'.fixture-readonly'))) as d:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/tempfile.py\", line 886, in __init__\n    self.name = mkdtemp(suffix, prefix, dir)\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/tempfile.py\", line 384, in mkdtemp\n    _os.mkdir(file, 0o700)\nPermissionError: [Errno 13] Permission denied: '/private/tmp/dn2-cal-847ik91f/workspace/.fixture-readonly/tmp08jgusbf'\n",
+      "duration_seconds": 0.028461000001698267
+    },
+    "reference_phase1": {
+      "pass": true,
+      "contract": {
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_existing_product_contract (__main__.EnvironmentTests.test_existing_product_contract) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n",
+        "duration_seconds": 0.029012582999712322
+      },
+      "upstream": {
+        "exit_code": 0,
+        "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.16s\n",
+        "stderr": "",
+        "duration_seconds": 4.232873082997685
+      },
+      "agent_tests": {
+        "exit_code": 0,
+        "stdout": "No agent tests supplied",
+        "stderr": ""
+      }
+    },
+    "reference_launcher_phase1": {
+      "exit_code": 0,
+      "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.16s\nTASK_CHECK_RESULT {\"task\": \"E1\", \"phase\": 1, \"task_tests\": 1, \"passed\": true, \"source_before\": \"adc6f9c419d4babb43b7dfa0da0948dad5ef5536c68f440993b8353f3e34efe9\", \"source_after\": \"adc6f9c419d4babb43b7dfa0da0948dad5ef5536c68f440993b8353f3e34efe9\", \"started_epoch\": 1791270397.9833128, \"ended_epoch\": 1791270402.2089322, \"pid\": 29735, \"upstream_exit\": 0, \"extra_exit\": null}\n",
+      "stderr": "test_existing_product_contract (benchmark_tests.EnvironmentTests.test_existing_product_contract) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n",
+      "duration_seconds": 4.264868250000291
+    },
+    "halfway_full_grade": null,
+    "reference_final": {
+      "pass": true,
+      "contract": {
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_existing_product_contract (__main__.EnvironmentTests.test_existing_product_contract) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n",
+        "duration_seconds": 0.029412291001790436
+      },
+      "upstream": {
+        "exit_code": 0,
+        "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.16s\n",
+        "stderr": "",
+        "duration_seconds": 4.231624291998742
+      },
+      "agent_tests": {
+        "exit_code": 0,
+        "stdout": "No agent tests supplied",
+        "stderr": ""
+      }
+    },
+    "reference_launcher_final": {
+      "exit_code": 0,
+      "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.15s\nTASK_CHECK_RESULT {\"task\": \"E1\", \"phase\": 2, \"task_tests\": 1, \"passed\": true, \"source_before\": \"5bb4c87dc1f0bdcd1dff1d1d87406c81a87a64e5c772a55cbaeeded93f9fe75b\", \"source_after\": \"5bb4c87dc1f0bdcd1dff1d1d87406c81a87a64e5c772a55cbaeeded93f9fe75b\", \"started_epoch\": 1791270406.532487, \"ended_epoch\": 1791270410.753998, \"pid\": 29741, \"upstream_exit\": 0, \"extra_exit\": null}\n",
+      "stderr": "test_existing_product_contract (benchmark_tests.EnvironmentTests.test_existing_product_contract) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n",
+      "duration_seconds": 4.260632166002324
+    }
+  },
+  "F1": {
+    "fixture_commit": "aa67f407a1c2494fd2a92ef9610e8b10d8d99971",
+    "before": {
+      "pass": false,
+      "contract": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "test_bulk_removal (__main__.FreshStageOne.test_bulk_removal) ... ERROR\ntest_no_missing_side_effect (__main__.FreshStageOne.test_no_missing_side_effect) ... ERROR\n\n======================================================================\nERROR: test_bulk_removal (__main__.FreshStageOne.test_bulk_removal)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 75, in test_bulk_removal\n    result=c.pop_many(iter(['b','missing','b','a']))\n           ^^^^^^^^^^\nAttributeError: 'Cache' object has no attribute 'pop_many'\n\n======================================================================\nERROR: test_no_missing_side_effect (__main__.FreshStageOne.test_no_missing_side_effect)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 80, in test_no_missing_side_effect\n    c=Auto(5);self.assertEqual(c.pop_many(['x','x']),[])\n                               ^^^^^^^^^^\nAttributeError: 'Auto' object has no attribute 'pop_many'\n\n----------------------------------------------------------------------\nRan 2 tests in 0.001s\n\nFAILED (errors=2)\n",
+        "duration_seconds": 0.029158084002119722
+      },
+      "upstream": {
+        "exit_code": 0,
+        "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.17s\n",
+        "stderr": "",
+        "duration_seconds": 4.241981833001773
+      },
+      "agent_tests": {
+        "exit_code": 0,
+        "stdout": "No agent tests supplied",
+        "stderr": ""
+      }
+    },
+    "launcher_before": {
+      "exit_code": 1,
+      "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.15s\nTASK_CHECK_RESULT {\"task\": \"F1\", \"phase\": 1, \"task_tests\": 2, \"passed\": false, \"source_before\": \"e11c27ce58fba7274215b77a4327047a447a65a5d3769b751e293f937bfc8cf0\", \"source_after\": \"e11c27ce58fba7274215b77a4327047a447a65a5d3769b751e293f937bfc8cf0\", \"started_epoch\": 1791270415.151412, \"ended_epoch\": 1791270419.377037, \"pid\": 29759, \"upstream_exit\": 0, \"extra_exit\": null}\n",
+      "stderr": "test_bulk_removal (benchmark_tests.FreshStageOne.test_bulk_removal) ... ERROR\ntest_no_missing_side_effect (benchmark_tests.FreshStageOne.test_no_missing_side_effect) ... ERROR\n\n======================================================================\nERROR: test_bulk_removal (benchmark_tests.FreshStageOne.test_bulk_removal)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/tmp/dn2-cal-tdcfx_vp/workspace/benchmark_tests.py\", line 12, in test_bulk_removal\n    result = c.pop_many(iter(['b', 'missing', 'b', 'a']))\n             ^^^^^^^^^^\nAttributeError: 'Cache' object has no attribute 'pop_many'\n\n======================================================================\nERROR: test_no_missing_side_effect (benchmark_tests.FreshStageOne.test_no_missing_side_effect)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/tmp/dn2-cal-tdcfx_vp/workspace/benchmark_tests.py\", line 24, in test_no_missing_side_effect\n    self.assertEqual(c.pop_many(['x', 'x']), [])\n                     ^^^^^^^^^^\nAttributeError: 'Auto' object has no attribute 'pop_many'\n\n----------------------------------------------------------------------\nRan 2 tests in 0.001s\n\nFAILED (errors=2)\n",
+      "duration_seconds": 4.263497207997716
+    },
+    "reference_phase1": {
+      "pass": true,
+      "contract": {
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_bulk_removal (__main__.FreshStageOne.test_bulk_removal) ... ok\ntest_no_missing_side_effect (__main__.FreshStageOne.test_no_missing_side_effect) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK\n",
+        "duration_seconds": 0.03097462499863468
+      },
+      "upstream": {
+        "exit_code": 0,
+        "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.16s\n",
+        "stderr": "",
+        "duration_seconds": 4.236335249999684
+      },
+      "agent_tests": {
+        "exit_code": 0,
+        "stdout": "No agent tests supplied",
+        "stderr": ""
+      }
+    },
+    "reference_launcher_phase1": {
+      "exit_code": 0,
+      "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.16s\nTASK_CHECK_RESULT {\"task\": \"F1\", \"phase\": 1, \"task_tests\": 2, \"passed\": true, \"source_before\": \"a207b8709990aa0611207464d101d439344cd36a38a338aed09a1f6a3f74277b\", \"source_after\": \"a207b8709990aa0611207464d101d439344cd36a38a338aed09a1f6a3f74277b\", \"started_epoch\": 1791270423.704664, \"ended_epoch\": 1791270427.933079, \"pid\": 29769, \"upstream_exit\": 0, \"extra_exit\": null}\n",
+      "stderr": "test_bulk_removal (benchmark_tests.FreshStageOne.test_bulk_removal) ... ok\ntest_no_missing_side_effect (benchmark_tests.FreshStageOne.test_no_missing_side_effect) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK\n",
+      "duration_seconds": 4.267204750001838
+    },
+    "halfway_full_grade": null,
+    "reference_final": {
+      "pass": true,
+      "contract": {
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_bulk_removal (__main__.FreshStageTwo.test_bulk_removal) ... ok\ntest_iterator_failure_does_not_partially_remove (__main__.FreshStageTwo.test_iterator_failure_does_not_partially_remove) ... ok\ntest_keyword_signature (__main__.FreshStageTwo.test_keyword_signature) ... ok\ntest_no_missing_side_effect (__main__.FreshStageTwo.test_no_missing_side_effect) ... ok\ntest_strict_is_atomic (__main__.FreshStageTwo.test_strict_is_atomic) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK\n",
+        "duration_seconds": 0.031605415999365505
+      },
+      "upstream": {
+        "exit_code": 0,
+        "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.14s\n",
+        "stderr": "",
+        "duration_seconds": 4.216773832999024
+      },
+      "agent_tests": {
+        "exit_code": 0,
+        "stdout": "No agent tests supplied",
+        "stderr": ""
+      }
+    },
+    "reference_launcher_final": {
+      "exit_code": 0,
+      "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.15s\nTASK_CHECK_RESULT {\"task\": \"F1\", \"phase\": 2, \"task_tests\": 5, \"passed\": true, \"source_before\": \"a36717dca582ba060c3c5a567cb75c669f954be86e35fa11b7f135d48815e229\", \"source_after\": \"a36717dca582ba060c3c5a567cb75c669f954be86e35fa11b7f135d48815e229\", \"started_epoch\": 1791270432.240018, \"ended_epoch\": 1791270436.468222, \"pid\": 29782, \"upstream_exit\": 0, \"extra_exit\": null}\n",
+      "stderr": "test_bulk_removal (benchmark_tests.FreshStageTwo.test_bulk_removal) ... ok\ntest_iterator_failure_does_not_partially_remove (benchmark_tests.FreshStageTwo.test_iterator_failure_does_not_partially_remove) ... ok\ntest_keyword_signature (benchmark_tests.FreshStageTwo.test_keyword_signature) ... ok\ntest_no_missing_side_effect (benchmark_tests.FreshStageTwo.test_no_missing_side_effect) ... ok\ntest_strict_is_atomic (benchmark_tests.FreshStageTwo.test_strict_is_atomic) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK\n",
+      "duration_seconds": 4.263461375001498
+    }
+  },
+  "R1": {
+    "fixture_commit": "fdd87c05778216693a43b36ae33b01f76456eba4",
+    "before": {
+      "pass": false,
+      "contract": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "test_empty_and_order (__main__.RecoveryStageOne.test_empty_and_order) ... ERROR\ntest_snapshot_is_shallow_immutable_and_non_mutating (__main__.RecoveryStageOne.test_snapshot_is_shallow_immutable_and_non_mutating) ... ERROR\n\n======================================================================\nERROR: test_empty_and_order (__main__.RecoveryStageOne.test_empty_and_order)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 107, in test_empty_and_order\n    c=Cache(4);self.assertEqual(c.snapshot(),())\n                                ^^^^^^^^^^\nAttributeError: 'Cache' object has no attribute 'snapshot'\n\n======================================================================\nERROR: test_snapshot_is_shallow_immutable_and_non_mutating (__main__.RecoveryStageOne.test_snapshot_is_shallow_immutable_and_non_mutating)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 102, in test_snapshot_is_shallow_immutable_and_non_mutating\n    before=c.currsize;result=c.snapshot()\n                             ^^^^^^^^^^\nAttributeError: 'Cache' object has no attribute 'snapshot'\n\n----------------------------------------------------------------------\nRan 2 tests in 0.001s\n\nFAILED (errors=2)\n",
+        "duration_seconds": 0.029467416999978013
+      },
+      "upstream": {
+        "exit_code": 0,
+        "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.16s\n",
+        "stderr": "",
+        "duration_seconds": 4.237486083002295
+      },
+      "agent_tests": {
+        "exit_code": 0,
+        "stdout": "No agent tests supplied",
+        "stderr": ""
+      }
+    },
+    "launcher_before": {
+      "exit_code": 1,
+      "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.15s\nTASK_CHECK_RESULT {\"task\": \"R1\", \"phase\": 1, \"task_tests\": 2, \"passed\": false, \"source_before\": \"139bb2b3c58cc98b3d65368bb770294172b62ca5dd6c6f6cf5eaaa1cbc08b7d2\", \"source_after\": \"139bb2b3c58cc98b3d65368bb770294172b62ca5dd6c6f6cf5eaaa1cbc08b7d2\", \"started_epoch\": 1791270440.863894, \"ended_epoch\": 1791270445.088901, \"pid\": 29798, \"upstream_exit\": 0, \"extra_exit\": null}\n",
+      "stderr": "test_empty_and_order (benchmark_tests.RecoveryStageOne.test_empty_and_order) ... ERROR\ntest_snapshot_is_shallow_immutable_and_non_mutating (benchmark_tests.RecoveryStageOne.test_snapshot_is_shallow_immutable_and_non_mutating) ... ERROR\n\n======================================================================\nERROR: test_empty_and_order (benchmark_tests.RecoveryStageOne.test_empty_and_order)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/tmp/dn2-cal-shgtf6w1/workspace/benchmark_tests.py\", line 22, in test_empty_and_order\n    self.assertEqual(c.snapshot(), ())\n                     ^^^^^^^^^^\nAttributeError: 'Cache' object has no attribute 'snapshot'\n\n======================================================================\nERROR: test_snapshot_is_shallow_immutable_and_non_mutating (benchmark_tests.RecoveryStageOne.test_snapshot_is_shallow_immutable_and_non_mutating)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/tmp/dn2-cal-shgtf6w1/workspace/benchmark_tests.py\", line 12, in test_snapshot_is_shallow_immutable_and_non_mutating\n    result = c.snapshot()\n             ^^^^^^^^^^\nAttributeError: 'Cache' object has no attribute 'snapshot'\n\n----------------------------------------------------------------------\nRan 2 tests in 0.001s\n\nFAILED (errors=2)\n",
+      "duration_seconds": 4.263112917000399
+    },
+    "reference_phase1": {
+      "pass": true,
+      "contract": {
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_empty_and_order (__main__.RecoveryStageOne.test_empty_and_order) ... ok\ntest_snapshot_is_shallow_immutable_and_non_mutating (__main__.RecoveryStageOne.test_snapshot_is_shallow_immutable_and_non_mutating) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK\n",
+        "duration_seconds": 0.02969666599892662
+      },
+      "upstream": {
+        "exit_code": 0,
+        "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.15s\n",
+        "stderr": "",
+        "duration_seconds": 4.227316541000619
+      },
+      "agent_tests": {
+        "exit_code": 0,
+        "stdout": "No agent tests supplied",
+        "stderr": ""
+      }
+    },
+    "reference_launcher_phase1": {
+      "exit_code": 0,
+      "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.16s\nTASK_CHECK_RESULT {\"task\": \"R1\", \"phase\": 1, \"task_tests\": 2, \"passed\": true, \"source_before\": \"0eaa8afb126d780bd11875a313f8a09ea20ff8f29d8f21dac05ce455c2ee2c4f\", \"source_after\": \"0eaa8afb126d780bd11875a313f8a09ea20ff8f29d8f21dac05ce455c2ee2c4f\", \"started_epoch\": 1791270449.405673, \"ended_epoch\": 1791270453.633482, \"pid\": 29811, \"upstream_exit\": 0, \"extra_exit\": null}\n",
+      "stderr": "test_empty_and_order (benchmark_tests.RecoveryStageOne.test_empty_and_order) ... ok\ntest_snapshot_is_shallow_immutable_and_non_mutating (benchmark_tests.RecoveryStageOne.test_snapshot_is_shallow_immutable_and_non_mutating) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK\n",
+      "duration_seconds": 4.266073083002993
+    },
+    "halfway_full_grade": {
+      "pass": false,
+      "contract": {
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "test_empty_and_order (__main__.RecoveryStageTwo.test_empty_and_order) ... ok\ntest_getsizeof_failure_before_any_mutation (__main__.RecoveryStageTwo.test_getsizeof_failure_before_any_mutation) ... ERROR\ntest_invalid_snapshots_are_atomic (__main__.RecoveryStageTwo.test_invalid_snapshots_are_atomic) ... ERROR\ntest_restore_replaces_and_preserves_identity_and_size (__main__.RecoveryStageTwo.test_restore_replaces_and_preserves_identity_and_size) ... ERROR\ntest_snapshot_is_shallow_immutable_and_non_mutating (__main__.RecoveryStageTwo.test_snapshot_is_shallow_immutable_and_non_mutating) ... ok\n\n======================================================================\nERROR: test_getsizeof_failure_before_any_mutation (__main__.RecoveryStageTwo.test_getsizeof_failure_before_any_mutation)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 132, in test_getsizeof_failure_before_any_mutation\n    with self.assertRaises(ValueError):c.restore([('x','A'),('y','BAD')])\n                                       ^^^^^^^^^\nAttributeError: 'Cache' object has no attribute 'restore'\n\n======================================================================\nERROR: test_invalid_snapshots_are_atomic (__main__.RecoveryStageTwo.test_invalid_snapshots_are_atomic)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 121, in test_invalid_snapshots_are_atomic\n    with self.assertRaises((TypeError,ValueError)):c.restore(value)\n                                                   ^^^^^^^^^\nAttributeError: 'Cache' object has no attribute 'restore'\n\n======================================================================\nERROR: test_restore_replaces_and_preserves_identity_and_size (__main__.RecoveryStageTwo.test_restore_replaces_and_preserves_identity_and_size)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native-v02/evals/benchmark-v0.2/task_tests.py\", line 114, in test_restore_replaces_and_preserves_identity_and_size\n    self.assertIsNone(c.restore(iter([('new',v),('x',[8])])) )\n                      ^^^^^^^^^\nAttributeError: 'Cache' object has no attribute 'restore'\n\n----------------------------------------------------------------------\nRan 5 tests in 0.001s\n\nFAILED (errors=3)\n",
+        "duration_seconds": 0.03004125000006752
+      },
+      "upstream": {
+        "exit_code": 0,
+        "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.15s\n",
+        "stderr": "",
+        "duration_seconds": 4.231122166002024
+      },
+      "agent_tests": {
+        "exit_code": 0,
+        "stdout": "No agent tests supplied",
+        "stderr": ""
+      }
+    },
+    "reference_final": {
+      "pass": true,
+      "contract": {
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "test_empty_and_order (__main__.RecoveryStageTwo.test_empty_and_order) ... ok\ntest_getsizeof_failure_before_any_mutation (__main__.RecoveryStageTwo.test_getsizeof_failure_before_any_mutation) ... ok\ntest_invalid_snapshots_are_atomic (__main__.RecoveryStageTwo.test_invalid_snapshots_are_atomic) ... ok\ntest_restore_replaces_and_preserves_identity_and_size (__main__.RecoveryStageTwo.test_restore_replaces_and_preserves_identity_and_size) ... ok\ntest_snapshot_is_shallow_immutable_and_non_mutating (__main__.RecoveryStageTwo.test_snapshot_is_shallow_immutable_and_non_mutating) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK\n",
+        "duration_seconds": 0.02921562499977881
+      },
+      "upstream": {
+        "exit_code": 0,
+        "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.16s\n",
+        "stderr": "",
+        "duration_seconds": 4.233406041999842
+      },
+      "agent_tests": {
+        "exit_code": 0,
+        "stdout": "No agent tests supplied",
+        "stderr": ""
+      }
+    },
+    "reference_launcher_final": {
+      "exit_code": 0,
+      "stdout": "........................................................................ [ 21%]\n........................................................................ [ 42%]\n........................................................................ [ 63%]\n........................................................................ [ 85%]\n..................................................                       [100%]\n338 passed in 4.15s\nTASK_CHECK_RESULT {\"task\": \"R1\", \"phase\": 2, \"task_tests\": 5, \"passed\": true, \"source_before\": \"248c60b55b107f57d3e1b5902238030c8a0e8ee62f720c319bd60b148a54de9b\", \"source_after\": \"248c60b55b107f57d3e1b5902238030c8a0e8ee62f720c319bd60b148a54de9b\", \"started_epoch\": 1791270462.245322, \"ended_epoch\": 1791270466.4692018, \"pid\": 29827, \"upstream_exit\": 0, \"extra_exit\": null}\n",
+      "stderr": "test_empty_and_order (benchmark_tests.RecoveryStageTwo.test_empty_and_order) ... ok\ntest_getsizeof_failure_before_any_mutation (benchmark_tests.RecoveryStageTwo.test_getsizeof_failure_before_any_mutation) ... ok\ntest_invalid_snapshots_are_atomic (benchmark_tests.RecoveryStageTwo.test_invalid_snapshots_are_atomic) ... ok\ntest_restore_replaces_and_preserves_identity_and_size (benchmark_tests.RecoveryStageTwo.test_restore_replaces_and_preserves_identity_and_size) ... ok\ntest_snapshot_is_shallow_immutable_and_non_mutating (benchmark_tests.RecoveryStageTwo.test_snapshot_is_shallow_immutable_and_non_mutating) ... ok\n\n----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK\n",
+      "duration_seconds": 4.264869750000798
+    }
+  }
+}

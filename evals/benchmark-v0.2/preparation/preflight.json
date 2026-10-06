@@ -1,0 +1,134 @@
+{
+  "passed": true,
+  "model_calls": 0,
+  "environment": {
+    "HOME": "/private/tmp/dn2-pf-2aw9ttlg/home",
+    "CLAUDE_CONFIG_DIR": "/private/tmp/dn2-pf-2aw9ttlg/home/.claude",
+    "PATH": "/private/tmp/dn2-pf-2aw9ttlg/tools:/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/ablation-env/bin:/Users/yimingyang/.local/bin:/Library/Developer/CommandLineTools/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+    "TMPDIR": "/private/tmp/dn2-pf-2aw9ttlg/tmp/",
+    "TMP": "/private/tmp/dn2-pf-2aw9ttlg/tmp",
+    "TEMP": "/private/tmp/dn2-pf-2aw9ttlg/tmp",
+    "TMPPREFIX": "/private/tmp/dn2-pf-2aw9ttlg/tmp/zsh",
+    "CLAUDE_CODE_TMPDIR": "/private/tmp/dn2-pf-2aw9ttlg/tmp",
+    "PYTHONPATH": "/private/tmp/dn2-pf-2aw9ttlg/workspace/src",
+    "PYTHONNOUSERSITE": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+    "LANG": "en_US.UTF-8",
+    "USER": "benchmark",
+    "BASH_ENV": "/dev/null",
+    "ZDOTDIR": "/private/tmp/dn2-pf-2aw9ttlg/home",
+    "DISABLE_AUTOUPDATER": "1",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+    "CLAUDE_CODE_EFFORT_LEVEL": "max"
+  },
+  "profile": "(version 1)\n(allow default)\n(deny file-write* (require-all (require-not (subpath \"/private/tmp/dn2-pf-2aw9ttlg\")) (require-not (subpath \"/private/tmp/claude-501/-private-tmp-dn2-pf-2aw9ttlg-workspace\")) (require-not (literal \"/private/tmp/claude-501\")) (require-not (literal \"/private/tmp/cc-socks\")) (require-not (literal (string-append \"/private/tmp/cc-socks/\" (param \"CLI_PID\") \".sock\"))) (require-not (literal \"/dev/null\"))))\n(deny file-read-data (subpath \"/Users/yimingyang/.claude\") (subpath \"/Users/yimingyang/.claude.json\") (subpath \"/Users/yimingyang/.codex\") (subpath \"/Users/yimingyang/.ssh\") (subpath \"/Users/yimingyang/.config\") (subpath \"/Users/yimingyang/.dsh\") (subpath \"/Users/yimingyang/Library/Keychains\"))\n(deny file-read-data (require-all (subpath \"/Users/yimingyang/Documents\") (require-not (subpath \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/ablation-env\")) (require-not (subpath \"/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none\"))))\n(deny file-read-data (require-all (subpath \"/private/tmp\") (require-not (subpath \"/private/tmp/dn2-pf-2aw9ttlg\")) (require-not (subpath \"/private/tmp/claude-501/-private-tmp-dn2-pf-2aw9ttlg-workspace\")) (require-not (subpath \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/ablation-env\")) (require-not (subpath \"/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none\")) (require-not (literal \"/private/tmp/claude-501\")) (require-not (literal \"/private/tmp/cc-socks\")) (require-not (literal (string-append \"/private/tmp/cc-socks/\" (param \"CLI_PID\") \".sock\")))))\n(deny file-read-data (require-all (subpath \"/tmp\") (require-not (subpath \"/private/tmp/dn2-pf-2aw9ttlg\")) (require-not (subpath \"/private/tmp/claude-501/-private-tmp-dn2-pf-2aw9ttlg-workspace\")) (require-not (subpath \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/ablation-env\")) (require-not (subpath \"/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none\")) (require-not (literal \"/private/tmp/claude-501\")) (require-not (literal \"/private/tmp/cc-socks\")) (require-not (literal (string-append \"/private/tmp/cc-socks/\" (param \"CLI_PID\") \".sock\")))))\n(deny file-read-data (require-all (subpath \"/private/var/tmp\") (require-not (subpath \"/private/tmp/dn2-pf-2aw9ttlg\")) (require-not (subpath \"/private/tmp/claude-501/-private-tmp-dn2-pf-2aw9ttlg-workspace\")) (require-not (subpath \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/ablation-env\")) (require-not (subpath \"/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none\")) (require-not (literal \"/private/tmp/claude-501\")) (require-not (literal \"/private/tmp/cc-socks\")) (require-not (literal (string-append \"/private/tmp/cc-socks/\" (param \"CLI_PID\") \".sock\")))))\n(deny file-read-data (require-all (subpath \"/var/tmp\") (require-not (subpath \"/private/tmp/dn2-pf-2aw9ttlg\")) (require-not (subpath \"/private/tmp/claude-501/-private-tmp-dn2-pf-2aw9ttlg-workspace\")) (require-not (subpath \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/ablation-env\")) (require-not (subpath \"/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none\")) (require-not (literal \"/private/tmp/claude-501\")) (require-not (literal \"/private/tmp/cc-socks\")) (require-not (literal (string-append \"/private/tmp/cc-socks/\" (param \"CLI_PID\") \".sock\")))))\n(deny file-read-data (require-all (subpath \"/private/var/folders/6x/2c3dc9h12332f39bgtg2z25r0000gn/T\") (require-not (subpath \"/private/tmp/dn2-pf-2aw9ttlg\")) (require-not (subpath \"/private/tmp/claude-501/-private-tmp-dn2-pf-2aw9ttlg-workspace\")) (require-not (subpath \"/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/ablation-env\")) (require-not (subpath \"/Users/yimingyang/Documents/Codex/2026-09-25/files-pasted-by-the-user-principal/work/tools/python/cpython-3.12.14-macos-aarch64-none\")) (require-not (literal \"/private/tmp/claude-501\")) (require-not (literal \"/private/tmp/cc-socks\")) (require-not (literal (string-append \"/private/tmp/cc-socks/\" (param \"CLI_PID\") \".sock\")))))\n(deny network-outbound)\n(allow network-outbound (remote tcp \"localhost:12345\"))\n(allow network-outbound (remote tcp \"localhost:*\"))\n",
+  "cases": [
+    {
+      "name": "heredoc",
+      "argv": [
+        "/bin/zsh",
+        "-df",
+        "-c",
+        "python3 - <<'PY'\nfrom pathlib import Path\nimport os,tempfile\np=Path(tempfile.mkstemp()[1]);p.write_text('ok');assert p.read_text()=='ok'\nprint('HEREDOC_OK')\nPY"
+      ],
+      "exit_code": 0,
+      "stdout": "HEREDOC_OK\n",
+      "stderr": ""
+    },
+    {
+      "name": "mktemp_default",
+      "argv": [
+        "/bin/zsh",
+        "-df",
+        "-c",
+        "p=$(mktemp); test -f \"$p\"; echo OK > \"$p\"; cat \"$p\"; case \"$p\" in \"$TMPDIR\"*) ;; *) exit 9;; esac"
+      ],
+      "exit_code": 0,
+      "stdout": "OK\n",
+      "stderr": ""
+    },
+    {
+      "name": "mktemp_dir",
+      "argv": [
+        "/bin/zsh",
+        "-df",
+        "-c",
+        "p=$(mktemp -d); test -d \"$p\"; echo OK > \"$p/test\"; cat \"$p/test\""
+      ],
+      "exit_code": 0,
+      "stdout": "OK\n",
+      "stderr": ""
+    },
+    {
+      "name": "mktemp_native",
+      "argv": [
+        "/bin/zsh",
+        "-df",
+        "-c",
+        "p=$(/usr/bin/mktemp -p \"$TMPDIR\"); echo OK > \"$p\"; cat \"$p\""
+      ],
+      "exit_code": 0,
+      "stdout": "OK\n",
+      "stderr": ""
+    },
+    {
+      "name": "shell_cwd",
+      "argv": [
+        "/bin/zsh",
+        "-df",
+        "-c",
+        "pwd -P >| \"$CLAUDE_CODE_TMPDIR/claude-preflight-cwd\"; cat \"$CLAUDE_CODE_TMPDIR/claude-preflight-cwd\""
+      ],
+      "exit_code": 0,
+      "stdout": "/private/tmp/dn2-pf-2aw9ttlg/workspace\n",
+      "stderr": ""
+    },
+    {
+      "name": "test_subprocess",
+      "argv": [
+        "/bin/zsh",
+        "-df",
+        "-c",
+        "python3 -c \"import subprocess,sys;subprocess.run([sys.executable,'-m','pytest','-q','test_probe.py'],check=True)\""
+      ],
+      "exit_code": 0,
+      "stdout": ".                                                                        [100%]\n1 passed in 0.00s\n",
+      "stderr": ""
+    },
+    {
+      "name": "git",
+      "argv": [
+        "git",
+        "status",
+        "--porcelain"
+      ],
+      "exit_code": 0,
+      "stdout": "?? test_probe.py\n",
+      "stderr": ""
+    },
+    {
+      "name": "claude_native_no_model",
+      "argv": [
+        "claude",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "2.1.289 (Claude Code)\n",
+      "stderr": ""
+    },
+    {
+      "name": "ordinary_local_test_socket",
+      "exit_code": 0,
+      "stdout": "LOCAL_TCP_OK\n",
+      "stderr": ""
+    },
+    {
+      "name": "sibling_isolation",
+      "exit_code": 0,
+      "stdout": "SIBLING_DENIED\n",
+      "stderr": ""
+    }
+  ]
+}
