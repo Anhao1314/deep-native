@@ -5,6 +5,7 @@ import os
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 BENCH=Path(__file__).resolve().parents[1]/'evals/benchmark-v1'
@@ -33,7 +34,9 @@ class BenchmarkTests(unittest.TestCase):
 
     def test_secret_env_is_allowlist(self):
         relay=type('R',(),{'url':'http://127.0.0.1:12345'})()
-        env=harness.agent_env(Path('/tmp/home'),Path('/tmp/t'),Path(sys.executable),relay,'model')
+        # Pure environment construction; no Claude executable/model is used by CI.
+        with patch('harness.shutil.which',return_value='/tools/claude'):
+            env=harness.agent_env(Path('/tmp/home'),Path('/tmp/t'),Path(sys.executable),relay,'model')
         self.assertEqual(env['ANTHROPIC_AUTH_TOKEN'],'benchmark-local-relay')
         self.assertNotIn('GH_TOKEN',env)
         self.assertNotIn('PYTHONPATH',env)
