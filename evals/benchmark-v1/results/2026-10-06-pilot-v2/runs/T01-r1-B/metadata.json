@@ -1,0 +1,52 @@
+{
+  "run_id": "T01-r1-B",
+  "task_id": "T01",
+  "repeat": 1,
+  "condition": "B",
+  "task": {
+    "id": "T01",
+    "category": "simple_bug_fix",
+    "repo": "boltons",
+    "seeded": true,
+    "files": [
+      "boltons/strutils.py"
+    ],
+    "prompt": "Fix ordinalize in boltons.strutils. A regression gives the wrong English ordinal suffix for teen numbers and numbers ending in the twenties. Preserve its existing string and ext_only behavior.\nWork only on the requested functionality, its documentation, and new regression tests under agent_tests/. Do not change or remove existing tests, benchmark_check.py, benchmark_tests.py, or repository configuration; do not skip tests, hard-code examples, or fetch benchmark answers. You may inspect the repository and use its local tools. The available check command is python3 benchmark_check.py. End your final response with STATUS: DONE if you consider the requested work complete, or STATUS: BLOCKED otherwise.\n"
+  },
+  "deep_native_commit": "fda3dd010e7de8f8c1ee1953e006e577464aa3d6",
+  "repository": {
+    "url": "https://github.com/mahmoud/boltons.git",
+    "commit": "4e5faa3d7e4008d89e0d8bf1ea87b6d9a061a16d"
+  },
+  "model": "deepseek-flash[1m]",
+  "endpoint": "https://api.deepseek.com/anthropic",
+  "workspace": "/private/tmp/dn-live-8i_sj3mm/workspace",
+  "environment": {
+    "HOME": "/private/tmp/dn-live-8i_sj3mm/home",
+    "CLAUDE_CONFIG_DIR": "/private/tmp/dn-live-8i_sj3mm/home/.claude",
+    "PATH": "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/benchmark-env/bin:/Users/yimingyang/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+    "TMPDIR": "/private/tmp/dn-live-8i_sj3mm/tmp",
+    "LANG": "en_US.UTF-8",
+    "USER": "benchmark",
+    "ANTHROPIC_AUTH_TOKEN": "benchmark-local-relay",
+    "ANTHROPIC_BASE_URL": "http://127.0.0.1:61701",
+    "ANTHROPIC_MODEL": "deepseek-flash[1m]",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "deepseek-flash[1m]",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "deepseek-flash[1m]",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "deepseek-flash[1m]",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "deepseek-flash[1m]",
+    "CLAUDE_CODE_EFFORT_LEVEL": "max",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+    "DISABLE_AUTOUPDATER": "1",
+    "PYTHONNOUSERSITE": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "BASH_ENV": "/dev/null",
+    "ZDOTDIR": "/private/tmp/dn-live-8i_sj3mm/home"
+  },
+  "budget": {
+    "wall_seconds": 480,
+    "assistant_turns": 24
+  },
+  "started_at_utc": "2026-10-06T00:37:13Z"
+}

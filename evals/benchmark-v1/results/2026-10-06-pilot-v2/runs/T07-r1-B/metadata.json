@@ -1,0 +1,53 @@
+{
+  "run_id": "T07-r1-B",
+  "task_id": "T07",
+  "repeat": 1,
+  "condition": "B",
+  "task": {
+    "id": "T07",
+    "category": "error_recovery",
+    "repo": "more",
+    "seeded": false,
+    "files": [
+      "more_itertools/more.py"
+    ],
+    "transient_failure": true,
+    "prompt": "Start by running python3 benchmark_check.py. Then add a public take_until_inclusive(iterable, pred) iterator: yield through the first item whose predicate is true, including that item, and stop without consuming any later items. Empty input stays empty; predicate is evaluated once per encountered item. Export it from the package and document it. The check environment may have a transient startup failure; complete the task using the available local tools.\nWork only on the requested functionality, its documentation, and new regression tests under agent_tests/. Do not change or remove existing tests, benchmark_check.py, benchmark_tests.py, or repository configuration; do not skip tests, hard-code examples, or fetch benchmark answers. You may inspect the repository and use its local tools. The available check command is python3 benchmark_check.py. End your final response with STATUS: DONE if you consider the requested work complete, or STATUS: BLOCKED otherwise.\n"
+  },
+  "deep_native_commit": "fda3dd010e7de8f8c1ee1953e006e577464aa3d6",
+  "repository": {
+    "url": "https://github.com/more-itertools/more-itertools.git",
+    "commit": "1ea82a711c69f590054987b5cb194157f8ce8ac4"
+  },
+  "model": "deepseek-flash[1m]",
+  "endpoint": "https://api.deepseek.com/anthropic",
+  "workspace": "/private/tmp/dn-live-hcq7r9dd/workspace",
+  "environment": {
+    "HOME": "/private/tmp/dn-live-hcq7r9dd/home",
+    "CLAUDE_CONFIG_DIR": "/private/tmp/dn-live-hcq7r9dd/home/.claude",
+    "PATH": "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/benchmark-env/bin:/Users/yimingyang/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+    "TMPDIR": "/private/tmp/dn-live-hcq7r9dd/tmp",
+    "LANG": "en_US.UTF-8",
+    "USER": "benchmark",
+    "ANTHROPIC_AUTH_TOKEN": "benchmark-local-relay",
+    "ANTHROPIC_BASE_URL": "http://127.0.0.1:61880",
+    "ANTHROPIC_MODEL": "deepseek-flash[1m]",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "deepseek-flash[1m]",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "deepseek-flash[1m]",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "deepseek-flash[1m]",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "deepseek-flash[1m]",
+    "CLAUDE_CODE_EFFORT_LEVEL": "max",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+    "DISABLE_AUTOUPDATER": "1",
+    "PYTHONNOUSERSITE": "1",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "BASH_ENV": "/dev/null",
+    "ZDOTDIR": "/private/tmp/dn-live-hcq7r9dd/home"
+  },
+  "budget": {
+    "wall_seconds": 480,
+    "assistant_turns": 24
+  },
+  "started_at_utc": "2026-10-06T00:39:13Z"
+}

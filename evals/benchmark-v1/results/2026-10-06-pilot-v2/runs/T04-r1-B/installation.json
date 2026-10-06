@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/work/benchmark-env/bin/python",
+    "/Users/yimingyang/Documents/Codex/2026-10-06/files-pasted-by-the-user-https/outputs/deep-native/evals/benchmark-v1/results/2026-10-06-pilot-v2/frozen-treatment/skills/deep-native/scripts/deep_native.py",
+    "--project",
+    "/private/tmp/dn-live-yompg6uv/workspace",
+    "install",
+    "--hooks"
+  ],
+  "exit_code": 0,
+  "stdout": "{\n  \"files\": 4,\n  \"hooks\": true,\n  \"installed\": true,\n  \"restart_claude_code\": true,\n  \"scope\": \"project\"\n}\n",
+  "stderr": "",
+  "duration_seconds": 0.0326
+}

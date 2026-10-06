@@ -1,0 +1,192 @@
+diff --git a/boltons/strutils.py b/boltons/strutils.py
+index 74441c7..6c1ab27 100644
+--- a/boltons/strutils.py
++++ b/boltons/strutils.py
+@@ -884,39 +884,73 @@ def args2cmd(args, sep=' '):
+ 
+ 
+ def parse_int_list(range_string, delim=',', range_delim='-'):
+-    """Returns a sorted list of positive integers based on
+-    *range_string*. Reverse of :func:`format_int_list`.
++    """Returns a sorted list of integers based on *range_string*.
++    Reverse of :func:`format_int_list`.
++
++    Integers and range endpoints may be signed (e.g. ``'-3'``,
++    ``'+2'``), so signed inclusive ranges such as ``'-3--1'`` and
++    ``'+2-+4'`` are supported. Ranges include both endpoints, and
++    ranges whose endpoints are reversed (e.g. ``'8-5'``) are
++    normalized to ascending order. Whitespace around the whole
++    *range_string*, individual entries, and range endpoints is
++    ignored. Duplicates are preserved in the sorted output.
+ 
+     Args:
+-        range_string (str): String of comma separated positive
+-            integers or ranges (e.g. '1,2,4-6,8'). Typical of a custom
+-            page range string used in printer dialogs.
++        range_string (str): String of delimited, optionally signed
++            integers or ranges (e.g. '1,2,4-6,8', '-3--1,+2-+4').
++            Typical of a custom page range string used in printer
++            dialogs.
+         delim (char): Defaults to ','. Separates integers and
+             contiguous ranges of integers.
+         range_delim (char): Defaults to '-'. Indicates a contiguous
+-            range of integers.
++            range of integers, taken literally.
++
++    Raises:
++        ValueError: If an entry is neither an integer nor a range of
++            two integers, as in '1-', '1-2-3', or 'abc'. Empty entries
++            (including an empty *range_string*) are skipped.
+ 
+     >>> parse_int_list('1,3,5-8,10-11,15')
+     [1, 3, 5, 6, 7, 8, 10, 11, 15]
+ 
++    >>> parse_int_list('-3--1,+2-+4')
++    [-3, -2, -1, 2, 3, 4]
++
++    >>> parse_int_list(' 8 - 5 , +2 - +4 ')
++    [2, 3, 4, 5, 6, 7, 8]
++
++    >>> parse_int_list('1-')
++    Traceback (most recent call last):
++        ...
++    ValueError: invalid integer or range: '1-'
++
+     """
+     output = []
++    int_pattern = re.compile(r'[+-]?\d+')
++    range_pattern = re.compile(
++        r'([+-]?\d+)\s*%s\s*([+-]?\d+)' % re.escape(range_delim))
+ 
+-    for x in range_string.strip().split(delim):
+-
+-        # Range
+-        if range_delim in x:
+-            range_limits = list(map(int, x.split(range_delim)))
+-            output += list(range(min(range_limits), max(range_limits)+1))
++    for x in range_string.split(delim):
++        x = x.strip()
+ 
+-        # Empty String
+-        elif not x:
++        # Empty entry
++        if not x:
+             continue
+ 
++        # Range
++        range_match = range_pattern.fullmatch(x)
++        if range_match:
++            start, end = map(int, range_match.groups())
++            output += list(range(min(start, end), max(start, end) + 1))
++
+         # Integer
+-        else:
++        elif int_pattern.fullmatch(x):
+             output.append(int(x))
+ 
++        # Anything else is malformed
++        else:
++            raise ValueError('invalid integer or range: %r' % (x,))
++
+     return sorted(output)
+diff --git a/agent_tests/__init__.py b/agent_tests/__init__.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/__init__.py
+@@ -0,0 +1,0 @@
+
+diff --git a/agent_tests/test_parse_int_list.py b/agent_tests/test_parse_int_list.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/test_parse_int_list.py
+@@ -0,0 +1,90 @@
++import unittest
++
++from boltons.strutils import parse_int_list
++
++
++class ParseIntListSignedTest(unittest.TestCase):
++    """Regression tests for signed parsing in strutils.parse_int_list."""
++
++    def test_signed_integers(self):
++        self.assertEqual(parse_int_list('-3'), [-3])
++        self.assertEqual(parse_int_list('+2'), [2])
++        self.assertEqual(parse_int_list('-3,+2,0'), [-3, 0, 2])
++        self.assertEqual(parse_int_list('0,-1,1'), [-1, 0, 1])
++
++    def test_signed_ranges(self):
++        self.assertEqual(parse_int_list('-3--1'), [-3, -2, -1])
++        self.assertEqual(parse_int_list('+2-+4'), [2, 3, 4])
++        self.assertEqual(parse_int_list('-3--1,+2-+4'), [-3, -2, -1, 2, 3, 4])
++        self.assertEqual(parse_int_list('-2--2'), [-2])
++        self.assertEqual(parse_int_list('-5-0'), [-5, -4, -3, -2, -1, 0])
++
++    def test_mixed_sign_ranges(self):
++        self.assertEqual(parse_int_list('1--3'), [-3, -2, -1, 0, 1])
++        self.assertEqual(parse_int_list('3--1'), [-1, 0, 1, 2, 3])
++        self.assertEqual(parse_int_list('-2-+2'), [-2, -1, 0, 1, 2])
++
++    def test_reversed_endpoints(self):
++        self.assertEqual(parse_int_list('8-5'), [5, 6, 7, 8])
++        self.assertEqual(parse_int_list('+4-+2'), [2, 3, 4])
++        self.assertEqual(parse_int_list('-1--3'), [-3, -2, -1])
++        self.assertEqual(parse_int_list('1--3'), [-3, -2, -1, 0, 1])
++
++    def test_whitespace_around_tokens_and_endpoints(self):
++        self.assertEqual(parse_int_list(' 1, 3 ,5-8,10-11,15 '),
++                         [1, 3, 5, 6, 7, 8, 10, 11, 15])
++        self.assertEqual(parse_int_list(' -3 , +2 , 0 '), [-3, 0, 2])
++        self.assertEqual(parse_int_list(' -3 - -1 , +2 - +4 '),
++                         [-3, -2, -1, 2, 3, 4])
++        self.assertEqual(parse_int_list('\t+2 - +4\n'), [2, 3, 4])
++        self.assertEqual(parse_int_list('8 - 5'), [5, 6, 7, 8])
++
++    def test_sorting_and_duplicates_preserved(self):
++        self.assertEqual(parse_int_list('5,1,-3,1,5'), [-3, 1, 1, 5, 5])
++        self.assertEqual(parse_int_list('5,1,3-4,4'), [1, 3, 4, 4, 5])
++        self.assertEqual(parse_int_list('-1--3,-2,-3'), [-3, -3, -2, -2, -1])
++        self.assertEqual(parse_int_list('2,+2,2'), [2, 2, 2])
++
++    def test_empty_input_and_empty_entries(self):
++        self.assertEqual(parse_int_list(''), [])
++        self.assertEqual(parse_int_list('   '), [])
++        self.assertEqual(parse_int_list(','), [])
++        self.assertEqual(parse_int_list(' , , '), [])
++        self.assertEqual(parse_int_list(',-3--1,,'), [-3, -2, -1])
++
++    def test_custom_literal_delimiters(self):
++        self.assertEqual(parse_int_list('-3--1;+2-+4', delim=';'),
++                         [-3, -2, -1, 2, 3, 4])
++        self.assertEqual(parse_int_list('1:3', range_delim=':'),
++                         [1, 2, 3])
++        self.assertEqual(parse_int_list('-3:-1,+2:+4', range_delim=':'),
++                         [-3, -2, -1, 2, 3, 4])
++        self.assertEqual(parse_int_list('1|2|3', delim='|'), [1, 2, 3])
++        # Regex-special characters are matched literally.
++        self.assertEqual(parse_int_list('-3..-1,+2..+4', range_delim='..'),
++                         [-3, -2, -1, 2, 3, 4])
++        self.assertEqual(parse_int_list('1+3', range_delim='+'), [1, 2, 3])
++
++    def test_malformed_raises_value_error(self):
++        malformed = [
++            '1-', '-1-', '--', '--3', '1--', '1---3', '1-2-3', '1--2-3',
++            'a', '1,a', '+', '-', '+ 2', '- 3', '1-2a', 'a-1', '1 - -',
++            '+2-+', '1.2', '1,,a', '3-1-',
++        ]
++        for value in malformed:
++            with self.subTest(value=value):
++                with self.assertRaises(ValueError):
++                    parse_int_list(value)
++
++    def test_malformed_raises_value_error_with_custom_delimiters(self):
++        with self.assertRaises(ValueError):
++            parse_int_list('1;2-3-4', delim=';')
++        with self.assertRaises(ValueError):
++            parse_int_list('1:', range_delim=':')
++
++    def test_visible_acceptance_case(self):
++        self.assertEqual(parse_int_list('-3--1,+2-+4'), [-3, -2, -1, 2, 3, 4])
++
++
++if __name__ == '__main__':
++    unittest.main()

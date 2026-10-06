@@ -1,0 +1,98 @@
+{
+  "session_id": "80d032ce-aa16-45bd-9f36-3acb291f55b9",
+  "exit_code": 0,
+  "duration_seconds": 69.4267,
+  "interrupted": false,
+  "stop_reason": "completed",
+  "observed_assistant_messages": 17,
+  "final_response": "## Root cause\n\n`boltons/strutils.py:172` guarded the \"teens\" case with `numstr[-2] == '2'` — the digit identifying the **twenties** (20–29), not teens (10–19). Consequences, reproduced before the fix:\n\n| Input | Was | Now |\n|---|---|---|\n| 11, 12, 13 | `11st`, `12nd`, `13rd` | `11th`, `12th`, `13th` |\n| 21, 22, 23 | `21th`, `22th`, `23th` | `21st`, `22nd`, `23rd` |\n| 111–113, 211–213 | `111st`, `112nd`, `113rd`, … | `111th`, `112th`, `113th`, … |\n| 121, 122, 123 | `121th`, `122th`, `123th` | `121st`, `122nd`, `123rd` |\n\n## Change\n\n- `boltons/strutils.py`: one-character fix, `numstr[-2] == '2'` → `numstr[-2] == '1'`; single-digit `IndexError` fallback, `_ORDINAL_MAP`, string passthrough, and `ext_only` paths are untouched. Added doctest examples (`11th`, `22nd`) to the docstring.\n- `agent_tests/test_ordinalize_regression.py` (new): 8 tests covering teens, twenties, teenage/twenty tails of larger numbers, `ext_only` for every case, string inputs, unchanged non-digit endings, preserved prior examples, and a 0–1000-plus sweep checked against an independently written suffix rule.\n\nNo existing tests, `benchmark_check.py`, `benchmark_tests.py`, or configuration were modified.\n\n## Verification (actually run)\n\n- `python3 benchmark_check.py` → exit **0** (visible acceptance checks passed; 77 pytest tests in `tests/test_strutils.py` + `tests/test_iterutils.py`; 8/8 new agent tests)\n- `python3 -m pytest --doctest-modules boltons/strutils.py -q` → **29 passed**\n- `deep-native verify` → **passed**, both configured checks exit 0, bound to worktree hash `78725df…` (unchanged before/after); evidence attempt `711c3afe1dde42efb92b490969e63e03` under `.deep-native/attempts/`\n\nResidual risk: no independent reviewer (self-review only); negative-number inputs were not targeted and their handling is structurally unchanged.\n\nSTATUS: DONE",
+  "cli_result": {
+    "duration_api_ms": 67779,
+    "stop_reason": "end_turn",
+    "session_id": "80d032ce-aa16-45bd-9f36-3acb291f55b9",
+    "total_cost_usd": 0.529904,
+    "usage": {
+      "input_tokens": 16078,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 262528,
+      "output_tokens": 12730,
+      "output_tokens_details": {
+        "thinking_tokens": 0
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 0,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "",
+      "iterations": [],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "modelUsage": {
+      "deepseek-flash[1m]": {
+        "inputTokens": 16078,
+        "outputTokens": 12730,
+        "cacheReadInputTokens": 262528,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.529904,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 32000,
+        "thinkingTokens": 0,
+        "canonicalModel": "deepseek-flash[1m]",
+        "provider": "firstParty",
+        "costBasis": "unknown"
+      }
+    },
+    "permission_denials": [],
+    "terminal_reason": "completed",
+    "fast_mode_state": "off",
+    "fast_mode_disabled_reason": "sdk_opt_in_required",
+    "subagent_stats": {
+      "spawned": 0,
+      "requested": {
+        "background": 0,
+        "foreground": 0,
+        "unset": 0
+      },
+      "started_in_background": 0,
+      "max_depth": 0,
+      "spawned_by_subagents": 0,
+      "completed": 0,
+      "failed": 0,
+      "killed": {
+        "parent": 0,
+        "user": 0,
+        "system": 0
+      },
+      "refused": {
+        "depth_limit": 0,
+        "concurrency_limit": 0,
+        "budget": 0
+      },
+      "by_type": {}
+    },
+    "is_error": false,
+    "num_turns": 29,
+    "subtype": "success",
+    "api_error_status": null,
+    "result": "## Root cause\n\n`boltons/strutils.py:172` guarded the \"teens\" case with `numstr[-2] == '2'` — the digit identifying the **twenties** (20–29), not teens (10–19). Consequences, reproduced before the fix:\n\n| Input | Was | Now |\n|---|---|---|\n| 11, 12, 13 | `11st`, `12nd`, `13rd` | `11th`, `12th`, `13th` |\n| 21, 22, 23 | `21th`, `22th`, `23th` | `21st`, `22nd`, `23rd` |\n| 111–113, 211–213 | `111st`, `112nd`, `113rd`, … | `111th`, `112th`, `113th`, … |\n| 121, 122, 123 | `121th`, `122th`, `123th` | `121st`, `122nd`, `123rd` |\n\n## Change\n\n- `boltons/strutils.py`: one-character fix, `numstr[-2] == '2'` → `numstr[-2] == '1'`; single-digit `IndexError` fallback, `_ORDINAL_MAP`, string passthrough, and `ext_only` paths are untouched. Added doctest examples (`11th`, `22nd`) to the docstring.\n- `agent_tests/test_ordinalize_regression.py` (new): 8 tests covering teens, twenties, teenage/twenty tails of larger numbers, `ext_only` for every case, string inputs, unchanged non-digit endings, preserved prior examples, and a 0–1000-plus sweep checked against an independently written suffix rule.\n\nNo existing tests, `benchmark_check.py`, `benchmark_tests.py`, or configuration were modified.\n\n## Verification (actually run)\n\n- `python3 benchmark_check.py` → exit **0** (visible acceptance checks passed; 77 pytest tests in `tests/test_strutils.py` + `tests/test_iterutils.py`; 8/8 new agent tests)\n- `python3 -m pytest --doctest-modules boltons/strutils.py -q` → **29 passed**\n- `deep-native verify` → **passed**, both configured checks exit 0, bound to worktree hash `78725df…` (unchanged before/after); evidence attempt `711c3afe1dde42efb92b490969e63e03` under `.deep-native/attempts/`\n\nResidual risk: no independent reviewer (self-review only); negative-number inputs were not targeted and their handling is structurally unchanged.\n\nSTATUS: DONE",
+    "ttft_ms": 1413,
+    "type": "result",
+    "duration_ms": 69238,
+    "uuid": "817d69dc-c008-49d7-85a8-ba1a25bf7760",
+    "ttft_stream_ms": 887,
+    "time_to_request_ms": 15,
+    "first_content_frame_ms": 887,
+    "queued_turn_count": 0,
+    "result_index": 0
+  },
+  "last_observed_verified_source_hash": "7f28a5d4fd9fa085f983aa2cf9fab20b66352a9911c6e880b19daa5fceadc33e",
+  "final_source_hash": "7f28a5d4fd9fa085f983aa2cf9fab20b66352a9911c6e880b19daa5fceadc33e",
+  "stale_observed_verification": false
+}

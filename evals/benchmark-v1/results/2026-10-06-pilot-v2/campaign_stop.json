@@ -1,0 +1,9 @@
+{
+  "reason": "User interrupted the active turn; background runner was explicitly stopped to prevent further API calls. All completed and partial artifacts retained.",
+  "completed_runs": 8,
+  "started_runs": 9,
+  "planned_runs": 60,
+  "stop_requested_by_user": true,
+  "grading_contract_issue": "grading_contract_issue.json",
+  "results_not_suitable_for_quality_comparison": true
+}

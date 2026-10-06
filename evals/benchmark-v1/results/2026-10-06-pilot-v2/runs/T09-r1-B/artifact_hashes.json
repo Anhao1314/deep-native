@@ -1,0 +1,10 @@
+{
+  "tests_before.json": "77250a227b71ba362c32477438408b5cad0d2e7a0e2e9d1f48ca6a38c114abe8",
+  "installation.json": "e0dfea26b6ebe9459c7f507a357367be1bd3edfd0b78a248609a1319eec85b22",
+  "metadata.json": "5d76aa542d43d80a3be246faef814449429ec0862fd0ded67c71b140b81fb03a",
+  "api_calls.json": "cc496f507f0f71023075c00d10a1d0b12d43513a4040df4dab2d804b28e262c2",
+  "phase1/transcript.jsonl": "1a2026017d5440ffae1386c833483b163cd77f479769427173d23aa29d8ed4cc",
+  "phase1/prompt.txt": "cc92233d7dd1a9310656cabc45c94cee7f001bad663bbc2643313895e78fcf72",
+  "phase1/stderr.txt": "af2f4f95914df9c684b8c6d9f07bfa793cb3ed8a4c9f15c3022ee6363d84537e",
+  "phase1/command.json": "e4ed8ff22a0a07319e0b5066964cdc3a96aa7194e8bce010aaaf197aee0c704d"
+}

@@ -1,0 +1,82 @@
+diff --git a/README.rst b/README.rst
+index 870e98c..b6dfba8 100644
+--- a/README.rst
++++ b/README.rst
+@@ -117,6 +117,7 @@ Python iterables.
+ |                        | `duplicates_justseen <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.duplicates_justseen>`_,                                                       |
+ |                        | `classify_unique <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.classify_unique>`_,                                                               |
+ |                        | `longest_common_prefix <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.longest_common_prefix>`_,                                                   |
++|                        | `take_until_inclusive <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.take_until_inclusive>`_,                                                     |
+ |                        | `takewhile_inclusive <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.takewhile_inclusive>`_                                                        |
+ +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+ | Math                   | `dft <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.dft>`_,                                                                                       |
+diff --git a/docs/api.rst b/docs/api.rst
+index 7b40a8e..f8bccb4 100644
+--- a/docs/api.rst
++++ b/docs/api.rst
+@@ -212,6 +212,7 @@ These tools yield certain items from an iterable.
+ .. autofunction:: duplicates_justseen
+ .. autofunction:: classify_unique
+ .. autofunction:: longest_common_prefix
++.. autofunction:: take_until_inclusive
+ .. autofunction:: takewhile_inclusive
+ 
+ ----
+diff --git a/more_itertools/more.py b/more_itertools/more.py
+index 940b800..c7afbfa 100755
+--- a/more_itertools/more.py
++++ b/more_itertools/more.py
+@@ -168,6 +168,7 @@ __all__ = [
+     'substrings',
+     'substrings_indexes',
+     'synchronized',
++    'take_until_inclusive',
+     'takewhile_inclusive',
+     'time_limited',
+     'unique_in_window',
+@@ -5066,6 +5067,23 @@ def partial_product(*iterables, repeat=1):
+             yield tuple(prod)
+ 
+ 
++def take_until_inclusive(iterable, pred):
++    """Yield elements from *iterable* up to and including the first element
++    for which *pred* is true, then stop.
++
++        >>> list(take_until_inclusive([1, 4, 6, 4, 1], lambda x: x >= 5))
++        [1, 4, 6]
++
++    If *pred* is false for every element, all of them are yielded. If
++    *iterable* is empty, nothing is yielded. *pred* is called once per
++    encountered element, and no element after the matching one is consumed.
++    """
++    for x in iterable:
++        yield x
++        if pred(x):
++            break
++
++
+ def takewhile_inclusive(predicate, iterable):
+     """A variant of :func:`takewhile` that yields one additional element.
+ 
+diff --git a/more_itertools/more.pyi b/more_itertools/more.pyi
+index 927cb21..b68aee6 100644
+--- a/more_itertools/more.pyi
++++ b/more_itertools/more.pyi
+@@ -141,6 +141,7 @@ __all__ = [
+     'substrings',
+     'substrings_indexes',
+     'synchronized',
++    'take_until_inclusive',
+     'takewhile_inclusive',
+     'time_limited',
+     'unique_in_window',
+@@ -957,6 +958,9 @@ def gray_product(
+ def partial_product(
+     *iterables: Iterable[_T], repeat: int = ...
+ ) -> Iterator[tuple[_T, ...]]: ...
++def take_until_inclusive(
++    iterable: Iterable[_T], pred: Callable[[_T], bool]
++) -> Iterator[_T]: ...
+ def takewhile_inclusive(
+     predicate: Callable[[_T], bool], iterable: Iterable[_T]
+ ) -> Iterator[_T]: ...

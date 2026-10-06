@@ -1,0 +1,3562 @@
+{
+  "schema": 2,
+  "planned_runs": 60,
+  "actual_runs": 8,
+  "completed_plan": false,
+  "quality_comparison_valid": false,
+  "evidence_integrity_status": "PASS",
+  "experiment_validity_issues": [
+    {
+      "issue": "frozen_treatment_hash_unavailable"
+    },
+    {
+      "issue": "retained_scoring_contract_issue",
+      "details": {
+        "status": "INVALID_FOR_QUALITY_COMPARISON",
+        "affected_runs": [
+          "T07-r1-A",
+          "T07-r1-B"
+        ],
+        "issue": "Task prompt authorizes functionality-related edits, but the manifest allowlist omitted more_itertools/more.pyi. Both agents added legitimate public API type declarations. External contract and upstream regressions passed; FAIL came only from this unintended scope restriction.",
+        "required_next_step": "Correct the allowlists for public API/type-stub maintenance, validate prompt/criteria agreement, freeze a new campaign and rerun. Do not relabel current frozen results after seeing outputs.",
+        "raw_scores_preserved": true,
+        "model_calls_stopped": true
+      }
+    },
+    {
+      "issue": "retained_campaign_stop",
+      "details": {
+        "reason": "User interrupted the active turn; background runner was explicitly stopped to prevent further API calls. All completed and partial artifacts retained.",
+        "completed_runs": 8,
+        "started_runs": 9,
+        "planned_runs": 60,
+        "stop_requested_by_user": true,
+        "grading_contract_issue": "grading_contract_issue.json",
+        "results_not_suitable_for_quality_comparison": true
+      }
+    }
+  ],
+  "scoring_contract_issue": {
+    "status": "INVALID_FOR_QUALITY_COMPARISON",
+    "affected_runs": [
+      "T07-r1-A",
+      "T07-r1-B"
+    ],
+    "issue": "Task prompt authorizes functionality-related edits, but the manifest allowlist omitted more_itertools/more.pyi. Both agents added legitimate public API type declarations. External contract and upstream regressions passed; FAIL came only from this unintended scope restriction.",
+    "required_next_step": "Correct the allowlists for public API/type-stub maintenance, validate prompt/criteria agreement, freeze a new campaign and rerun. Do not relabel current frozen results after seeing outputs.",
+    "raw_scores_preserved": true,
+    "model_calls_stopped": true
+  },
+  "campaign_stop": {
+    "reason": "User interrupted the active turn; background runner was explicitly stopped to prevent further API calls. All completed and partial artifacts retained.",
+    "completed_runs": 8,
+    "started_runs": 9,
+    "planned_runs": 60,
+    "stop_requested_by_user": true,
+    "grading_contract_issue": "grading_contract_issue.json",
+    "results_not_suitable_for_quality_comparison": true
+  },
+  "judgment": "INCONCLUSIVE",
+  "A": {
+    "runs": 4,
+    "passes": 3,
+    "success_rate": 0.75,
+    "success_rate_wilson95_descriptive": [
+      0.30064184258240184,
+      0.9544127391902995
+    ],
+    "declared_done": 3,
+    "unknown_declaration": 1,
+    "verified_completions": 3,
+    "verified_completion_rate": 1.0,
+    "verified_completion_per_run": 0.75,
+    "false_completions": 0,
+    "false_completion_rate": 0.0,
+    "runs_with_forbidden_changes": 1,
+    "runs_with_protected_test_changes": 0,
+    "median_duration_seconds": 87.8746,
+    "median_including_setup_and_grade_seconds": 88.9999,
+    "tokens_available_runs": 3,
+    "median_total_tokens": 281666,
+    "total_provider_tokens_available": 906004,
+    "token_categories": {
+      "input_tokens": {
+        "median": 16179,
+        "total_available": 46266
+      },
+      "output_tokens": {
+        "median": 15248,
+        "total_available": 39386
+      },
+      "cache_read_input_tokens": {
+        "median": 247808,
+        "total_available": 820352
+      },
+      "cache_creation_input_tokens": {
+        "median": 0,
+        "total_available": 0
+      }
+    },
+    "api_cost_usd": null,
+    "api_cost_status": "unavailable: no provider billing receipt",
+    "median_tool_calls": 19.5,
+    "median_files_changed": 2.5,
+    "median_lines_changed": 108.5,
+    "behavior": {
+      "inspection_before_edit": {
+        "true": 4,
+        "available": 4
+      },
+      "reproduction_before_edit": {
+        "true": 3,
+        "available": 4
+      },
+      "executed_verification": {
+        "true": 4,
+        "available": 4
+      },
+      "successful_verification": {
+        "true": 4,
+        "available": 4
+      },
+      "continued_after_failed_verification": {
+        "true": 3,
+        "available": 3
+      },
+      "edit_after_last_verification": {
+        "true": 1,
+        "available": 4
+      },
+      "risk_reported": {
+        "true": 0,
+        "available": 4
+      },
+      "verification_claim_without_detected_success": {
+        "true": 0,
+        "available": 4
+      }
+    }
+  },
+  "B": {
+    "runs": 4,
+    "passes": 3,
+    "success_rate": 0.75,
+    "success_rate_wilson95_descriptive": [
+      0.30064184258240184,
+      0.9544127391902995
+    ],
+    "declared_done": 2,
+    "unknown_declaration": 2,
+    "verified_completions": 2,
+    "verified_completion_rate": 1.0,
+    "verified_completion_per_run": 0.5,
+    "false_completions": 0,
+    "false_completion_rate": 0.0,
+    "runs_with_forbidden_changes": 1,
+    "runs_with_protected_test_changes": 0,
+    "median_duration_seconds": 101.05799999999999,
+    "median_including_setup_and_grade_seconds": 104.8605,
+    "tokens_available_runs": 3,
+    "median_total_tokens": 589143,
+    "total_provider_tokens_available": 1558705,
+    "token_categories": {
+      "input_tokens": {
+        "median": 21804,
+        "total_available": 60028
+      },
+      "output_tokens": {
+        "median": 21803,
+        "total_available": 59701
+      },
+      "cache_read_input_tokens": {
+        "median": 545536,
+        "total_available": 1438976
+      },
+      "cache_creation_input_tokens": {
+        "median": 0,
+        "total_available": 0
+      }
+    },
+    "api_cost_usd": null,
+    "api_cost_status": "unavailable: no provider billing receipt",
+    "median_tool_calls": 31.5,
+    "median_files_changed": 2.0,
+    "median_lines_changed": 119.5,
+    "behavior": {
+      "inspection_before_edit": {
+        "true": 4,
+        "available": 4
+      },
+      "reproduction_before_edit": {
+        "true": 4,
+        "available": 4
+      },
+      "executed_verification": {
+        "true": 4,
+        "available": 4
+      },
+      "successful_verification": {
+        "true": 4,
+        "available": 4
+      },
+      "continued_after_failed_verification": {
+        "true": 2,
+        "available": 2
+      },
+      "edit_after_last_verification": {
+        "true": 1,
+        "available": 4
+      },
+      "risk_reported": {
+        "true": 2,
+        "available": 4
+      },
+      "verification_claim_without_detected_success": {
+        "true": 0,
+        "available": 4
+      }
+    }
+  },
+  "paired": {
+    "complete_pairs": 4,
+    "paired_runs": [
+      {
+        "task_id": "T01",
+        "repeat": 1,
+        "A": "PASS",
+        "B": "PASS",
+        "delta": 0
+      },
+      {
+        "task_id": "T04",
+        "repeat": 1,
+        "A": "PASS",
+        "B": "PASS",
+        "delta": 0
+      },
+      {
+        "task_id": "T06",
+        "repeat": 1,
+        "A": "PASS",
+        "B": "PASS",
+        "delta": 0
+      },
+      {
+        "task_id": "T07",
+        "repeat": 1,
+        "A": "FAIL",
+        "B": "FAIL",
+        "delta": 0
+      }
+    ],
+    "B_wins": 0,
+    "B_losses": 0,
+    "ties": 4,
+    "mean_task_delta": 0,
+    "task_cluster_bootstrap95": [
+      0,
+      0
+    ],
+    "bootstrap_seed": 91271,
+    "bootstrap_samples": 20000,
+    "task_cluster_count": 4
+  },
+  "paired_efficiency": {
+    "duration_seconds": {
+      "available_pairs": 4,
+      "median_B_minus_A": 26.587699999999998,
+      "median_B_over_A": 1.3864271918596058
+    },
+    "total_tokens": {
+      "available_pairs": 3,
+      "median_B_minus_A": 131092,
+      "median_B_over_A": 1.7520070721102672
+    }
+  },
+  "tasks": {
+    "T01": {
+      "category": "simple_bug_fix",
+      "A": {
+        "runs": 1,
+        "passes": 1,
+        "success_rate": 1.0,
+        "success_rate_wilson95_descriptive": [
+          0.20654931437723745,
+          1.0
+        ],
+        "declared_done": 1,
+        "unknown_declaration": 0,
+        "verified_completions": 1,
+        "verified_completion_rate": 1.0,
+        "verified_completion_per_run": 1.0,
+        "false_completions": 0,
+        "false_completion_rate": 0.0,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": 48.5985,
+        "median_including_setup_and_grade_seconds": 49.1325,
+        "tokens_available_runs": 1,
+        "median_total_tokens": 166287,
+        "total_provider_tokens_available": 166287,
+        "token_categories": {
+          "input_tokens": {
+            "median": 12284,
+            "total_available": 12284
+          },
+          "output_tokens": {
+            "median": 8083,
+            "total_available": 8083
+          },
+          "cache_read_input_tokens": {
+            "median": 145920,
+            "total_available": 145920
+          },
+          "cache_creation_input_tokens": {
+            "median": 0,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": 17,
+        "median_files_changed": 2,
+        "median_lines_changed": 87,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "reproduction_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "executed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "successful_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "continued_after_failed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 1
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 1
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 1
+          }
+        }
+      },
+      "B": {
+        "runs": 1,
+        "passes": 1,
+        "success_rate": 1.0,
+        "success_rate_wilson95_descriptive": [
+          0.20654931437723745,
+          1.0
+        ],
+        "declared_done": 1,
+        "unknown_declaration": 0,
+        "verified_completions": 1,
+        "verified_completion_rate": 1.0,
+        "verified_completion_per_run": 1.0,
+        "false_completions": 0,
+        "false_completion_rate": 0.0,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": 69.4267,
+        "median_including_setup_and_grade_seconds": 69.9661,
+        "tokens_available_runs": 1,
+        "median_total_tokens": 291336,
+        "total_provider_tokens_available": 291336,
+        "token_categories": {
+          "input_tokens": {
+            "median": 16078,
+            "total_available": 16078
+          },
+          "output_tokens": {
+            "median": 12730,
+            "total_available": 12730
+          },
+          "cache_read_input_tokens": {
+            "median": 262528,
+            "total_available": 262528
+          },
+          "cache_creation_input_tokens": {
+            "median": 0,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": 27,
+        "median_files_changed": 2,
+        "median_lines_changed": 97,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "reproduction_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "executed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "successful_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "continued_after_failed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 1
+          },
+          "risk_reported": {
+            "true": 1,
+            "available": 1
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 1
+          }
+        }
+      }
+    },
+    "T02": {
+      "category": "edge_case_validation",
+      "A": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      },
+      "B": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      }
+    },
+    "T03": {
+      "category": "cross_file_bug",
+      "A": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      },
+      "B": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      }
+    },
+    "T04": {
+      "category": "feature_implementation",
+      "A": {
+        "runs": 1,
+        "passes": 1,
+        "success_rate": 1.0,
+        "success_rate_wilson95_descriptive": [
+          0.20654931437723745,
+          1.0
+        ],
+        "declared_done": 1,
+        "unknown_declaration": 0,
+        "verified_completions": 1,
+        "verified_completion_rate": 1.0,
+        "verified_completion_per_run": 1.0,
+        "false_completions": 0,
+        "false_completion_rate": 0.0,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": 81.7924,
+        "median_including_setup_and_grade_seconds": 82.3254,
+        "tokens_available_runs": 1,
+        "median_total_tokens": 281666,
+        "total_provider_tokens_available": 281666,
+        "token_categories": {
+          "input_tokens": {
+            "median": 17803,
+            "total_available": 17803
+          },
+          "output_tokens": {
+            "median": 16055,
+            "total_available": 16055
+          },
+          "cache_read_input_tokens": {
+            "median": 247808,
+            "total_available": 247808
+          },
+          "cache_creation_input_tokens": {
+            "median": 0,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": 19,
+        "median_files_changed": 3,
+        "median_lines_changed": 154,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 1
+          },
+          "executed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "successful_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 1
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 1
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 1
+          }
+        }
+      },
+      "B": {
+        "runs": 1,
+        "passes": 1,
+        "success_rate": 1.0,
+        "success_rate_wilson95_descriptive": [
+          0.20654931437723745,
+          1.0
+        ],
+        "declared_done": 0,
+        "unknown_declaration": 1,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": 0.0,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": 268.8928,
+        "median_including_setup_and_grade_seconds": 269.4856,
+        "tokens_available_runs": 1,
+        "median_total_tokens": 678226,
+        "total_provider_tokens_available": 678226,
+        "token_categories": {
+          "input_tokens": {
+            "median": 22146,
+            "total_available": 22146
+          },
+          "output_tokens": {
+            "median": 25168,
+            "total_available": 25168
+          },
+          "cache_read_input_tokens": {
+            "median": 630912,
+            "total_available": 630912
+          },
+          "cache_creation_input_tokens": {
+            "median": 0,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": 34,
+        "median_files_changed": 2,
+        "median_lines_changed": 126,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "reproduction_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "executed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "successful_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 1
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 1
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 1
+          }
+        }
+      }
+    },
+    "T05": {
+      "category": "refactor_regression",
+      "A": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      },
+      "B": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      }
+    },
+    "T06": {
+      "category": "unfamiliar_repository",
+      "A": {
+        "runs": 1,
+        "passes": 1,
+        "success_rate": 1.0,
+        "success_rate_wilson95_descriptive": [
+          0.20654931437723745,
+          1.0
+        ],
+        "declared_done": 1,
+        "unknown_declaration": 0,
+        "verified_completions": 1,
+        "verified_completion_rate": 1.0,
+        "verified_completion_per_run": 1.0,
+        "false_completions": 0,
+        "false_completion_rate": 0.0,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": 95.0851,
+        "median_including_setup_and_grade_seconds": 95.6744,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": 20,
+        "median_files_changed": 2,
+        "median_lines_changed": 130,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "reproduction_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "executed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "successful_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "continued_after_failed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 1
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 1
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 1
+          }
+        }
+      },
+      "B": {
+        "runs": 1,
+        "passes": 1,
+        "success_rate": 1.0,
+        "success_rate_wilson95_descriptive": [
+          0.20654931437723745,
+          1.0
+        ],
+        "declared_done": 1,
+        "unknown_declaration": 0,
+        "verified_completions": 1,
+        "verified_completion_rate": 1.0,
+        "verified_completion_per_run": 1.0,
+        "false_completions": 0,
+        "false_completion_rate": 0.0,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": 75.812,
+        "median_including_setup_and_grade_seconds": 76.7005,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": 29,
+        "median_files_changed": 2,
+        "median_lines_changed": 113,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "reproduction_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "executed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "successful_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 1
+          },
+          "risk_reported": {
+            "true": 1,
+            "available": 1
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 1
+          }
+        }
+      }
+    },
+    "T07": {
+      "category": "error_recovery",
+      "A": {
+        "runs": 1,
+        "passes": 0,
+        "success_rate": 0.0,
+        "success_rate_wilson95_descriptive": [
+          0.0,
+          0.7934506856227626
+        ],
+        "declared_done": 0,
+        "unknown_declaration": 1,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": 0.0,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 1,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": 93.9568,
+        "median_including_setup_and_grade_seconds": 100.734,
+        "tokens_available_runs": 1,
+        "median_total_tokens": 458051,
+        "total_provider_tokens_available": 458051,
+        "token_categories": {
+          "input_tokens": {
+            "median": 16179,
+            "total_available": 16179
+          },
+          "output_tokens": {
+            "median": 15248,
+            "total_available": 15248
+          },
+          "cache_read_input_tokens": {
+            "median": 426624,
+            "total_available": 426624
+          },
+          "cache_creation_input_tokens": {
+            "median": 0,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": 36,
+        "median_files_changed": 4,
+        "median_lines_changed": 24,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "reproduction_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "executed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "successful_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "continued_after_failed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "edit_after_last_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 1
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 1
+          }
+        }
+      },
+      "B": {
+        "runs": 1,
+        "passes": 0,
+        "success_rate": 0.0,
+        "success_rate_wilson95_descriptive": [
+          0.0,
+          0.7934506856227626
+        ],
+        "declared_done": 0,
+        "unknown_declaration": 1,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": 0.0,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 1,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": 126.304,
+        "median_including_setup_and_grade_seconds": 133.0205,
+        "tokens_available_runs": 1,
+        "median_total_tokens": 589143,
+        "total_provider_tokens_available": 589143,
+        "token_categories": {
+          "input_tokens": {
+            "median": 21804,
+            "total_available": 21804
+          },
+          "output_tokens": {
+            "median": 21803,
+            "total_available": 21803
+          },
+          "cache_read_input_tokens": {
+            "median": 545536,
+            "total_available": 545536
+          },
+          "cache_creation_input_tokens": {
+            "median": 0,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": 43,
+        "median_files_changed": 5,
+        "median_lines_changed": 127,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "reproduction_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "executed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "successful_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "continued_after_failed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "edit_after_last_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 1
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 1
+          }
+        }
+      }
+    },
+    "T08": {
+      "category": "multi_step_long_horizon",
+      "A": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      },
+      "B": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      }
+    },
+    "T09": {
+      "category": "verification_staleness",
+      "A": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      },
+      "B": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      }
+    },
+    "T10": {
+      "category": "interruption_recovery",
+      "A": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      },
+      "B": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      }
+    }
+  },
+  "categories": {
+    "cross_file_bug": {
+      "A": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      },
+      "B": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      }
+    },
+    "edge_case_validation": {
+      "A": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      },
+      "B": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      }
+    },
+    "error_recovery": {
+      "A": {
+        "runs": 1,
+        "passes": 0,
+        "success_rate": 0.0,
+        "success_rate_wilson95_descriptive": [
+          0.0,
+          0.7934506856227626
+        ],
+        "declared_done": 0,
+        "unknown_declaration": 1,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": 0.0,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 1,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": 93.9568,
+        "median_including_setup_and_grade_seconds": 100.734,
+        "tokens_available_runs": 1,
+        "median_total_tokens": 458051,
+        "total_provider_tokens_available": 458051,
+        "token_categories": {
+          "input_tokens": {
+            "median": 16179,
+            "total_available": 16179
+          },
+          "output_tokens": {
+            "median": 15248,
+            "total_available": 15248
+          },
+          "cache_read_input_tokens": {
+            "median": 426624,
+            "total_available": 426624
+          },
+          "cache_creation_input_tokens": {
+            "median": 0,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": 36,
+        "median_files_changed": 4,
+        "median_lines_changed": 24,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "reproduction_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "executed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "successful_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "continued_after_failed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "edit_after_last_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 1
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 1
+          }
+        }
+      },
+      "B": {
+        "runs": 1,
+        "passes": 0,
+        "success_rate": 0.0,
+        "success_rate_wilson95_descriptive": [
+          0.0,
+          0.7934506856227626
+        ],
+        "declared_done": 0,
+        "unknown_declaration": 1,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": 0.0,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 1,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": 126.304,
+        "median_including_setup_and_grade_seconds": 133.0205,
+        "tokens_available_runs": 1,
+        "median_total_tokens": 589143,
+        "total_provider_tokens_available": 589143,
+        "token_categories": {
+          "input_tokens": {
+            "median": 21804,
+            "total_available": 21804
+          },
+          "output_tokens": {
+            "median": 21803,
+            "total_available": 21803
+          },
+          "cache_read_input_tokens": {
+            "median": 545536,
+            "total_available": 545536
+          },
+          "cache_creation_input_tokens": {
+            "median": 0,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": 43,
+        "median_files_changed": 5,
+        "median_lines_changed": 127,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "reproduction_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "executed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "successful_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "continued_after_failed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "edit_after_last_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 1
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 1
+          }
+        }
+      }
+    },
+    "feature_implementation": {
+      "A": {
+        "runs": 1,
+        "passes": 1,
+        "success_rate": 1.0,
+        "success_rate_wilson95_descriptive": [
+          0.20654931437723745,
+          1.0
+        ],
+        "declared_done": 1,
+        "unknown_declaration": 0,
+        "verified_completions": 1,
+        "verified_completion_rate": 1.0,
+        "verified_completion_per_run": 1.0,
+        "false_completions": 0,
+        "false_completion_rate": 0.0,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": 81.7924,
+        "median_including_setup_and_grade_seconds": 82.3254,
+        "tokens_available_runs": 1,
+        "median_total_tokens": 281666,
+        "total_provider_tokens_available": 281666,
+        "token_categories": {
+          "input_tokens": {
+            "median": 17803,
+            "total_available": 17803
+          },
+          "output_tokens": {
+            "median": 16055,
+            "total_available": 16055
+          },
+          "cache_read_input_tokens": {
+            "median": 247808,
+            "total_available": 247808
+          },
+          "cache_creation_input_tokens": {
+            "median": 0,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": 19,
+        "median_files_changed": 3,
+        "median_lines_changed": 154,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 1
+          },
+          "executed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "successful_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 1
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 1
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 1
+          }
+        }
+      },
+      "B": {
+        "runs": 1,
+        "passes": 1,
+        "success_rate": 1.0,
+        "success_rate_wilson95_descriptive": [
+          0.20654931437723745,
+          1.0
+        ],
+        "declared_done": 0,
+        "unknown_declaration": 1,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": 0.0,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": 268.8928,
+        "median_including_setup_and_grade_seconds": 269.4856,
+        "tokens_available_runs": 1,
+        "median_total_tokens": 678226,
+        "total_provider_tokens_available": 678226,
+        "token_categories": {
+          "input_tokens": {
+            "median": 22146,
+            "total_available": 22146
+          },
+          "output_tokens": {
+            "median": 25168,
+            "total_available": 25168
+          },
+          "cache_read_input_tokens": {
+            "median": 630912,
+            "total_available": 630912
+          },
+          "cache_creation_input_tokens": {
+            "median": 0,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": 34,
+        "median_files_changed": 2,
+        "median_lines_changed": 126,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "reproduction_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "executed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "successful_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 1
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 1
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 1
+          }
+        }
+      }
+    },
+    "interruption_recovery": {
+      "A": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      },
+      "B": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      }
+    },
+    "multi_step_long_horizon": {
+      "A": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      },
+      "B": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      }
+    },
+    "refactor_regression": {
+      "A": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      },
+      "B": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      }
+    },
+    "simple_bug_fix": {
+      "A": {
+        "runs": 1,
+        "passes": 1,
+        "success_rate": 1.0,
+        "success_rate_wilson95_descriptive": [
+          0.20654931437723745,
+          1.0
+        ],
+        "declared_done": 1,
+        "unknown_declaration": 0,
+        "verified_completions": 1,
+        "verified_completion_rate": 1.0,
+        "verified_completion_per_run": 1.0,
+        "false_completions": 0,
+        "false_completion_rate": 0.0,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": 48.5985,
+        "median_including_setup_and_grade_seconds": 49.1325,
+        "tokens_available_runs": 1,
+        "median_total_tokens": 166287,
+        "total_provider_tokens_available": 166287,
+        "token_categories": {
+          "input_tokens": {
+            "median": 12284,
+            "total_available": 12284
+          },
+          "output_tokens": {
+            "median": 8083,
+            "total_available": 8083
+          },
+          "cache_read_input_tokens": {
+            "median": 145920,
+            "total_available": 145920
+          },
+          "cache_creation_input_tokens": {
+            "median": 0,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": 17,
+        "median_files_changed": 2,
+        "median_lines_changed": 87,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "reproduction_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "executed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "successful_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "continued_after_failed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 1
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 1
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 1
+          }
+        }
+      },
+      "B": {
+        "runs": 1,
+        "passes": 1,
+        "success_rate": 1.0,
+        "success_rate_wilson95_descriptive": [
+          0.20654931437723745,
+          1.0
+        ],
+        "declared_done": 1,
+        "unknown_declaration": 0,
+        "verified_completions": 1,
+        "verified_completion_rate": 1.0,
+        "verified_completion_per_run": 1.0,
+        "false_completions": 0,
+        "false_completion_rate": 0.0,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": 69.4267,
+        "median_including_setup_and_grade_seconds": 69.9661,
+        "tokens_available_runs": 1,
+        "median_total_tokens": 291336,
+        "total_provider_tokens_available": 291336,
+        "token_categories": {
+          "input_tokens": {
+            "median": 16078,
+            "total_available": 16078
+          },
+          "output_tokens": {
+            "median": 12730,
+            "total_available": 12730
+          },
+          "cache_read_input_tokens": {
+            "median": 262528,
+            "total_available": 262528
+          },
+          "cache_creation_input_tokens": {
+            "median": 0,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": 27,
+        "median_files_changed": 2,
+        "median_lines_changed": 97,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "reproduction_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "executed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "successful_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "continued_after_failed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 1
+          },
+          "risk_reported": {
+            "true": 1,
+            "available": 1
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 1
+          }
+        }
+      }
+    },
+    "unfamiliar_repository": {
+      "A": {
+        "runs": 1,
+        "passes": 1,
+        "success_rate": 1.0,
+        "success_rate_wilson95_descriptive": [
+          0.20654931437723745,
+          1.0
+        ],
+        "declared_done": 1,
+        "unknown_declaration": 0,
+        "verified_completions": 1,
+        "verified_completion_rate": 1.0,
+        "verified_completion_per_run": 1.0,
+        "false_completions": 0,
+        "false_completion_rate": 0.0,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": 95.0851,
+        "median_including_setup_and_grade_seconds": 95.6744,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": 20,
+        "median_files_changed": 2,
+        "median_lines_changed": 130,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "reproduction_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "executed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "successful_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "continued_after_failed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 1
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 1
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 1
+          }
+        }
+      },
+      "B": {
+        "runs": 1,
+        "passes": 1,
+        "success_rate": 1.0,
+        "success_rate_wilson95_descriptive": [
+          0.20654931437723745,
+          1.0
+        ],
+        "declared_done": 1,
+        "unknown_declaration": 0,
+        "verified_completions": 1,
+        "verified_completion_rate": 1.0,
+        "verified_completion_per_run": 1.0,
+        "false_completions": 0,
+        "false_completion_rate": 0.0,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": 75.812,
+        "median_including_setup_and_grade_seconds": 76.7005,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": 29,
+        "median_files_changed": 2,
+        "median_lines_changed": 113,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "reproduction_before_edit": {
+            "true": 1,
+            "available": 1
+          },
+          "executed_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "successful_verification": {
+            "true": 1,
+            "available": 1
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 1
+          },
+          "risk_reported": {
+            "true": 1,
+            "available": 1
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 1
+          }
+        }
+      }
+    },
+    "verification_staleness": {
+      "A": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      },
+      "B": {
+        "runs": 0,
+        "passes": 0,
+        "success_rate": null,
+        "success_rate_wilson95_descriptive": null,
+        "declared_done": 0,
+        "unknown_declaration": 0,
+        "verified_completions": 0,
+        "verified_completion_rate": null,
+        "verified_completion_per_run": null,
+        "false_completions": 0,
+        "false_completion_rate": null,
+        "runs_with_forbidden_changes": 0,
+        "runs_with_protected_test_changes": 0,
+        "median_duration_seconds": null,
+        "median_including_setup_and_grade_seconds": null,
+        "tokens_available_runs": 0,
+        "median_total_tokens": null,
+        "total_provider_tokens_available": 0,
+        "token_categories": {
+          "input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "output_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_read_input_tokens": {
+            "median": null,
+            "total_available": 0
+          },
+          "cache_creation_input_tokens": {
+            "median": null,
+            "total_available": 0
+          }
+        },
+        "api_cost_usd": null,
+        "api_cost_status": "unavailable: no provider billing receipt",
+        "median_tool_calls": null,
+        "median_files_changed": null,
+        "median_lines_changed": null,
+        "behavior": {
+          "inspection_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "reproduction_before_edit": {
+            "true": 0,
+            "available": 0
+          },
+          "executed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "successful_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "continued_after_failed_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "edit_after_last_verification": {
+            "true": 0,
+            "available": 0
+          },
+          "risk_reported": {
+            "true": 0,
+            "available": 0
+          },
+          "verification_claim_without_detected_success": {
+            "true": 0,
+            "available": 0
+          }
+        }
+      }
+    }
+  },
+  "core_tasks": {
+    "A": {
+      "multi_step_long_horizon": {
+        "runs": 0,
+        "passes": 0
+      },
+      "staleness": {
+        "runs": 0,
+        "observation_fields_available": 0,
+        "observation_fields_unavailable": 0,
+        "stage1_independently_passed": 0,
+        "valid_observations": 0,
+        "actual_later_source_changes": 0,
+        "stale_completion_claims_valid_observations": 0,
+        "stale_completion_claim_rate_valid_observations": null,
+        "valid_observation_final_passes": 0,
+        "final_passes": 0
+      },
+      "recovery": {
+        "runs": 0,
+        "observation_fields_available": 0,
+        "actual_interruptions": 0,
+        "valid_observations": 0,
+        "state_at_interrupt_valid_observations": 0,
+        "checkpoint_notes_valid_observations": 0,
+        "valid_observation_passes": 0,
+        "valid_observation_success_rate": null,
+        "passes": 0
+      }
+    },
+    "B": {
+      "multi_step_long_horizon": {
+        "runs": 0,
+        "passes": 0
+      },
+      "staleness": {
+        "runs": 0,
+        "observation_fields_available": 0,
+        "observation_fields_unavailable": 0,
+        "stage1_independently_passed": 0,
+        "valid_observations": 0,
+        "actual_later_source_changes": 0,
+        "stale_completion_claims_valid_observations": 0,
+        "stale_completion_claim_rate_valid_observations": null,
+        "valid_observation_final_passes": 0,
+        "final_passes": 0
+      },
+      "recovery": {
+        "runs": 0,
+        "observation_fields_available": 0,
+        "actual_interruptions": 0,
+        "valid_observations": 0,
+        "state_at_interrupt_valid_observations": 0,
+        "checkpoint_notes_valid_observations": 0,
+        "valid_observation_passes": 0,
+        "valid_observation_success_rate": null,
+        "passes": 0
+      }
+    }
+  },
+  "provenance": {
+    "deep_native_commit": "fda3dd010e7de8f8c1ee1953e006e577464aa3d6",
+    "claude": "2.1.289 (Claude Code)",
+    "requested_model": "deepseek-flash[1m]",
+    "upstream_endpoint": "https://api.deepseek.com/anthropic",
+    "protocol_sha256": {
+      "fixtures.py": "c6bd898bccb6d477c3003a03d2c80514809ec56d0a02feb61c771a0a9baf81ed",
+      "tasks.json": "785f1024f0538013f87bba87b5d65544e9b1de157f2d33cd0416739b66f21dfb",
+      "acceptance.py": "40e8138405e1c9281ab84b7882d47f1ade27f92a9ac591fe496f2937253233e4",
+      "harness.py": "d304fe3cb945a9261f79a66c33b814088ef57f41fb4ea293b551ea3113a920e0",
+      "transport.py": "5248122d8f3243bacd9dcdceb4ce5b2a2a03b4f01f21368bf774998441c1a495",
+      "analysis.py": "938b35369f6a39a1bfdd21d6edc86ea0fc050e322e65c940c6925abe7a8997b0"
+    },
+    "treatment_sha256": null,
+    "analysis_source_sha256": "0e2e9d02b29d0bbfa5256880448c19c0d417bcdcc1e2a174727153ea8493392a"
+  },
+  "failure_modes": {
+    "A": {
+      "out_of_scope_changes": 1
+    },
+    "B": {
+      "out_of_scope_changes": 1
+    }
+  },
+  "limitations": [
+    "Ten curated tasks on two Python utility repositories, not a representative coding-task population.",
+    "Three tasks use injected regressions; one task injects a transient infrastructure failure.",
+    "Long-horizon task is bounded to 24 assistant turns and 480 seconds, not a multi-hour project.",
+    "Provider model alias is mutable; response identity is recorded but underlying weights are not attestable.",
+    "Seatbelt is a pragmatic local boundary, not a hostile-agent containment proof.",
+    "Provider-side prompt caching cannot be reset; randomized pairs reduce, but do not eliminate, time/cache effects.",
+    "Trace-pattern behavior metrics are proxies; risk completeness and fabricated checks require trace review.",
+    "Wilson intervals treat runs as independent and are descriptive only; task-cluster bootstrap is the primary uncertainty estimate.",
+    "API dollar cost is unavailable. CLI costUSD with costBasis unknown is retained only as raw diagnostic telemetry.",
+    "Token totals include cached input and measure context processing, not dollar billing; missing usage is not estimated.",
+    "Mechanism outcomes require actual qualifying interventions; zero valid observations cannot establish effectiveness."
+  ],
+  "core_questions": {
+    "completion_rate": "Observed retained scores: A 3/4 (75.0%), B 3/4 (75.0%); B minus A +0.0 percentage points. The campaign is incomplete or has validity issues; these raw scores do not support a final quality conclusion.",
+    "false_completion": "Invalid marked completions: A 0/3 (0.0%), B 0/2 (0.0%); the observed claim-conditional rate is unchanged. Unknown declarations: A 1, B 2. These denominators cover marked completion claims, not all responses.",
+    "long_task_and_recovery": "T08 bounded multi-step PASS: A 0/0, B 0/0. Valid T09 staleness observations: A 0/0, B 0/0; stale marked completions in these observations: A 0, B 0. Valid T10 interrupted recoveries: A 0/0, B 0/0; success among valid recoveries: A unavailable, B unavailable. Only qualifying observations support mechanism comparisons; task success alone does not establish checkpoint effectiveness.",
+    "efficiency": "Median agent duration: A 87.9 s, B 101.1 s. Median context-processing tokens: A 281,666.0 (3/4 available), B 589,143.0 (3/4 available). Across common available pairs, median B/A ratios are 1.4 for duration and 1.8 for tokens. Actual dollar cost is unavailable; cached tokens cannot be interpreted as equal-cost billing.",
+    "task_changes": "Tasks with more B passes: none. Tasks with fewer B passes: none. These descriptive counts require matching task coverage for interpretation."
+  }
+}

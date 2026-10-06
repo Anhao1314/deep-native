@@ -1,0 +1,129 @@
+diff --git a/boltons/iterutils.py b/boltons/iterutils.py
+index e8ccd61..adefc31 100644
+--- a/boltons/iterutils.py
++++ b/boltons/iterutils.py
+@@ -1361,7 +1361,7 @@ def get_path(root, path, default=_UNSET):
+     try:
+         for seg in path:
+             try:
+-                cur = root[seg]
++                cur = cur[seg]
+             except (KeyError, IndexError) as exc:
+                 raise PathAccessError(exc, seg, path)
+             except TypeError as exc:
+diff --git a/agent_tests/test_get_path.py b/agent_tests/test_get_path.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/test_get_path.py
+@@ -0,0 +1,111 @@
++"""Regression tests for get_path: each path segment must be looked up
++against the value reached by the previous segment, not against the
++original root.
++"""
++import os
++import sys
++import unittest
++
++sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir)))
++
++from boltons.iterutils import PathAccessError, get_path  # noqa: E402
++
++
++class TestGetPathNestedRoots(unittest.TestCase):
++    def test_deeply_nested_mapping(self):
++        root = {'a': {'b': {'c': {'d': 'value'}}}}
++        self.assertEqual(get_path(root, ('a', 'b', 'c', 'd')), 'value')
++
++    def test_segment_repeated_at_outer_root(self):
++        # 'a' exists both at the outer root and inside the nested mapping;
++        # the second segment must be resolved against the nested mapping.
++        root = {'a': {'a': 'nested'}, 'b': 'outer'}
++        self.assertEqual(get_path(root, ('a', 'a')), 'nested')
++
++    def test_later_segment_found_only_at_outer_root(self):
++        # 'b' is only reachable through the nested mapping, never from root.
++        root = {'out': {'b': 1}}
++        self.assertEqual(get_path(root, ('out', 'b')), 1)
++
++    def test_mixed_mappings_and_lists(self):
++        root = {'a': {'b': {'c': [[1], [2], [3]]}}}
++        self.assertEqual(get_path(root, ('a', 'b', 'c', 2, 0)), 3)
++
++    def test_mappings_inside_tuple(self):
++        root = {'k': (10, {'m': 20})}
++        self.assertEqual(get_path(root, ('k', 1, 'm')), 20)
++
++    def test_list_of_lists(self):
++        self.assertEqual(get_path([[1, 2], [3, 4]], (1, 0)), 3)
++
++
++class TestGetPathStringPaths(unittest.TestCase):
++    def test_dotted_nested_mapping(self):
++        root = {'a': {'b': {'c': 'value'}}}
++        self.assertEqual(get_path(root, 'a.b.c'), 'value')
++
++    def test_dotted_list_index(self):
++        root = {'key': ['test']}
++        self.assertEqual(get_path(root, 'key.0'), 'test')
++
++    def test_dotted_deep_list_indices(self):
++        root = {'a': {'b': {'c': [[1], [2], [3]]}}}
++        self.assertEqual(get_path(root, 'a.b.c.2.0'), 3)
++
++    def test_single_index_string_on_list(self):
++        self.assertEqual(get_path(['test'], '0'), 'test')
++
++
++class TestGetPathDefaults(unittest.TestCase):
++    def test_default_on_missing_nested_segment(self):
++        root = {'a': {'b': 1}}
++        self.assertEqual(get_path(root, ('a', 'z'), default='dflt'), 'dflt')
++
++    def test_default_on_out_of_range_nested_index(self):
++        root = {'a': {'b': [1]}}
++        self.assertEqual(get_path(root, ('a', 'b', 9), default=None), None)
++
++    def test_default_not_used_on_success(self):
++        root = {'a': {'b': 1}}
++        self.assertEqual(get_path(root, ('a', 'b'), default='dflt'), 1)
++
++    def test_default_not_used_for_falsy_value(self):
++        root = {'a': {'b': 0}}
++        self.assertEqual(get_path(root, ('a', 'b'), default='dflt'), 0)
++
++
++class TestPathAccessErrorDetails(unittest.TestCase):
++    def test_error_identifies_segment_and_path(self):
++        root = {'a': {'b': {'c': [1]}}}
++        with self.assertRaises(PathAccessError) as ctx:
++            get_path(root, ('a', 'b', 'c', 5))
++        err = ctx.exception
++        self.assertEqual(err.seg, 5)
++        self.assertEqual(err.path, ('a', 'b', 'c', 5))
++        self.assertIsInstance(err.exc, IndexError)
++        self.assertIsInstance(err, (KeyError, IndexError, TypeError))
++
++    def test_repr_and_str_include_details(self):
++        root = {'a': {}}
++        with self.assertRaises(PathAccessError) as ctx:
++            get_path(root, ('a', 'missing'))
++        err = ctx.exception
++        self.assertIn("'missing'", repr(err))
++        self.assertIn("'missing'", str(err))
++        self.assertIn("('a', 'missing')", str(err))
++
++    def test_non_indexable_parent_raises_type_error_detail(self):
++        with self.assertRaises(PathAccessError) as ctx:
++            get_path(1, ('a',))
++        self.assertIsInstance(ctx.exception.exc, TypeError)
++
++    def test_dotted_path_reported_as_split_sequence(self):
++        root = {'a': {'b': 1}}
++        with self.assertRaises(PathAccessError) as ctx:
++            get_path(root, 'a.z')
++        self.assertEqual(ctx.exception.seg, 'z')
++        self.assertEqual(ctx.exception.path, ['a', 'z'])
++
++
++if __name__ == '__main__':
++    unittest.main()

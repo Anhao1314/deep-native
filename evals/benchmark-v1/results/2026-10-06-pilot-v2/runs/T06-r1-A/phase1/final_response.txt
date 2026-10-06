@@ -1,0 +1,29 @@
+All checks pass with a focused one-line fix. Summary:
+
+## Investigation
+
+`boltons/iterutils.py:1364` — inside `get_path`'s lookup loop, every segment was resolved against the outer `root` rather than the value reached so far:
+
+```python
+cur = root[seg]
+```
+
+So `get_path({'a': {'b': 7}}, ('a', 'b'))` first set `cur = {'b': 7}`, then looked `root['b']` again — raising `PathAccessError` when absent, or silently returning the wrong (outer) value when a same-named key existed at the root. The int-coercion fallback for list indices already used `cur`, and the docstring/doctest already described correct nested traversal, confirming this was the defect.
+
+## Fix
+
+`boltons/iterutils.py:1364` → `cur = cur[seg]`. This walks each segment against the intermediate value while leaving the `TypeError` fallback (string → int coercion for dotted list indices), `default` short-circuit, and `PathAccessError(exc, seg, path)` construction untouched. The docstring already documents the correct behavior, so no doc changes were needed.
+
+## Regression tests
+
+New `agent_tests/test_get_path.py` (18 tests, auto-discovered by `benchmark_check.py`):
+- nested/repeated-key traversal proving later segments no longer hit the root (`{'a': {'b': 1}, 'b': 2}` → `1`)
+- dotted list-index paths (`'key.0'`, `'a.b.10'`, `'key.0.x'`), tuple/int paths, string indexing
+- defaults for missing keys, missing outer keys, and out-of-range indices; default never masking a successful nested lookup
+- `PathAccessError` details: `seg`, `path`, underlying `exc` type (`KeyError`/`IndexError`/`TypeError`), `str`/`repr`, non-indexable-parent message
+
+## Verification
+
+`python3 benchmark_check.py`: visible acceptance check passed, 77 existing pytest tests passed, 18 new unittest tests passed. The only doctest failure in the module is pre-existing and unrelated (trailing whitespace in `pairwise_iter`'s expected output at line 455); the `get_path` doctest passes.
+
+STATUS: DONE

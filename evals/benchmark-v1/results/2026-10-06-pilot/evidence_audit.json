@@ -1,7 +1,7 @@
 {
-  "schema": 1,
+  "schema": 2,
   "planned_runs": 60,
-  "audited_completed_runs": 1,
+  "audited_completed_runs": 2,
   "missing_run_ids": [
     "T01-r1-A",
     "T01-r1-B",
@@ -21,7 +21,6 @@
     "T03-r2-B",
     "T03-r3-A",
     "T03-r3-B",
-    "T04-r1-A",
     "T04-r2-A",
     "T04-r2-B",
     "T04-r3-A",
@@ -63,14 +62,24 @@
     "T10-r3-A",
     "T10-r3-B"
   ],
+  "extra_run_ids": [],
+  "duplicate_run_ids": [],
+  "campaign_complete": false,
+  "integrity_status": "PASS",
+  "status": "PASS",
+  "treatment_hash_available": false,
   "issues": [],
   "checks": [
+    {
+      "run_id": "T04-r1-A",
+      "issues": [],
+      "local_treatment_bytes_checked": false
+    },
     {
       "run_id": "T04-r1-B",
       "issues": [],
       "local_treatment_bytes_checked": true
     }
   ],
-  "status": "PASS",
-  "scope": "Artifact hashes, exact prompts, identities, token/duration aggregates, independent-grade logic, activation and actual recovery sessions. Does not independently attest hidden model weights or subjective behavior."
+  "scope": "Evidence integrity of retained runs is separate from campaign completion. Checks frozen campaign inputs, schedule identities, artifact hashes, independent grades, provider tokens/model, session durations, shared budget configuration and actual recovery sessions. Does not attest hidden model weights or subjective behavior."
 }

@@ -1,0 +1,190 @@
+diff --git a/README.rst b/README.rst
+index 870e98c..b6dfba8 100644
+--- a/README.rst
++++ b/README.rst
+@@ -117,6 +117,7 @@ Python iterables.
+ |                        | `duplicates_justseen <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.duplicates_justseen>`_,                                                       |
+ |                        | `classify_unique <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.classify_unique>`_,                                                               |
+ |                        | `longest_common_prefix <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.longest_common_prefix>`_,                                                   |
++|                        | `take_until_inclusive <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.take_until_inclusive>`_,                                                     |
+ |                        | `takewhile_inclusive <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.takewhile_inclusive>`_                                                        |
+ +------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+ | Math                   | `dft <https://more-itertools.readthedocs.io/en/stable/api.html#more_itertools.dft>`_,                                                                                       |
+diff --git a/docs/api.rst b/docs/api.rst
+index 7b40a8e..f8bccb4 100644
+--- a/docs/api.rst
++++ b/docs/api.rst
+@@ -212,6 +212,7 @@ These tools yield certain items from an iterable.
+ .. autofunction:: duplicates_justseen
+ .. autofunction:: classify_unique
+ .. autofunction:: longest_common_prefix
++.. autofunction:: take_until_inclusive
+ .. autofunction:: takewhile_inclusive
+ 
+ ----
+diff --git a/more_itertools/more.py b/more_itertools/more.py
+index 940b800..54ad82d 100755
+--- a/more_itertools/more.py
++++ b/more_itertools/more.py
+@@ -168,6 +168,7 @@ __all__ = [
+     'substrings',
+     'substrings_indexes',
+     'synchronized',
++    'take_until_inclusive',
+     'takewhile_inclusive',
+     'time_limited',
+     'unique_in_window',
+@@ -5066,6 +5067,24 @@ def partial_product(*iterables, repeat=1):
+             yield tuple(prod)
+ 
+ 
++def take_until_inclusive(iterable, pred):
++    """Yield items from *iterable* through the first item for which *pred*
++    returns ``True``. That item is included, and no later item is consumed.
++
++        >>> list(take_until_inclusive([1, 4, 6, 4, 1], lambda x: x > 5))
++        [1, 4, 6]
++
++    If *pred* is false for every item, the whole iterable is yielded.  Empty
++    input yields nothing.  This is the complement of
++    :func:`takewhile_inclusive`; it is equivalent to
++    ``takewhile_inclusive(lambda x: not pred(x), iterable)``.
++    """
++    for x in iterable:
++        yield x
++        if pred(x):
++            break
++
++
+ def takewhile_inclusive(predicate, iterable):
+     """A variant of :func:`takewhile` that yields one additional element.
+ 
+diff --git a/more_itertools/more.pyi b/more_itertools/more.pyi
+index 927cb21..b68aee6 100644
+--- a/more_itertools/more.pyi
++++ b/more_itertools/more.pyi
+@@ -141,6 +141,7 @@ __all__ = [
+     'substrings',
+     'substrings_indexes',
+     'synchronized',
++    'take_until_inclusive',
+     'takewhile_inclusive',
+     'time_limited',
+     'unique_in_window',
+@@ -957,6 +958,9 @@ def gray_product(
+ def partial_product(
+     *iterables: Iterable[_T], repeat: int = ...
+ ) -> Iterator[tuple[_T, ...]]: ...
++def take_until_inclusive(
++    iterable: Iterable[_T], pred: Callable[[_T], bool]
++) -> Iterator[_T]: ...
+ def takewhile_inclusive(
+     predicate: Callable[[_T], bool], iterable: Iterable[_T]
+ ) -> Iterator[_T]: ...
+diff --git a/agent_tests/test_take_until_inclusive.py b/agent_tests/test_take_until_inclusive.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/test_take_until_inclusive.py
+@@ -0,0 +1,102 @@
++"""Regression tests for :func:`more_itertools.take_until_inclusive`."""
++
++from __future__ import annotations
++
++import unittest
++from itertools import count
++
++import more_itertools as mi
++
++
++class TakeUntilInclusiveTests(unittest.TestCase):
++    def test_basic(self) -> None:
++        result = list(mi.take_until_inclusive(range(6), lambda x: x == 2))
++        self.assertEqual(result, [0, 1, 2])
++
++    def test_empty_iterator(self) -> None:
++        # Empty input stays empty and the predicate is never called.
++        calls = []
++        result = list(
++            mi.take_until_inclusive([], lambda x: calls.append(x) or True)
++        )
++        self.assertEqual(result, [])
++        self.assertEqual(calls, [])
++
++    def test_match_on_first_item(self) -> None:
++        result = list(mi.take_until_inclusive([5, 1, 2], lambda x: x == 5))
++        self.assertEqual(result, [5])
++
++    def test_match_on_last_item(self) -> None:
++        result = list(mi.take_until_inclusive([1, 2, 3], lambda x: x == 3))
++        self.assertEqual(result, [1, 2, 3])
++
++    def test_no_match_yields_whole_iterable(self) -> None:
++        result = list(mi.take_until_inclusive([1, 2, 3], lambda x: x > 10))
++        self.assertEqual(result, [1, 2, 3])
++
++    def test_infinite_iterable(self) -> None:
++        result = list(mi.take_until_inclusive(count(), lambda x: x == 4))
++        self.assertEqual(result, [0, 1, 2, 3, 4])
++
++    def test_predicate_evaluated_once_per_encountered_item(self) -> None:
++        calls = []
++
++        def pred(x):
++            calls.append(x)
++            return x == 2
++
++        result = list(mi.take_until_inclusive([1, 2, 3, 4, 5], pred))
++        self.assertEqual(result, [1, 2])
++        # No item after the match was encountered, and the match itself was
++        # evaluated exactly once.
++        self.assertEqual(calls, [1, 2])
++
++    def test_does_not_consume_items_after_match(self) -> None:
++        iterator = iter(range(10))
++        result = list(mi.take_until_inclusive(iterator, lambda x: x == 3))
++        self.assertEqual(result, [0, 1, 2, 3])
++        self.assertEqual(list(iterator), [4, 5, 6, 7, 8, 9])
++
++    def test_partially_consumed_stops_at_match(self) -> None:
++        calls = []
++        iterator = iter([1, 2, 3, 4])
++        gen = mi.take_until_inclusive(
++            iterator, lambda x: calls.append(x) or x == 2
++        )
++
++        self.assertEqual(next(gen), 1)
++        self.assertEqual(next(gen), 2)
++        # Nothing past the match has been pulled or evaluated yet.
++        self.assertEqual(calls, [1])
++        self.assertEqual(list(iterator), [3, 4])
++
++        with self.assertRaises(StopIteration):
++            next(gen)
++        self.assertEqual(calls, [1, 2])
++
++    def test_accepts_keyword_arguments(self) -> None:
++        result = list(
++            mi.take_until_inclusive(iterable=[1, 2, 3], pred=lambda x: x == 2)
++        )
++        self.assertEqual(result, [1, 2])
++
++    def test_equivalent_to_complement_of_takewhile_inclusive(self) -> None:
++        data = [3, 1, 4, 1, 5, 9, 2, 6]
++        pred = lambda x: x > 4
++        self.assertEqual(
++            list(mi.take_until_inclusive(data, pred)),
++            list(mi.takewhile_inclusive(lambda x: not pred(x), data)),
++        )
++
++    def test_exported_from_package(self) -> None:
++        import more_itertools.more
++
++        self.assertIs(
++            mi.take_until_inclusive,
++            more_itertools.more.take_until_inclusive,
++        )
++        self.assertIn('take_until_inclusive', more_itertools.more.__all__)
++
++
++if __name__ == '__main__':
++    unittest.main()

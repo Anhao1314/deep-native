@@ -1,0 +1,12 @@
+{
+  "attempt": "",
+  "config_hash": "9918af3dd1d5c3f74ba7b872936588255df42c28302210c39e4ba655ee967bf5",
+  "goal": "more_itertools.take_until_inclusive(iterable, pred) is exported, documented, and behaves as specified: yields through the first item where pred is true (inclusive), consumes no later items, evaluates pred once per encountered item, empty input yields nothing; python3 benchmark_check.py passes",
+  "next": "Run deep-native verify against frozen contract, then finish.",
+  "note": "Added take_until_inclusive to more.py __all__ and implementation (yield x; if pred(x): break) matching takewhile_inclusive style; stub in more.pyi; docs in docs/api.rst and README table; 12 regression tests in agent_tests/test_take_until_inclusive.py. benchmark_check.py exits 0 (933 project tests + 12 new).",
+  "schema": 1,
+  "session": "b7677501-3218-47d2-87f8-2fe04239c19e",
+  "status": "active",
+  "task_id": "7687e8c486a44dc99bb27b76b5d8b8a3",
+  "updated_at": "2026-10-06T00:41:19Z"
+}

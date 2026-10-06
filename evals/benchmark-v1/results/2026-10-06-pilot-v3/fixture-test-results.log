@@ -1,0 +1,15 @@
+test_all_fixtures_fail_and_reference_repairs_pass (test_benchmark_v1.BenchmarkTests.test_all_fixtures_fail_and_reference_repairs_pass) ... ok
+test_balanced_randomized_schedule (test_benchmark_v1.BenchmarkTests.test_balanced_randomized_schedule) ... ok
+test_behavior_links_actual_tool_results (test_benchmark_v1.BenchmarkTests.test_behavior_links_actual_tool_results) ... ok
+test_cleanup_kills_detached_descendant (test_benchmark_v1.BenchmarkTests.test_cleanup_kills_detached_descendant) ... ok
+test_completion_denominators (test_benchmark_v1.BenchmarkTests.test_completion_denominators) ... ok
+test_exact_prompt_one_source_for_arms (test_benchmark_v1.BenchmarkTests.test_exact_prompt_one_source_for_arms) ... ok
+test_freeze_detects_modification (test_benchmark_v1.BenchmarkTests.test_freeze_detects_modification) ... ok
+test_provider_usage_is_not_estimated (test_benchmark_v1.BenchmarkTests.test_provider_usage_is_not_estimated) ... ok
+test_secret_env_is_allowlist (test_benchmark_v1.BenchmarkTests.test_secret_env_is_allowlist) ... ok
+test_wilson_and_task_cluster_pairing (test_benchmark_v1.BenchmarkTests.test_wilson_and_task_cluster_pairing) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 93.013s
+
+OK

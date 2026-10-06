@@ -2,5 +2,5 @@
   "harness_commit": "5762b27b4f397bbb48c3db07a2b0dc3c8266b33d",
   "deep_native_commit": "fda3dd010e7de8f8c1ee1953e006e577464aa3d6",
   "preflight_runs_excluded": "Toy greet, transport smoke and offline reference patches. No official-task model trials before freeze.",
-  "local_validation": "70 tests passed (one optional fixture test skipped); all 10 fixtures reject initial and accept offline reference repairs in separate 9-test full validation."
+  "local_validation": "70 tests run: 69 passed and 1 optional fixture validation skipped. Separate full fixture validation: 9 tests passed, covering rejection/reference acceptance for all 10 tasks."
 }

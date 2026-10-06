@@ -1,0 +1,14 @@
+{
+  "attempt": "711c3afe1dde42efb92b490969e63e03",
+  "config_hash": "53e041f670aeaebb6ee7206805097a28633a28b32090e9c724b88d48f58aed15",
+  "goal": "ordinalize yields correct English ordinal suffixes: teens 10-19 end th, numbers ending 21-23/31-33/... get st/nd/rd by final digit, all existing string and ext_only behavior preserved; python3 benchmark_check.py exits 0",
+  "next": "Run deep-native verify on frozen worktree, then finish.",
+  "note": "Fixed boltons/strutils.py ordinalize teens guard: numstr[-2] == '2' -> '1' (twenties digit was misread as teens). Added doctest examples for 11th/22nd. New regression suite agent_tests/test_ordinalize_regression.py (8 tests incl. 0..1000 sweep vs independent suffix rule). benchmark_check.py exit 0; strutils doctests 29 passed.",
+  "risk": "No independent reviewer; verification is local (project check + doctests). Negative-number inputs and non-ASCII digit strings were not targeted and their handling is unchanged.",
+  "schema": 1,
+  "session": "80d032ce-aa16-45bd-9f36-3acb291f55b9",
+  "status": "complete",
+  "summary": "ordinalize: fixed teens detection in boltons/strutils.py (tens digit check '2' -> '1'), so 10-19 get 'th' and numbers ending 21/22/23 keep st/nd/rd; added doctest examples for 11th/22nd and regression tests in agent_tests/test_ordinalize_regression.py (8 tests, incl. 0..1000 sweep vs an independent suffix rule).",
+  "task_id": "289fc6418d63487994e33f81f29b7cee",
+  "updated_at": "2026-10-06T00:38:19Z"
+}

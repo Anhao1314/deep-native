@@ -1,0 +1,6 @@
+{
+  "harness_commit": "0d915b3039380dff9bf017ce999c6b8fcd280db0",
+  "deep_native_commit": "fda3dd010e7de8f8c1ee1953e006e577464aa3d6",
+  "restarted_after": "Initial campaign retained separately: 2 completed plus 1 partial run; detached-child cleanup repair only. Same task and schedule hashes.",
+  "validation": "71 tests run: 70 passed and 1 optional fixture validation skipped. Full 10-fixture rejection/reference acceptance already passed locally and in 4-environment CI."
+}

@@ -1,0 +1,17 @@
+{
+  "tests_before.json": "0a73c38d29ff8e0fd2a1607b0d536a3d73c409eac180c87984e9a846ab36c674",
+  "patch.diff": "f07d1ed075c13d583cbba28114604970615523b84cf2eb1358fae9af951faf23",
+  "behavior.json": "6eef1ee666e26fb8f113a5eaee35048395a4d0bd4adaa340aa9b39fa936b9df4",
+  "result.json": "2542ee8ce580dffcaec6440d5b564de20cf351cf7b8b426074e08af3c2ba19a2",
+  "metadata.json": "8af6432df40250c0b18d581e19d082d98ce569d96baa7da2ee090677f5550203",
+  "final_response.txt": "b71937f9dbc8a8cfb4280a753e1d0628e0cbf8db3c019a06c169f089947d8a65",
+  "tests_after.json": "9d43386765d6b438ed92d06ec7277229db1c8e4f46f7aeb42d0747acdb8e65e1",
+  "api_calls.json": "a0b4d8d64c0fafab97eacf3b9f07ff2268c6bdcdb124d7dbf2f320d13c4a7d22",
+  "phase1/session.json": "6d1eb4555d8e33997943d7e5898f9fce88f1d5d767f17d3ae2953c6943234095",
+  "phase1/transcript.jsonl": "4e5c13dd8ed4858a8ea3120985d3dad0b9996b06e6d83d11d79807e277e4e5d5",
+  "phase1/prompt.txt": "057721eacb0a0f1a9e577cca5b05f097f5ff23246ad4288fa429fb97feb36ab0",
+  "phase1/stderr.txt": "af2f4f95914df9c684b8c6d9f07bfa793cb3ed8a4c9f15c3022ee6363d84537e",
+  "phase1/command.json": "139147abdcbc92cdf9143d0522074858aeaa9c8c0396cca538e20946998c5b0c",
+  "phase1/source_observations.json": "e8792a0a387e6982aa5294f7010e3bd2058c2b2a30ca686d5b960588c48d3b67",
+  "phase1/final_response.txt": "b71937f9dbc8a8cfb4280a753e1d0628e0cbf8db3c019a06c169f089947d8a65"
+}

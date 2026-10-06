@@ -1,0 +1,23 @@
+{
+  "checks": [
+    {
+      "argv": [
+        "python3",
+        "benchmark_check.py"
+      ],
+      "name": "project_check"
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "pytest",
+        "--doctest-modules",
+        "boltons/strutils.py",
+        "-q"
+      ],
+      "name": "strutils_doctests"
+    }
+  ],
+  "schema": 1
+}

@@ -1,0 +1,11 @@
+{
+  "status": "INVALID_FOR_QUALITY_COMPARISON",
+  "affected_runs": [
+    "T07-r1-A",
+    "T07-r1-B"
+  ],
+  "issue": "Task prompt authorizes functionality-related edits, but the manifest allowlist omitted more_itertools/more.pyi. Both agents added legitimate public API type declarations. External contract and upstream regressions passed; FAIL came only from this unintended scope restriction.",
+  "required_next_step": "Correct the allowlists for public API/type-stub maintenance, validate prompt/criteria agreement, freeze a new campaign and rerun. Do not relabel current frozen results after seeing outputs.",
+  "raw_scores_preserved": true,
+  "model_calls_stopped": true
+}

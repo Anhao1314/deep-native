@@ -1,0 +1,108 @@
+diff --git a/boltons/strutils.py b/boltons/strutils.py
+index 5ff4f38..a3b3a50 100644
+--- a/boltons/strutils.py
++++ b/boltons/strutils.py
+@@ -164,12 +164,16 @@ def ordinalize(number, ext_only=False):
+     hi
+     >>> print(ordinalize(1515))
+     1515th
++    >>> print(ordinalize(11))
++    11th
++    >>> print(ordinalize(22))
++    22nd
+     """
+     numstr, ext = str(number), ''
+     if numstr and numstr[-1] in string.digits:
+         try:
+             # first check for teens
+-            if numstr[-2] == '2':
++            if numstr[-2] == '1':
+                 ext = 'th'
+             else:
+                 # all other cases
+diff --git a/agent_tests/test_ordinalize.py b/agent_tests/test_ordinalize.py
+new file mode 100644
+--- /dev/null
++++ b/agent_tests/test_ordinalize.py
+@@ -0,0 +1,81 @@
++"""Regression tests for boltons.strutils.ordinalize.
++
++The bug: the teens check inspected the wrong tens digit, so teen
++numbers got digit-based suffixes (11st, 12nd, 13rd) while numbers
++ending in the twenties got ``th`` (21th, 22th, 23th).
++"""
++import unittest
++
++from boltons.strutils import ordinalize
++
++
++class OrdinalizeSuffixTest(unittest.TestCase):
++    def test_single_digits(self):
++        self.assertEqual(ordinalize(0), '0th')
++        self.assertEqual(ordinalize(1), '1st')
++        self.assertEqual(ordinalize(2), '2nd')
++        self.assertEqual(ordinalize(3), '3rd')
++        self.assertEqual(ordinalize(4), '4th')
++        self.assertEqual(ordinalize(9), '9th')
++
++    def test_teens_are_th(self):
++        for number in range(10, 20):
++            self.assertEqual(ordinalize(number), '%dth' % number)
++        self.assertEqual(ordinalize(111), '111th')
++        self.assertEqual(ordinalize(112), '112th')
++        self.assertEqual(ordinalize(113), '113th')
++        self.assertEqual(ordinalize(1010), '1010th')
++
++    def test_twenties_use_last_digit(self):
++        self.assertEqual(ordinalize(20), '20th')
++        self.assertEqual(ordinalize(21), '21st')
++        self.assertEqual(ordinalize(22), '22nd')
++        self.assertEqual(ordinalize(23), '23rd')
++        self.assertEqual(ordinalize(24), '24th')
++        self.assertEqual(ordinalize(29), '29th')
++        self.assertEqual(ordinalize(121), '121st')
++        self.assertEqual(ordinalize(122), '122nd')
++        self.assertEqual(ordinalize(123), '123rd')
++        self.assertEqual(ordinalize(1224), '1224th')
++
++    def test_larger_numbers(self):
++        self.assertEqual(ordinalize(100), '100th')
++        self.assertEqual(ordinalize(1515), '1515th')
++        self.assertEqual(ordinalize(3694839230), '3694839230th')
++
++    def test_negative_numbers(self):
++        self.assertEqual(ordinalize(-1), '-1st')
++        self.assertEqual(ordinalize(-11), '-11th')
++        self.assertEqual(ordinalize(-21), '-21st')
++        self.assertEqual(ordinalize(-22), '-22nd')
++
++    def test_string_numbers(self):
++        self.assertEqual(ordinalize('1'), '1st')
++        self.assertEqual(ordinalize('11'), '11th')
++        self.assertEqual(ordinalize('22'), '22nd')
++
++    def test_non_digit_string_unchanged(self):
++        self.assertEqual(ordinalize('hi'), 'hi')
++        self.assertEqual(ordinalize(''), '')
++
++
++class OrdinalizeExtOnlyTest(unittest.TestCase):
++    def test_suffix_only(self):
++        self.assertEqual(ordinalize(1, ext_only=True), 'st')
++        self.assertEqual(ordinalize(2, ext_only=True), 'nd')
++        self.assertEqual(ordinalize(3, ext_only=True), 'rd')
++        self.assertEqual(ordinalize(4, ext_only=True), 'th')
++        self.assertEqual(ordinalize(11, ext_only=True), 'th')
++        self.assertEqual(ordinalize(12, ext_only=True), 'th')
++        self.assertEqual(ordinalize(13, ext_only=True), 'th')
++        self.assertEqual(ordinalize(21, ext_only=True), 'st')
++        self.assertEqual(ordinalize(22, ext_only=True), 'nd')
++        self.assertEqual(ordinalize(23, ext_only=True), 'rd')
++
++    def test_ext_only_leaves_non_digits_alone(self):
++        self.assertEqual(ordinalize('hi', ext_only=True), '')
++        self.assertEqual(ordinalize('', ext_only=True), '')
++
++
++if __name__ == '__main__':
++    unittest.main()

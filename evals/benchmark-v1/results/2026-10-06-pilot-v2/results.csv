@@ -1,0 +1,9 @@
+run_id,task_id,repeat,condition,task_success,declared_done,actually_valid,false_completion,duration_seconds,tool_calls,failure_mode
+T01-r1-A,T01,1,A,PASS,True,True,False,48.5985,17,
+T01-r1-B,T01,1,B,PASS,True,True,False,69.4267,27,
+T04-r1-A,T04,1,A,PASS,True,True,False,81.7924,19,
+T04-r1-B,T04,1,B,PASS,,True,False,268.8928,34,
+T06-r1-A,T06,1,A,PASS,True,True,False,95.0851,20,
+T06-r1-B,T06,1,B,PASS,True,True,False,75.812,29,
+T07-r1-A,T07,1,A,FAIL,,False,False,93.9568,36,out_of_scope_changes
+T07-r1-B,T07,1,B,FAIL,,False,False,126.304,43,out_of_scope_changes

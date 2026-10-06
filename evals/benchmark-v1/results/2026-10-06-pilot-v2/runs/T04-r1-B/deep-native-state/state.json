@@ -1,0 +1,12 @@
+{
+  "attempt": "f5260a089aed457cb09b30ff411c2a48",
+  "config_hash": "9918af3dd1d5c3f74ba7b872936588255df42c28302210c39e4ba655ee967bf5",
+  "goal": "parse_int_list accepts signed ints and signed inclusive ranges (-3--1, +2-+4, reversed endpoints, whitespace around tokens/endpoints) while preserving sorting, duplicates, empty input and custom literal delimiters; malformed ranges raise ValueError; docstring updated; new regression tests under agent_tests/; python3 benchmark_check.py passes",
+  "next": "Run deep-native verify on frozen worktree; review diff; report.",
+  "note": "Rewrote parse_int_list tokenizer (boltons/strutils.py:886): signed ints via regex fullmatch, signed inclusive ranges with re.escape'd literal range_delim and whitespace tolerance, min/max for reversed endpoints, ValueError on malformed tokens. Docstring updated with signed examples. Added agent_tests/test_parse_int_list.py (9 unittest cases). benchmark_check.py passes (77 repo tests + 9 agent tests). Differential check vs original: only '1-2-3' changed (now ValueError, as required).",
+  "schema": 1,
+  "session": "b40e9d97-e6be-4190-a6ed-1676ae073883",
+  "status": "active",
+  "task_id": "dc2e3cb654c9445882c5f2db5b2302a8",
+  "updated_at": "2026-10-06T00:35:38Z"
+}

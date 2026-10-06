@@ -1,0 +1,25 @@
+All checks pass and the diff is scoped as requested.
+
+**Implementation** (`boltons/strutils.py:886`): `parse_int_list` now parses each entry with two regexes:
+
+- `[+-]?\d+` for signed integers (`-3`, `+2`)
+- `<int> <range_delim> <int>`, with `re.escape` so custom range delimiters stay literal, for signed inclusive ranges (`-3--1`, `+2-+4`, `1--3`); endpoints are normalized with `min`/`max`, so reversed ranges like `8-5` and `-1--3` still work
+- Whitespace is stripped from every entry, and `\s*` around the range delimiter tolerates spaces around endpoints (` 8 - 5 , +2 - +4 `)
+- Empty entries and empty input are still skipped; duplicates are preserved and output stays sorted
+- Anything that is neither a valid integer nor a valid two-integer range (`1-`, `-`, `--3`, `1-2-3`, `1.2`, …) raises `ValueError('invalid integer or range: ...')`
+
+Docstring updated with signed/whitespace/reversed-endpoint semantics, `Raises:` section, and new doctest examples (verified with `pytest --doctest-modules`: 29 passed).
+
+**Tests** (`agent_tests/test_parse_int_list.py`, 11 test methods): signed ints, signed/mixed-sign/reversed ranges, whitespace, sorting and duplicates, empty input, custom delimiters including regex-special ones (`..`, `+`, `:`, `;`, `|`), and malformed inputs raising `ValueError`.
+
+**Verification** — `python3 benchmark_check.py`:
+
+```
+Visible acceptance checks passed
+77 passed in 0.10s            (existing pytest suites, unchanged)
+Ran 11 tests ... OK           (new agent_tests)
+```
+
+No existing tests, benchmark files, or configuration were modified.
+
+STATUS: DONE
