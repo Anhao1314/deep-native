@@ -82,6 +82,15 @@ class SandboxTests(unittest.TestCase):
             profile = base / 'sandbox.sb'
             profile.write_text(sandbox_profile(root, home, Path('/usr/bin'), None,
                                                read_only_paths=[acceptance, BENCH / 'acceptance.py']))
+            # The recorded deployment repository is under ~/Documents. GitHub's
+            # /Users/runner/work checkout is outside this scoped read policy;
+            # always enforce the temp sibling guard, and check the real reference
+            # only when its actual location is inside a denied tree.
+            denied_roots = [Path.home().resolve() / 'Documents', Path('/private/tmp'),
+                            Path('/private/var/tmp'), Path(tempfile.gettempdir()).resolve()]
+            real_reference = (BENCH / 'reference.py').resolve()
+            guard_real_reference = any(path == real_reference or path in real_reference.parents
+                                       for path in denied_roots)
             with socket.socket() as listener:
                 listener.bind(('127.0.0.1', 0)); listener.listen()
                 port = listener.getsockname()[1]
@@ -89,7 +98,9 @@ class SandboxTests(unittest.TestCase):
                           'acceptance,reference=map(pathlib.Path,sys.argv[1:3]); '
                           'assert acceptance.read_text()=="approved evaluator"; '
                           'assert pathlib.Path(sys.argv[4]).read_text(); '
-                          '\nfor path,op in [(reference,"read"),(pathlib.Path(sys.argv[5]),"read"),(acceptance,"write")]:\n'
+                          'checks=[(reference,"read"),(acceptance,"write")]; '
+                          '\nif sys.argv[6]=="1": checks.append((pathlib.Path(sys.argv[5]),"read"))\n'
+                          'for path,op in checks:\n'
                           ' try:\n'
                           '  path.read_text() if op=="read" else path.write_text("forbidden")\n'
                           ' except PermissionError: pass\n'
@@ -101,9 +112,9 @@ class SandboxTests(unittest.TestCase):
                           'subprocess.run([sys.executable,"-B","-c",'
                           '"from pathlib import Path;Path(\\\"child.txt\\\").write_text(\\\"ok\\\")"],check=True)\n')
                 argv = ['sandbox-exec', '-D', 'CLI_PID=999999', '-f', str(profile),
-                        '/usr/bin/python3', '-B', '-c', script, str(acceptance),
+                        str(Path(sys.executable).resolve()), '-B', '-c', script, str(acceptance),
                         str(reference), str(port), str(BENCH / 'acceptance.py'),
-                        str(BENCH / 'reference.py')]
+                        str(real_reference), '1' if guard_real_reference else '0']
                 result = subprocess.run(argv, cwd=root, capture_output=True, text=True, timeout=15)
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual((root / 'child.txt').read_text(), 'ok')
@@ -135,7 +146,7 @@ class SandboxTests(unittest.TestCase):
                           ' except PermissionError: pass\n'
                           ' else: raise AssertionError(str(path)+" "+operation+" permitted")\n')
                 argv = ['sandbox-exec', '-D', 'CLI_PID=999999', '-f', str(profile),
-                        '/usr/bin/python3', '-B', '-c', script, str(root), str(answer),
+                        str(Path(sys.executable).resolve()), '-B', '-c', script, str(root), str(answer),
                         str(old_output), str(own_output)]
                 result = subprocess.run(argv, cwd=root, capture_output=True, text=True, timeout=15)
                 self.assertEqual(result.returncode, 0, result.stderr)

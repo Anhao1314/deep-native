@@ -109,6 +109,10 @@ success alone does not prove the checkpoint mechanism caused recovery.
 ## Isolation and credentials
 
 Live execution currently supports macOS with `sandbox-exec` (Seatbelt).
+The recorded deployment keeps this harness and its artifacts under the user's
+`~/Documents/` tree. Reproduce that layout (for example, clone into
+`~/Documents/deep-native`): this profile denies that personal tree plus sibling
+temporary runs; it does not claim to hide an arbitrary checkout elsewhere on disk.
 Every run has a fresh `/private/tmp/dn-live-*/` workspace, HOME, Claude config,
 temporary directory and sessions. None is reused. No ancestor has repository
 instructions; preparation rejects upstream CLAUDE.md, AGENTS.md or `.claude` trees
